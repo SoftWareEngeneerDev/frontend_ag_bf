@@ -1,0 +1,59 @@
+<div>
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of ['Toutes (3)','En cours (1)','Expédiées (1)','Livrées (2)']"
+            [class.active]="activeTab === t.split(' ')[0]"
+            (click)="setTab(t.split(' ')[0])">{{ t }}</button>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <app-empty-state *ngIf="!loading && filtered.length === 0"
+    icon="📦" title="Aucune commande" description="Vous n'avez pas encore de commande ici.">
+  </app-empty-state>
+
+  <div class="orders-list" *ngIf="!loading">
+    <div class="glass order-card" *ngFor="let o of filtered">
+
+      <!-- Header -->
+      <div class="flex-between order-head">
+        <div class="flex gap-14" style="align-items:center">
+          <span style="font-size:36px">{{ o.product.emoji }}</span>
+          <div>
+            <div class="font-display order-name">{{ o.product.name }}</div>
+            <div class="font-mono text-muted" style="font-size:12px">
+              Réf: {{ o.id }} · {{ o.createdAt | date:'dd MMM yyyy' }}
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span [class]="fmt.orderStatusClass(o.status)">● {{ o.status | orderStatusLabel }}</span>
+          <div class="font-mono order-amount">{{ o.amount | currencyXof }}</div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="order-timeline">
+        <div class="ot-item" *ngFor="let s of steps; let i = index">
+          <div class="ot-dot" [class.done]="i <= stepIndex(o.status)">
+            {{ i <= stepIndex(o.status) ? '✓' : i + 1 }}
+          </div>
+          <div class="ot-label" [class.text-gold-c]="i <= stepIndex(o.status)">{{ s }}</div>
+          <div class="ot-line" *ngIf="i < steps.length - 1"
+               [class.done]="i < stepIndex(o.status)"></div>
+        </div>
+      </div>
+
+      <!-- Tracking -->
+      <div class="alert-cyan alert" *ngIf="o.status === 'SHIPPED' && o.trackingCode">
+        📦 Code de suivi :
+        <strong class="font-mono">{{ o.trackingCode }}</strong>
+        <button class="btn-ghost btn-sm" style="margin-left:auto">Suivre →</button>
+      </div>
+
+      <!-- Review -->
+      <button class="btn-ghost btn-sm" *ngIf="o.status === 'DELIVERED'" style="margin-top:8px">
+        ⭐ Laisser un avis
+      </button>
+    </div>
+  </div>
+</div>

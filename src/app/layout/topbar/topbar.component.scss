@@ -1,0 +1,12 @@
+.topbar {
+  height:var(--topbar-h); background:var(--bg-white);
+  border-bottom:1px solid var(--border); box-shadow:var(--shadow-xs);
+  padding:0 28px; display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:50;
+}
+.topbar-title { font-size:18px; font-weight:700; color:var(--txt); }
+.tb-actions   { display:flex; align-items:center; gap:14px; }
+.tb-search-wrap { position:relative; }
+.tb-s-icon  { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; }
+.tb-search  { width:220px; padding-left:36px; padding-top:8px; padding-bottom:8px; }
+.tb-notif   { position:relative; cursor:pointer; font-size:20px; text-decoration:none; padding:6px; border-radius:var(--r); transition:background var(--t); &:hover{background:var(--bg2);} }

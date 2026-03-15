@@ -1,0 +1,14 @@
+<div class="topbar">
+  <h1 class="topbar-title font-display">{{ title }}</h1>
+  <div class="tb-actions">
+    <div *ngIf="showSearch" class="tb-search-wrap">
+      <span class="tb-s-icon">🔍</span>
+      <input class="inp tb-search" placeholder="Rechercher...">
+    </div>
+    <a routerLink="/member/notifications" class="tb-notif">
+      🔔
+      <span class="nb-dot" *ngIf="notifs.unreadCount() > 0">{{ notifs.unreadCount() }}</span>
+    </a>
+    <app-avatar [name]="auth.currentUser()?.fullName || 'U'" [size]="34" [bg]="userBg"></app-avatar>
+  </div>
+</div>

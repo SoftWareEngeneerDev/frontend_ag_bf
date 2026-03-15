@@ -1,0 +1,21 @@
+.sg-header { margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.sg-list   { display: flex; flex-direction: column; gap: 16px; }
+.sg-card   { padding: 20px; }
+.sg-top    { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+.sg-emoji  { font-size: 40px; flex-shrink: 0; }
+.sg-info   { flex: 1; min-width: 0; }
+.sg-name   { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.sg-meta   { font-size: 12px; }
+.sg-progress { margin-bottom: 14px; }
+.sg-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.sg-kpis   { display: flex; gap: 20px; flex-wrap: wrap; }
+.sg-kpi    { text-align: center; }
+.sg-kpi-v  { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.sg-kpi-l  { font-size: 10px; }
+
+.modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px; }
+.modal-box { width:100%;max-width:480px; }
+.modal-head { padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06); }
+.modal-body { padding:20px 24px;display:flex;flex-direction:column;gap:14px; }
+.tiers-grid { display:flex;flex-direction:column;gap:8px; }
+.tier-row   { display:flex;align-items:center;justify-content:space-between;padding:10px 14px; }

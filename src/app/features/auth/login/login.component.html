@@ -1,0 +1,80 @@
+<div class="auth-page">
+
+  <!-- Left -->
+  <div class="auth-left">
+    <div class="al-logo"><app-logo [size]="20"></app-logo></div>
+    <div class="al-body">
+      <div class="al-icon">🛒</div>
+      <h2 class="al-title">
+        Ensemble, on <span class="al-highlight">économise plus</span> au Burkina Faso
+      </h2>
+      <div class="al-features">
+        <div class="al-feature" *ngFor="let f of [
+          {icon:'🔒', text:'Paiements 100% sécurisés'},
+          {icon:'👥', text:'5 247 membres actifs'},
+          {icon:'⭐', text:'Note 4.8/5 — 2 000 avis'},
+          {icon:'🇧🇫', text:'100% Made in Burkina Faso'}
+        ]">
+          <span class="af-icon">{{ f.icon }}</span>
+          <span class="af-text">{{ f.text }}</span>
+        </div>
+      </div>
+    </div>
+    <p class="al-footer">© 2024 AchatGroupéBF · Ouagadougou</p>
+  </div>
+
+  <!-- Right -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <div class="auth-header">
+        <div style="font-size:36px;margin-bottom:12px">👋</div>
+        <h2 class="auth-title">Content de vous revoir !</h2>
+        <p class="auth-sub">Connectez-vous pour accéder à vos groupes d'achat</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+        <div class="inp-group">
+          <label>Téléphone ou email</label>
+          <div class="inp-icon-wrap">
+            <span class="inp-icon">📞</span>
+            <input class="inp" formControlName="phone" placeholder="+226 76 52 86 09">
+          </div>
+        </div>
+
+        <div class="inp-group">
+          <label>Mot de passe</label>
+          <div class="inp-icon-wrap">
+            <span class="inp-icon">🔑</span>
+            <input class="inp" type="password" formControlName="password" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="auth-forgot">
+          <a routerLink="/auth/forgot-password">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="alert-red alert" *ngIf="error">⚠️ {{ error }}</div>
+
+        <button class="btn-primary btn-blk btn-lg btn-round" type="submit" [disabled]="loading">
+          <span *ngIf="!loading">Se connecter →</span>
+          <app-loading-spinner *ngIf="loading" [size]="20"></app-loading-spinner>
+        </button>
+
+        <div class="auth-switch">
+          Pas encore membre ?
+          <a routerLink="/auth/register">Créer un compte gratuit</a>
+        </div>
+      </form>
+
+      <!-- Demo box -->
+      <div class="demo-box">
+        <div class="demo-title">🧪 Accès démo rapide</div>
+        <div class="demo-btns">
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('MEMBER')">👤 Membre</button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')">🏪 Fournisseur</button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('ADMIN')">🛡 Admin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

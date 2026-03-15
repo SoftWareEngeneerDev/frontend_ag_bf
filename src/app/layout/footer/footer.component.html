@@ -1,0 +1,63 @@
+<footer class="footer">
+
+  <!-- Top band -->
+  <div class="ft-top bg-gradient-primary">
+    <div class="container">
+      <div class="ft-top-inner">
+        <div class="ft-promo">
+          <span class="ft-promo-icon">🚀</span>
+          <div>
+            <div class="ft-promo-title font-display">Achetez groupé, économisez plus !</div>
+            <div class="ft-promo-sub">Rejoignez 5 247 membres qui économisent déjà jusqu'à 40%</div>
+          </div>
+        </div>
+        <a routerLink="/auth/register" class="btn-white btn-round">
+          Commencer gratuitement →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main footer -->
+  <div class="ft-main bg-white">
+    <div class="container">
+      <div class="ft-grid">
+        <!-- Brand -->
+        <div class="ft-brand">
+          <app-logo [size]="19"></app-logo>
+          <p class="ft-desc text-muted">
+            La première plateforme d'achats groupés au Burkina Faso.
+            Économisez ensemble avec Orange Money et Moov Money.
+          </p>
+          <div class="ft-payments">
+            <span *ngFor="let p of ['🟠 Orange Money','🔵 Moov Money','🟢 Ligdicash','💳 Carte']"
+                  class="ft-pay">{{ p }}</span>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="ft-col" *ngFor="let col of footerLinks">
+          <div class="ft-col-title font-display">{{ col.title }}</div>
+          <a *ngFor="let l of col.links" href="#" class="ft-link">{{ l }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="ft-bottom">
+    <div class="container">
+      <div class="ft-bottom-inner">
+        <span class="text-muted" style="font-size:13px">
+          © {{ year }} AchatGroupéBF — Ouagadougou, Burkina Faso 🇧🇫
+        </span>
+        <div class="ft-legal">
+          <a href="#" class="text-muted">CGU</a>
+          <a href="#" class="text-muted">Confidentialité</a>
+          <a href="#" class="text-muted">Contact</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</footer>

@@ -1,0 +1,104 @@
+<div class="md-page">
+
+  <!-- Welcome banner -->
+  <div class="md-welcome">
+    <div class="mw-left">
+      <div class="mw-greeting">{{ greeting }} {{ firstName }} ! 🌅</div>
+      <p class="text-muted" style="font-size:14px;margin-top:4px">
+        Vous participez à <strong class="text-primary">{{ myGroups.length }} groupes actifs</strong>
+      </p>
+    </div>
+    <div class="mw-savings">
+      <div class="mws-label">Total économisé</div>
+      <div class="mws-val font-display font-mono">47 500 XOF</div>
+      <span class="badge-ok" style="font-size:11px">↑ +12% ce mois</span>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <app-stats-card *ngFor="let k of kpis"
+      [icon]="k.icon" [value]="k.val" [label]="k.label" [sub]="k.sub" [color]="k.color">
+    </app-stats-card>
+  </div>
+
+  <!-- Threshold alert -->
+  <div class="alert-orange alert md-alert" *ngIf="myGroups.length > 0">
+    <span style="font-size:20px">🎯</span>
+    <div>
+      <strong>Seuil atteint !</strong> Le Climatiseur 12000 BTU a atteint son minimum.
+      Payez le solde avant le 20 mars pour confirmer votre commande.
+    </div>
+    <button class="btn-orange btn-sm btn-round" style="margin-left:auto;flex-shrink:0"
+            (click)="goPayment()">
+      Payer maintenant →
+    </button>
+  </div>
+
+  <div class="md-grid">
+    <!-- Left: mes groupes -->
+    <div class="md-col-main">
+      <div class="flex-between md-section-head">
+        <h3 class="font-display md-section-title">Mes groupes actifs</h3>
+        <button class="btn-outline btn-sm btn-round" (click)="goGroups()">Voir tout →</button>
+      </div>
+
+      <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+      <div class="mg-list" *ngIf="!loading">
+        <div class="mg-item" *ngFor="let g of myGroups">
+          <div class="mg-card card">
+            <div class="mg-left">
+              <div class="mg-emoji-wrap" [class.threshold]="isThreshold(g)">
+                {{ g.product.emoji }}
+              </div>
+            </div>
+            <div class="mg-body">
+              <div class="flex-between mg-top">
+                <span class="font-display mg-name">{{ g.product.name | truncate:35 }}</span>
+                <span [class]="'badge-' + (isThreshold(g) ? 'orange' : 'primary')">
+                  {{ isThreshold(g) ? '✅ Seuil atteint' : '● Actif' }}
+                </span>
+              </div>
+              <div class="mg-prog-row">
+                <div class="prog-wrap mg-prog">
+                  <div class="prog-fill" [class.orange]="isThreshold(g)"
+                       [style.width.%]="progressPct(g)"></div>
+                </div>
+                <span class="mg-pct font-mono">{{ progressPct(g) }}%</span>
+              </div>
+              <div class="flex-between mg-footer">
+                <div>
+                  <span class="text-muted" style="font-size:12px">
+                    {{ g.currentCount }}/{{ g.minParticipants }} membres
+                  </span>
+                  <span class="mg-price font-mono">{{ g.currentPrice | currencyXof }}</span>
+                </div>
+                <button [class]="'btn-' + (isThreshold(g) ? 'orange' : 'outline-primary') + ' btn-sm btn-round'"
+                        (click)="isThreshold(g) ? goPayment() : goGroupDetail(g)">
+                  {{ isThreshold(g) ? '💳 Payer le solde' : 'Voir →' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: notifications -->
+    <div class="md-col-side">
+      <div class="flex-between md-section-head">
+        <h3 class="font-display md-section-title">Notifications</h3>
+        <button class="btn-outline btn-sm btn-round" (click)="goNotifications()">Voir tout →</button>
+      </div>
+      <div class="card-flat">
+        <app-notification-item
+          *ngFor="let n of notifs"
+          [notif]="n"
+          (clicked)="notifService.markRead(n.id)">
+        </app-notification-item>
+      </div>
+    </div>
+  </div>
+
+</div>

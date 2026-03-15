@@ -1,0 +1,163 @@
+<app-navbar></app-navbar>
+
+<app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+<div *ngIf="!loading && group" class="gd-page">
+
+  <!-- Back -->
+  <button class="btn-ghost btn-sm gd-back" (click)="goBack()">← Retour aux groupes</button>
+
+  <!-- Hero banner -->
+  <div class="gd-hero">
+    <span class="gd-emoji">{{ group.product.emoji }}</span>
+    <div class="gd-hero-info">
+      <span [class]="fmt.groupStatusClass(group.status) + ' gd-status'">
+        ● {{ group.status | groupStatusLabel }}
+      </span>
+      <h1 class="font-display gd-title">{{ group.product.name }}</h1>
+      <p class="text-muted">
+        par <strong style="color:var(--txt)">{{ group.supplier.companyName }}</strong>
+        · {{ group.product.category.name }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Contenu 2 colonnes -->
+  <div class="gd-body">
+
+    <!-- Colonne gauche -->
+    <div class="gd-left">
+
+      <!-- Progression circulaire -->
+      <div class="glass gd-card">
+        <h3 class="font-display gd-card-title">📊 Progression du groupe</h3>
+        <div class="gd-progress-wrap">
+          <app-circle-progress [size]="130" [sw]="12" [pct]="pct" [color]="isThreshold ? '#10D98B' : '#F5A623'">
+            <span class="font-display cp-val">{{ group.currentCount }}/{{ group.minParticipants }}</span>
+            <span class="text-muted cp-lbl">participants</span>
+          </app-circle-progress>
+
+          <div class="gd-prog-info">
+            <div class="font-mono gd-pct">{{ pct }}%</div>
+            <div class="text-muted" style="font-size:13px; margin-bottom:12px">de complétion</div>
+            <span class="badge-ok" *ngIf="!isThreshold">
+              🎯 Plus que {{ group.minParticipants - group.currentCount }} place(s) !
+            </span>
+            <span class="badge-gold anim-pulse" *ngIf="isThreshold">
+              ✅ Seuil atteint !
+            </span>
+            <!-- Mini avatars membres -->
+            <div class="member-avs" style="margin-top:14px">
+              <app-avatar
+                *ngFor="let av of memberAvatars.slice(0, group.currentCount); let i = index"
+                [name]="av" [size]="26" [bg]="avatarBgs[i]">
+              </app-avatar>
+              <div class="av-more" *ngIf="group.minParticipants - group.currentCount > 0">
+                +{{ group.minParticipants - group.currentCount }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compte à rebours -->
+      <div class="glass gd-card">
+        <h3 class="font-display gd-card-title">⏱ Temps restant</h3>
+        <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
+        <div *ngIf="isThreshold" class="alert-gold alert" style="margin-top:12px">
+          ⚠️ Payez le solde avant l'expiration pour confirmer votre commande.
+        </div>
+      </div>
+
+      <!-- Modalités -->
+      <div class="glass gd-card">
+        <h3 class="font-display gd-card-title">💰 Modalités de paiement</h3>
+        <div class="modal-grid">
+          <div class="modal-item" *ngFor="let m of [
+            {k:'Dépôt requis',    v:'10% du prix',                  gold:true},
+            {k:'Montant dépôt',   v:(group.depositAmount | currencyXof), gold:true},
+            {k:'Prix actuel',     v:(group.currentPrice  | currencyXof), gold:true},
+            {k:'Économie vs solo',v:(group.product.soloPrice - group.currentPrice | currencyXof), gold:false}
+          ]">
+            <div class="text-muted modal-k">{{ m.k }}</div>
+            <div class="font-mono modal-v" [class.text-gold-c]="m.gold" [class.text-ok]="!m.gold">{{ m.v }}</div>
+          </div>
+        </div>
+        <div class="alert-cyan alert" style="margin-top:14px">
+          🔒 Votre dépôt est sécurisé en escrow jusqu'à la livraison confirmée
+        </div>
+        <div class="pay-icons">
+          <span *ngFor="let p of ['🟠 Orange Money','🔵 Moov Money','🟢 Ligdicash','💳 Carte']"
+                class="badge-grey">{{ p }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="gd-right">
+
+      <!-- Paliers de prix -->
+      <div class="glass gd-card">
+        <h3 class="font-display gd-card-title">📈 Paliers de prix</h3>
+        <table class="tbl">
+          <thead>
+            <tr><th>Participants</th><th>Réduction</th><th>Prix/pers.</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of group.pricingTiers; let i = index"
+                [class.tier-active]="i === currentTierIndex(group.pricingTiers)">
+              <td>
+                ≥ {{ t.minParticipants }} pers.
+                <span *ngIf="i === currentTierIndex(group.pricingTiers)"
+                      class="badge-cyan" style="font-size:9px; margin-left:6px">actuel</span>
+              </td>
+              <td><span class="badge-ok">{{ t.discountPercent }}%</span></td>
+              <td class="font-mono tier-price">{{ t.price | currencyXof }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- CTA rejoindre -->
+      <div class="glass-gold gd-card gd-cta">
+        <h3 class="font-display" style="font-size:18px; margin-bottom:6px">Rejoindre ce groupe</h3>
+        <p class="text-muted" style="font-size:13px; margin-bottom:18px">
+          Payez seulement 10% maintenant et verrouillez votre place !
+        </p>
+        <div class="cta-amount-box">
+          <span class="text-muted" style="font-size:13px">Dépôt à payer</span>
+          <span class="font-mono font-display cta-amount">{{ group.depositAmount | currencyXof }}</span>
+        </div>
+        <button class="btn-gold btn-blk btn-lg" (click)="joinGroup()">
+          💳 Rejoindre — Dépôt {{ group.depositAmount | currencyXof }}
+        </button>
+        <p class="text-muted" style="font-size:11px; text-align:center; margin-top:10px">
+          🔒 Paiement 100% sécurisé via CinetPay
+        </p>
+      </div>
+
+      <!-- Fournisseur -->
+      <div class="glass gd-card gd-supplier">
+        <div class="sup-header">
+          <div class="sup-icon">🏪</div>
+          <div>
+            <div class="font-display sup-name">{{ group.supplier.companyName }}</div>
+            <span class="badge-ok" style="font-size:10px">✓ Fournisseur vérifié</span>
+          </div>
+        </div>
+        <div class="sup-stats">
+          <div class="sup-stat" *ngFor="let s of [
+            {v: group.supplier.totalGroups.toString(), l:'Groupes'},
+            {v: group.supplier.successRate + '%', l:'Succès'},
+            {v: group.supplier.rating.toString(), l:'Note'}
+          ]">
+            <div class="font-mono sup-val">{{ s.v }}</div>
+            <div class="text-muted sup-lbl">{{ s.l }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

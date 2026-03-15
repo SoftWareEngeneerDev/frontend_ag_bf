@@ -1,0 +1,123 @@
+<div>
+
+  <!-- Header profil -->
+  <div class="glass-gold prof-header">
+    <div class="ph-left">
+      <div class="ph-av-wrap">
+        <app-avatar [name]="user?.fullName || 'U'" [size]="72" bg="#F5A623"></app-avatar>
+        <div class="ph-av-edit">✏️</div>
+      </div>
+      <div>
+        <div class="font-display ph-name">{{ user?.fullName }}</div>
+        <div class="text-muted ph-meta">📞 {{ user?.phone }} · 📍 {{ user?.city }}</div>
+        <div class="flex gap-8" style="margin-top:6px">
+          <span class="badge-cyan">Membre</span>
+          <span class="badge-ok">✓ Vérifié</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ph-stats">
+      <div class="ph-stat" *ngFor="let s of [
+        {v:'5', l:'Achats'},
+        {v:'47 500 XOF', l:'Économisés'},
+        {v:'6 mois', l:'Membre depuis'}
+      ]">
+        <div class="font-mono ph-stat-v">{{ s.v }}</div>
+        <div class="text-muted ph-stat-l">{{ s.l }}</div>
+      </div>
+    </div>
+
+    <app-circle-progress [size]="76" [sw]="7" [pct]="95" color="#10D98B">
+      <span class="font-mono" style="font-size:18px;font-weight:800;color:var(--ok)">95</span>
+    </app-circle-progress>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <!-- ── Infos ── -->
+  <ng-container *ngIf="activeTab === 'Infos'">
+    <div class="glass p-24">
+      <form [formGroup]="form" class="prof-form">
+        <div class="inp-group" *ngFor="let f of [
+          {ctrl:'fullName', label:'Nom complet'},
+          {ctrl:'email',    label:'Email'},
+          {ctrl:'phone',    label:'Téléphone'},
+          {ctrl:'city',     label:'Ville'}
+        ]">
+          <label>{{ f.label }}</label>
+          <input class="inp" [formControlName]="f.ctrl">
+        </div>
+        <button class="btn-gold" type="button" (click)="save()">Sauvegarder les modifications</button>
+      </form>
+    </div>
+  </ng-container>
+
+  <!-- ── Sécurité ── -->
+  <ng-container *ngIf="activeTab === 'Sécurité'">
+    <div class="glass p-24">
+      <h4 class="font-display" style="font-weight:700;margin-bottom:16px">Changer le mot de passe</h4>
+      <div class="prof-form">
+        <div class="inp-group" *ngFor="let l of ['Mot de passe actuel','Nouveau mot de passe','Confirmer']">
+          <label>{{ l }}</label>
+          <input class="inp" type="password" placeholder="••••••••">
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="flex-between" style="margin-top:16px">
+        <div>
+          <div class="font-display" style="font-weight:600;margin-bottom:3px">Authentification 2FA</div>
+          <div class="text-muted" style="font-size:13px">Sécurisez votre compte avec un code SMS</div>
+        </div>
+        <div class="toggle toggle-on"></div>
+      </div>
+      <button class="btn-gold" style="margin-top:20px">Mettre à jour</button>
+    </div>
+  </ng-container>
+
+  <!-- ── Notifications ── -->
+  <ng-container *ngIf="activeTab === 'Notifications'">
+    <div class="glass p-24">
+      <div class="notif-row" *ngFor="let n of notifSettings">
+        <div>
+          <div style="font-weight:500;font-size:14px;margin-bottom:2px">{{ n.label }}</div>
+          <div class="text-muted" style="font-size:12px">{{ n.desc }}</div>
+        </div>
+        <div class="toggle" [class.toggle-on]="n.on" (click)="toggleNotif(n)"></div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ── Parrainage ── -->
+  <ng-container *ngIf="activeTab === 'Parrainage'">
+    <div class="glass p-24">
+      <div class="text-center ref-hero">
+        <div style="font-size:48px;margin-bottom:12px">🎁</div>
+        <h3 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px">Invitez vos amis et gagnez !</h3>
+        <p class="text-muted" style="font-size:14px;margin-bottom:24px">Pour chaque ami inscrit avec votre code, vous gagnez 500 XOF de crédit</p>
+      </div>
+      <div class="glass-gold ref-code">
+        <div class="text-muted" style="font-size:12px;margin-bottom:6px">Votre code personnel</div>
+        <div class="font-mono" style="font-size:28px;font-weight:800;color:var(--gold);letter-spacing:5px">
+          {{ user?.referralCode }}
+        </div>
+      </div>
+      <div class="ref-stats">
+        <div class="ref-stat glass" *ngFor="let s of [{v:'3',l:'Amis parrainés'},{v:'1 500 XOF',l:'Crédits gagnés'},{v:'2',l:'Achats parrainage'}]">
+          <div class="font-mono" style="font-size:20px;font-weight:800;color:var(--gold)">{{ s.v }}</div>
+          <div class="text-muted" style="font-size:11px;margin-top:3px">{{ s.l }}</div>
+        </div>
+      </div>
+      <div class="flex gap-10" style="margin-top:16px">
+        <button class="btn-gold" style="flex:1;justify-content:center">📋 Copier le code</button>
+        <button class="btn-ghost" style="flex:1;justify-content:center">📲 Partager</button>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,103 @@
+<div>
+
+  <!-- Header stats row -->
+  <div class="adm-kpi-grid mb-24">
+    <app-stats-card *ngFor="let k of kpis"
+      [icon]="k.icon" [value]="k.val" [label]="k.label" [sub]="k.sub" [color]="k.color">
+    </app-stats-card>
+  </div>
+
+  <div class="adm-top-grid mb-24">
+    <!-- Revenue chart -->
+    <div class="card-flat p-24">
+      <div class="flex-between mb-20">
+        <h3 class="font-display" style="font-size:16px;font-weight:700;color:var(--txt)">
+          📈 Revenus & Commissions
+        </h3>
+        <div class="tab-nav" style="padding:3px">
+          <button class="tab-btn active" style="padding:5px 12px;font-size:11px">6 mois</button>
+          <button class="tab-btn"        style="padding:5px 12px;font-size:11px">1 an</button>
+        </div>
+      </div>
+      <div class="rev-chart">
+        <div class="rev-col" *ngFor="let r of revData; let i = index">
+          <div class="rev-val" style="font-size:9px;color:var(--muted)">
+            {{ (r.revenue/1000000).toFixed(1) }}M
+          </div>
+          <div class="rev-bar"
+               [style.height.%]="(r.revenue/revMax)*100"
+               [class.active]="i === revData.length - 1"></div>
+          <div class="rev-lbl" style="font-size:10px;color:var(--muted)">{{ r.month }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment methods -->
+    <div class="card-flat p-24">
+      <h3 class="font-display" style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:20px">
+        💳 Méthodes de paiement
+      </h3>
+      <div class="pm-row" *ngFor="let p of [
+        {l:'🟠 Orange Money',pct:48,c:'#FF6B00'},
+        {l:'🔵 Moov Money',  pct:30,c:'#0057B8'},
+        {l:'🟢 Ligdicash',   pct:14,c:'#00A651'},
+        {l:'💳 Carte',       pct:8, c:'#7B2FBE'}
+      ]">
+        <div class="flex-between" style="font-size:13px;margin-bottom:5px">
+          <span style="color:var(--txt2)">{{ p.l }}</span>
+          <strong [style.color]="p.c" class="font-mono">{{ p.pct }}%</strong>
+        </div>
+        <div class="prog-wrap" style="height:6px;margin-bottom:12px">
+          <div class="prog-fill" [style.width.%]="p.pct" [style.background]="p.c"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending actions -->
+  <div class="adm-pending-grid mb-24">
+    <div class="pending-col" *ngFor="let col of pending">
+      <div class="card-flat" [style.border-top]="'3px solid ' + col.color">
+        <div class="pc-head" [style.background]="col.color + '0E'">
+          <span class="font-display pc-title">{{ col.title }}</span>
+          <span class="badge" [style.background]="col.color+'18'" [style.color]="col.color">
+            {{ col.badge }}
+          </span>
+        </div>
+        <div class="pc-body">
+          <div class="pc-item" *ngFor="let item of col.items">
+            <div class="pc-dot" [style.background]="col.color"></div>
+            <span class="text-muted pc-text">{{ item }}</span>
+            <button class="pc-btn"
+                    [style.color]="col.color"
+                    [style.background]="col.color + '12'"
+                    [routerLink]="col.route">{{ col.act }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit log -->
+  <div class="card-flat">
+    <div class="adl-head">
+      <h3 class="font-display" style="font-size:15px;font-weight:700;color:var(--txt)">
+        🔍 Journal d'audit récent
+      </h3>
+      <button class="btn-outline btn-sm btn-round">Voir tout →</button>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Heure</th><th>Admin</th><th>Action</th><th>Entité</th><th>Résultat</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let l of auditLog">
+          <td class="font-mono" style="font-size:12px;color:var(--muted)">{{ l.time }}</td>
+          <td style="font-weight:500">{{ l.user }}</td>
+          <td><span [class]="actionClass(l.action)">{{ l.action }}</span></td>
+          <td style="color:var(--txt2);font-size:13px">{{ l.entity }}</td>
+          <td><span class="badge-ok" style="font-size:11px">✓ Succès</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

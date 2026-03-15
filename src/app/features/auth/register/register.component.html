@@ -1,0 +1,138 @@
+<div class="auth-page">
+
+  <div class="auth-left">
+    <div class="al-logo"><app-logo [size]="20"></app-logo></div>
+    <div class="al-body">
+      <div class="al-icon">🎉</div>
+      <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté</span> AchatGroupéBF</h2>
+      <div class="al-features">
+        <div class="al-feature" *ngFor="let f of ['Inscription gratuite et rapide','Première économie dès votre 1er groupe','Support client disponible 7j/7','Paiement sécurisé via mobile money']">
+          <span class="af-icon">✅</span>
+          <span class="af-text">{{ f }}</span>
+        </div>
+      </div>
+    </div>
+    <p class="al-footer">© 2024 AchatGroupéBF</p>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+
+      <!-- Steps indicator -->
+      <div class="reg-steps">
+        <div class="rs-item" *ngFor="let s of steps; let i = index">
+          <div class="rs-connector" *ngIf="i > 0" [class.done]="i < step"></div>
+          <div class="rs-dot" [class.active]="i === step - 1" [class.done]="i < step - 1">
+            <span *ngIf="i < step - 1">✓</span>
+            <span *ngIf="i >= step - 1">{{ i + 1 }}</span>
+          </div>
+          <span class="rs-label" [class.active]="i === step - 1">{{ s }}</span>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <ng-container *ngIf="step === 1">
+        <div class="auth-header">
+          <h2 class="auth-title">Créez votre compte</h2>
+          <p class="auth-sub">Gratuit · Rapide · Sans engagement</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="nextStep()" class="auth-form">
+          <div class="inp-group">
+            <label>Nom complet</label>
+            <input class="inp" formControlName="fullName" placeholder="Ex: Kofi Traoré">
+          </div>
+
+          <div class="inp-group">
+            <label>Téléphone</label>
+            <div class="inp-prefix">
+              <div class="prefix">🇧🇫 +226</div>
+              <input class="inp" formControlName="phone" placeholder="76 52 86 09" inputmode="tel">
+            </div>
+          </div>
+
+          <div class="inp-group">
+            <label>Email <span class="text-muted" style="font-weight:400">(optionnel)</span></label>
+            <input class="inp" formControlName="email" placeholder="votre@email.com" type="email">
+          </div>
+
+          <div class="inp-group">
+            <label>Mot de passe</label>
+            <input class="inp" type="password" formControlName="password"
+                   placeholder="Min. 8 caractères"
+                   (input)="onPasswordChange($any($event.target).value)">
+            <div class="pw-bar">
+              <div class="pw-seg" *ngFor="let s of [1,2,3,4]"
+                   [style.background]="s <= pwStrength ? pwColor : 'var(--bg3)'"></div>
+            </div>
+            <div class="pw-label" [style.color]="pwColor" *ngIf="pwStrength > 0">
+              {{ pwLabel }}
+            </div>
+          </div>
+
+          <div class="inp-group">
+            <label>Code de parrainage <span class="text-muted" style="font-weight:400">(optionnel)</span></label>
+            <input class="inp" formControlName="referralCode" placeholder="🎁 Ex: KOFI7A2F">
+          </div>
+
+          <label class="terms-label">
+            <input type="checkbox" formControlName="acceptTerms" style="accent-color:var(--primary);width:16px;height:16px">
+            <span class="text-muted" style="font-size:13px;line-height:1.5">
+              J'accepte les <a href="#" class="text-primary">CGU</a> et la
+              <a href="#" class="text-primary">Politique de confidentialité</a>
+            </span>
+          </label>
+
+          <button class="btn-primary btn-blk btn-lg btn-round" type="submit">
+            Continuer →
+          </button>
+
+          <div class="auth-switch">
+            Déjà membre ? <a routerLink="/auth/login">Se connecter</a>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- Step 2: OTP -->
+      <ng-container *ngIf="step === 2">
+        <app-otp [phone]="form.value.phone" (verified)="onOtpComplete($event)" (back)="step = 1"></app-otp>
+      </ng-container>
+
+      <!-- Step 3: Welcome -->
+      <ng-container *ngIf="step === 3">
+        <div class="welcome-wrap text-center">
+          <div class="wc-success">✓</div>
+          <h2 class="font-display" style="font-size:28px;font-weight:800;margin-bottom:8px">
+            Bienvenue <span class="text-primary">{{ user?.fullName?.split(' ')?.[0] }} !</span>
+          </h2>
+          <p class="text-muted" style="margin-bottom:28px">Compte activé avec succès 🎉</p>
+
+          <div class="wc-card card-flat p-20">
+            <div class="flex gap-14" style="align-items:center;text-align:left;margin-bottom:16px">
+              <app-avatar [name]="user?.fullName || 'U'" [size]="52" bg="#0DA487"></app-avatar>
+              <div>
+                <div class="font-display" style="font-weight:700;font-size:16px">{{ user?.fullName }}</div>
+                <div class="text-muted" style="font-size:13px">{{ user?.phone }}</div>
+                <span class="badge-primary" style="margin-top:4px;display:inline-flex">Membre actif ✓</span>
+              </div>
+              <div class="wc-score">
+                <div class="font-mono" style="font-size:22px;font-weight:800;color:var(--ok)">100</div>
+                <div class="text-muted" style="font-size:10px">Score</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wc-referral">
+            <div class="text-muted" style="font-size:12px;margin-bottom:6px">🎁 Votre code de parrainage</div>
+            <div class="font-mono wc-code">{{ user?.referralCode }}</div>
+          </div>
+
+          <button class="btn-primary btn-blk btn-xl btn-round" (click)="goToDashboard()">
+            Explorer les groupes 🚀
+          </button>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

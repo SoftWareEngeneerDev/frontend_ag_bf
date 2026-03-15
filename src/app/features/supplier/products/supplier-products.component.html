@@ -1,0 +1,123 @@
+<div>
+
+  <!-- Header -->
+  <div class="flex-between sp-header">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Mes Produits</h2>
+      <p class="text-muted" style="font-size:13px">{{ filtered.length }} produit(s) dans votre catalogue</p>
+    </div>
+    <button class="btn-gold" (click)="showAddModal = true">+ Ajouter un produit</button>
+  </div>
+
+  <!-- Tabs + Search -->
+  <div class="sp-toolbar">
+    <div class="tab-nav">
+      <button class="tab-btn" *ngFor="let t of tabs"
+              [class.active]="activeTab === t"
+              (click)="setTab(t)">{{ t }}</button>
+    </div>
+    <input class="inp sp-search" placeholder="🔍  Rechercher un produit..."
+           (input)="onSearch($any($event.target).value)">
+  </div>
+
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- Empty -->
+  <app-empty-state *ngIf="!loading && filtered.length === 0"
+    icon="📦" title="Aucun produit"
+    description="Ajoutez votre premier produit pour commencer à vendre.">
+    <button class="btn-gold" (click)="showAddModal = true">+ Ajouter un produit</button>
+  </app-empty-state>
+
+  <!-- Grille produits -->
+  <div class="sp-grid" *ngIf="!loading && filtered.length > 0">
+    <div class="glass sp-card" *ngFor="let p of filtered">
+
+      <!-- Image zone -->
+      <div class="sp-img">
+        <span class="sp-emoji">{{ p.emoji }}</span>
+        <span [class]="statusClass(p.status) + ' sp-status'">{{ statusLabel(p.status) }}</span>
+        <span class="badge-err sp-active" *ngIf="p.activeGroupCount > 0">
+          🔥 {{ p.activeGroupCount }} groupe{{ p.activeGroupCount > 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <!-- Body -->
+      <div class="sp-body">
+        <div class="text-muted sp-cat">{{ p.category.name }}</div>
+        <h3 class="font-display sp-name">{{ p.name | truncate:40 }}</h3>
+        <p class="text-muted sp-desc">{{ p.description | truncate:80 }}</p>
+
+        <!-- Stats row -->
+        <div class="sp-stats">
+          <div class="sp-stat">
+            <span class="sp-stat-v font-mono">{{ p.soloPrice | currencyXof }}</span>
+            <span class="text-muted sp-stat-l">Prix solo</span>
+          </div>
+          <div class="sp-stat">
+            <span class="sp-stat-v font-mono text-ok">{{ p.minGroupPrice | currencyXof }}</span>
+            <span class="text-muted sp-stat-l">Prix groupe min</span>
+          </div>
+          <div class="sp-stat">
+            <span class="sp-stat-v font-mono">{{ p.stock }}</span>
+            <span class="text-muted sp-stat-l">En stock</span>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="sp-rating">
+          <span *ngFor="let i of stars(5)"
+                [style.color]="i < p.rating ? '#F5A623' : 'rgba(255,255,255,.2)'">★</span>
+          <span class="text-muted" style="font-size:12px;margin-left:6px">
+            {{ p.rating }}/5 ({{ p.reviewCount }} avis)
+          </span>
+        </div>
+
+        <!-- Actions -->
+        <div class="sp-actions">
+          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">✏️ Modifier</button>
+          <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center">👥 Créer un groupe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ajout produit -->
+  <div class="modal-backdrop" *ngIf="showAddModal" (click)="showAddModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">Ajouter un produit</h3>
+        <button class="btn-ghost btn-sm" (click)="showAddModal = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="inp-group" *ngFor="let f of [
+          {l:'Nom du produit',     ph:'Ex: Smartphone Samsung Galaxy A55'},
+          {l:'Description',        ph:'Décrivez votre produit...'},
+          {l:'Prix solo (XOF)',    ph:'Ex: 285000'},
+          {l:'Stock disponible',   ph:'Ex: 100'},
+        ]">
+          <label>{{ f.l }}</label>
+          <input class="inp" [placeholder]="f.ph">
+        </div>
+        <div class="inp-group">
+          <label>Catégorie</label>
+          <select class="inp">
+            <option>Électronique</option>
+            <option>Alimentaire</option>
+            <option>Textile & Mode</option>
+            <option>Maison & Jardin</option>
+          </select>
+        </div>
+        <div class="alert-cyan alert">
+          ℹ️ Votre produit sera examiné par un admin avant d'être visible.
+        </div>
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showAddModal = false">Annuler</button>
+          <button class="btn-gold"  style="flex:1;justify-content:center" (click)="showAddModal = false">Soumettre →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

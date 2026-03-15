@@ -1,0 +1,49 @@
+<app-navbar></app-navbar>
+
+<div class="groups-page">
+
+  <!-- Page header -->
+  <div class="page-header bg-mesh">
+    <div>
+      <h1 class="font-display page-title">
+        Groupes d'achat <span class="text-gold">actifs</span>
+      </h1>
+      <p class="text-muted page-sub">
+        Rejoignez un groupe et économisez jusqu'à 40% sur vos achats
+      </p>
+    </div>
+    <input class="inp gh-search" placeholder="🔍  Rechercher un groupe..."
+           (input)="onSearch($any($event.target).value)">
+  </div>
+
+  <!-- Tabs filtres -->
+  <div class="groups-tabs-wrap">
+    <div class="tab-nav">
+      <button class="tab-btn" *ngFor="let t of tabs"
+              [class.active]="activeTab === t"
+              (click)="setTab(t)">{{ t }}</button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true" text="Chargement des groupes..."></app-loading-spinner>
+
+  <!-- Empty -->
+  <app-empty-state *ngIf="!loading && filtered.length === 0"
+    icon="👥" title="Aucun groupe trouvé"
+    description="Aucun groupe ne correspond à vos critères pour le moment.">
+    <button class="btn-gold" (click)="setTab('Tous')">Voir tous les groupes</button>
+  </app-empty-state>
+
+  <!-- Grille groupes -->
+  <div class="groups-grid" *ngIf="!loading && filtered.length > 0">
+    <app-group-card
+      *ngFor="let g of filtered"
+      [group]="g"
+      (join)="onJoin($event)"
+      (details)="onDetails($event)">
+    </app-group-card>
+  </div>
+</div>
+
+<app-footer></app-footer>

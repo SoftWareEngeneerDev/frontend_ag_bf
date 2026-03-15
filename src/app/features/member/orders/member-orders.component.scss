@@ -1,0 +1,23 @@
+.orders-list { display: flex; flex-direction: column; gap: 16px; }
+.order-card  { padding: 22px; }
+.order-head  { margin-bottom: 18px; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.order-name  { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.order-amount{ font-size: 16px; font-weight: 700; color: var(--gold); margin-top: 4px; }
+
+.order-timeline {
+  display: flex; align-items: flex-start; margin-bottom: 14px; overflow-x: auto;
+}
+.ot-item  { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.ot-dot   {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--muted); transition: all var(--t);
+  &.done { background: linear-gradient(135deg,var(--gold),var(--ok)); color: #0A0E1A; }
+}
+.ot-label { font-size: 9px; color: var(--muted); text-align: center; width: 68px; line-height: 1.3; }
+.ot-line  {
+  flex: 1; height: 1px; background: rgba(255,255,255,.08);
+  margin: 0 4px; margin-bottom: 24px; min-width: 40px;
+  &.done { background: var(--gold); }
+}

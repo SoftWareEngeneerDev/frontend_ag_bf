@@ -1,0 +1,42 @@
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sb-logo">
+    <app-logo [size]="17"></app-logo>
+  </div>
+
+  <!-- User card -->
+  <div class="sb-user">
+    <app-avatar [name]="user?.fullName || 'U'" [size]="38" [bg]="userBg"></app-avatar>
+    <div style="flex:1;min-width:0">
+      <div class="sb-user-name">{{ user?.fullName }}</div>
+      <div class="sb-user-role">
+        {{ user?.role === 'ADMIN' ? '🛡 Super Admin' : user?.role === 'SUPPLIER' ? '🏪 Fournisseur' : '👤 Membre' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav style="flex:1; padding-bottom:12px">
+    <ng-container *ngFor="let item of items">
+      <div *ngIf="item.separator" class="divider" style="margin:8px 16px"></div>
+      <a *ngIf="!item.separator" class="nav-item"
+         [routerLink]="item.route" routerLinkActive="active">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+        <span *ngIf="item.badge" class="nav-badge"
+              [style.background]="(item.badgeColor || 'var(--primary)') + '18'"
+              [style.color]="item.badgeColor || 'var(--primary)'">
+          {{ item.badge }}
+        </span>
+      </a>
+    </ng-container>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sb-footer">
+    <a class="nav-item sb-logout" (click)="auth.logout()">
+      <span class="nav-icon">🚪</span>
+      <span>Déconnexion</span>
+    </a>
+  </div>
+</aside>

@@ -1,0 +1,41 @@
+<!-- Announcement bar -->
+<div class="announce-bar">
+  🎉 Livraison gratuite sur Ouagadougou pour tout groupe de 10+ membres !
+  <a routerLink="/groups" style="color:#fff;font-weight:700;margin-left:8px;text-decoration:underline">Voir les groupes →</a>
+</div>
+
+<!-- Main navbar -->
+<nav class="navbar">
+  <div class="nb-inner">
+
+    <!-- Left: Logo -->
+    <app-logo [size]="20"></app-logo>
+
+    <!-- Center: Nav links -->
+    <div class="nb-links">
+      <a routerLink="/"         routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Accueil</a>
+      <a routerLink="/groups"   routerLinkActive="active">🔥 Groupes actifs</a>
+      <a routerLink="/catalog"  routerLinkActive="active">Catalogue</a>
+      <a routerLink="/how-it-works" routerLinkActive="active">Comment ça marche ?</a>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="nb-actions">
+      <ng-container *ngIf="!auth.isLoggedIn(); else loggedIn">
+        <a routerLink="/auth/login"    class="btn-outline btn-sm">Connexion</a>
+        <a routerLink="/auth/register" class="btn-primary btn-sm">S'inscrire gratuitement</a>
+      </ng-container>
+
+      <ng-template #loggedIn>
+        <a routerLink="/member/notifications" class="nb-notif">
+          🔔
+          <span class="nb-dot" *ngIf="notifs.unreadCount() > 0">{{ notifs.unreadCount() }}</span>
+        </a>
+        <a [routerLink]="auth.isAdmin() ? '/admin' : auth.isSupplier() ? '/supplier' : '/member'"
+           class="btn-primary btn-sm">
+          Mon espace →
+        </a>
+      </ng-template>
+    </div>
+  </div>
+</nav>

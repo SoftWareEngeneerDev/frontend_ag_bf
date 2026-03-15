@@ -1,0 +1,38 @@
+<div>
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Logs Système</h2>
+      <p class="text-muted" style="font-size:13px">{{ filtered.length }} entrées affichées</p>
+    </div>
+    <div class="flex gap-10">
+      <input class="inp" style="width:260px" placeholder="🔍  Rechercher action, entité, utilisateur..."
+             [(ngModel)]="search">
+      <button class="btn-ghost btn-sm">⬇️ Exporter</button>
+    </div>
+  </div>
+
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <div class="glass">
+    <table class="tbl">
+      <thead>
+        <tr><th>Horodatage</th><th>Utilisateur</th><th>Action</th><th>Entité</th><th>IP</th><th>Module</th><th>Niveau</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let l of filtered">
+          <td class="font-mono" style="font-size:11px;color:var(--muted);white-space:nowrap">{{ l.time }}</td>
+          <td style="font-size:13px">{{ l.user }}</td>
+          <td class="font-mono" style="font-size:12px;color:var(--cyan)">{{ l.action }}</td>
+          <td class="text-muted" style="font-size:12px">{{ l.entity }}</td>
+          <td class="font-mono" style="font-size:11px;color:var(--muted)">{{ l.ip }}</td>
+          <td><span class="badge-grey" style="font-size:10px">{{ l.module }}</span></td>
+          <td><span [class]="levelClass(l.level)" style="font-size:10px">{{ l.level }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

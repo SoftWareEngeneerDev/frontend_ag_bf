@@ -1,0 +1,63 @@
+<div class="gc-card card" (click)="details.emit(group)">
+
+  <!-- Image zone avec sticker -->
+  <div class="gc-img">
+    <div class="gc-emoji-bg">
+      <span class="gc-emoji">{{ group.product.emoji }}</span>
+    </div>
+    <span class="sticker sticker-hot gc-sticker-status"
+          *ngIf="group.status === 'THRESHOLD_REACHED'">✅ Seuil atteint</span>
+    <span class="sticker sticker-new gc-sticker-status" *ngIf="group.status === 'OPEN'">Ouvert</span>
+    <span class="gc-discount">-{{ group.discountPercent }}%</span>
+  </div>
+
+  <!-- Content -->
+  <div class="gc-body">
+    <span class="gc-cat">{{ group.product.category.name }}</span>
+    <h3 class="gc-name font-display">{{ group.product.name | truncate:42 }}</h3>
+
+    <!-- Participants -->
+    <div class="gc-part-row">
+      <div class="gc-avatars">
+        <div class="gc-av" *ngFor="let i of [1,2,3,4]"
+             [style.background]="['#0DA487','#FF8C00','#7B2FBE','#3B82F6'][i-1]">
+          {{ ['K','M','F','A'][i-1] }}
+        </div>
+        <div class="gc-av gc-av-plus" *ngIf="group.currentCount > 4">+{{ group.currentCount - 4 }}</div>
+      </div>
+      <span class="gc-part-label">{{ group.currentCount }}/{{ group.minParticipants }} membres</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="gc-prog-wrap">
+      <div class="prog-wrap" style="height:8px">
+        <div class="prog-fill" [class.full]="pct >= 100" [style.width.%]="pct"></div>
+      </div>
+      <span class="gc-pct font-mono">{{ pct }}%</span>
+    </div>
+
+    <!-- Price row -->
+    <div class="gc-price-row">
+      <div>
+        <div class="gc-old-price">{{ group.product.soloPrice | currencyXof }}</div>
+        <div class="gc-price font-mono font-display">{{ group.currentPrice | currencyXof }}</div>
+      </div>
+      <div class="gc-economy">
+        <div class="gc-eco-label">Économie</div>
+        <div class="gc-eco-val font-mono">{{ (group.product.soloPrice - group.currentPrice) | currencyXof }}</div>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="gc-countdown">
+      <span class="gc-cd-icon">⏱</span>
+      <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
+    </div>
+
+    <!-- CTA -->
+    <button class="btn-primary btn-blk gc-cta"
+            (click)="$event.stopPropagation(); join.emit(group)">
+      Rejoindre — Dépôt {{ group.depositAmount | currencyXof }}
+    </button>
+  </div>
+</div>

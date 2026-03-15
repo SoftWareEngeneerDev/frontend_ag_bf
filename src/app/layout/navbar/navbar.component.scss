@@ -1,0 +1,45 @@
+:host { display:block; position:sticky; top:0; z-index:200; }
+
+.navbar {
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+
+.nb-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nb-links {
+  display: flex; gap: 4px; flex: 1; justify-content: center;
+  a {
+    padding: 8px 14px; border-radius: var(--r);
+    font-size: 14px; font-weight: 500; color: var(--txt2);
+    text-decoration: none; transition: all var(--t);
+    &:hover  { background: var(--primary-l); color: var(--primary); }
+    &.active { background: var(--primary-l); color: var(--primary); font-weight: 700; }
+  }
+}
+
+.nb-actions { display:flex; align-items:center; gap:10px; }
+
+.nb-notif {
+  position: relative; font-size: 20px; padding: 6px;
+  cursor: pointer; text-decoration: none; border-radius: var(--r);
+  transition: background var(--t);
+  &:hover { background: var(--bg2); }
+}
+
+.nb-dot {
+  position: absolute; top: 2px; right: 2px;
+  background: var(--red); color: #fff;
+  font-size: 9px; font-weight: 700; border-radius: 99px;
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center; padding: 0 4px;
+}

@@ -1,0 +1,32 @@
+<div>
+  <div class="flex-between mb-20">
+    <div class="flex gap-12" style="align-items:center">
+      <h2 class="font-display" style="font-size:20px;font-weight:700">Notifications</h2>
+      <span class="badge-err" *ngIf="unread > 0">{{ unread }} non lues</span>
+    </div>
+    <button class="btn-ghost btn-sm" (click)="markAll()">Tout marquer comme lu</button>
+  </div>
+
+  <div class="glass notif-wrap" *ngIf="notifs.length > 0">
+    <ng-container *ngIf="today.length > 0">
+      <div class="notif-section-label">Aujourd'hui</div>
+      <app-notification-item
+        *ngFor="let n of today"
+        [notif]="n" (clicked)="onNotifClick($event)">
+      </app-notification-item>
+    </ng-container>
+
+    <ng-container *ngIf="thisWeek.length > 0">
+      <div class="notif-section-label">Cette semaine</div>
+      <app-notification-item
+        *ngFor="let n of thisWeek"
+        [notif]="n" (clicked)="onNotifClick($event)">
+      </app-notification-item>
+    </ng-container>
+  </div>
+
+  <app-empty-state *ngIf="notifs.length === 0"
+    icon="🔔" title="Aucune notification"
+    description="Vous êtes à jour ! Aucune nouvelle notification.">
+  </app-empty-state>
+</div>

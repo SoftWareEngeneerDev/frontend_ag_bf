@@ -1,0 +1,59 @@
+.gc-card { cursor:pointer; overflow:hidden; }
+
+/* Image zone */
+.gc-img {
+  position: relative;
+  background: linear-gradient(135deg, #E6F7F4 0%, #F0FDF9 100%);
+  padding: 28px 20px 20px;
+  text-align: center;
+}
+.gc-emoji-bg {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--bg-white); box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 4px;
+}
+.gc-emoji { font-size: 44px; display: block; }
+.gc-sticker-status { position: absolute; top: 12px; left: 12px; font-size: 11px; }
+.gc-discount {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--orange); color: #fff;
+  font-size: 13px; font-weight: 800; border-radius: var(--r-full);
+  padding: 4px 10px; font-family: 'JetBrains Mono', monospace;
+}
+
+/* Body */
+.gc-body { padding: 16px; }
+.gc-cat  { font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: .5px; }
+.gc-name { font-size: 14px; font-weight: 700; color: var(--txt); line-height: 1.35; margin: 5px 0 12px; min-height: 38px; }
+
+/* Participants */
+.gc-part-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.gc-avatars  { display:flex; gap:-4px; }
+.gc-av {
+  width:24px; height:24px; border-radius:50%; border:2px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:800; color:#fff; font-family:'Syne',sans-serif;
+  margin-left:-4px; &:first-child { margin-left:0; }
+}
+.gc-av-plus { background:var(--bg3); color:var(--muted) !important; font-size:9px; }
+.gc-part-label { font-size:12px; color:var(--muted); font-weight:500; }
+
+/* Progress */
+.gc-prog-wrap { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.gc-pct { font-size:12px; font-weight:700; color:var(--primary); }
+
+/* Price */
+.gc-price-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
+.gc-old-price { font-size:12px; color:var(--light); text-decoration:line-through; margin-bottom:2px; }
+.gc-price     { font-size:20px; font-weight:800; color:var(--txt); }
+.gc-economy   { text-align:right; background:var(--primary-l); border-radius:var(--r-sm); padding:6px 10px; }
+.gc-eco-label { font-size:10px; color:var(--primary); font-weight:600; }
+.gc-eco-val   { font-size:13px; font-weight:800; color:var(--primary); }
+
+/* Countdown */
+.gc-countdown { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.gc-cd-icon   { font-size:14px; }
+
+/* CTA */
+.gc-cta { font-size:13px; font-weight:700; border-radius:var(--r); }

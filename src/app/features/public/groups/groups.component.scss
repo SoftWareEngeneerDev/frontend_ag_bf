@@ -1,0 +1,24 @@
+:host { display: block; }
+
+.groups-page { padding-bottom: 48px; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 40px 64px 32px; gap: 24px; flex-wrap: wrap;
+}
+.page-title { font-size: clamp(24px, 3vw, 34px); font-weight: 800; margin-bottom: 6px; }
+.page-sub   { font-size: 15px; }
+.gh-search  { width: 300px; }
+
+.groups-tabs-wrap { padding: 0 64px 24px; }
+
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 0 64px;
+}
+
+@media (max-width: 768px) {
+  .page-header, .groups-grid, .groups-tabs-wrap { padding-left: 20px; padding-right: 20px; }
+}

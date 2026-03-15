@@ -1,0 +1,60 @@
+<div>
+  <div class="flex-between mb-24">
+    <h2 class="font-display" style="font-size:20px;font-weight:700">Analytics Plateforme</h2>
+    <div class="tab-nav">
+      <button class="tab-btn" *ngFor="let r of ranges"
+              [class.active]="activeRange === r"
+              (click)="activeRange = r">{{ r }}</button>
+    </div>
+  </div>
+
+  <div class="an-kpi-grid mb-24">
+    <div class="kpi-card text-center" *ngFor="let k of kpis">
+      <div class="font-mono an-val" [style.color]="k.color">{{ k.val }}</div>
+      <div class="text-muted" style="font-size:13px;margin-bottom:6px">{{ k.label }}</div>
+      <span class="badge-ok" style="font-size:10px">↑ {{ k.delta }}</span>
+    </div>
+  </div>
+
+  <div class="an-grid mb-24">
+    <!-- Categories -->
+    <div class="glass p-22">
+      <h3 class="font-display an-title">Activité par catégorie</h3>
+      <div class="cat-row" *ngFor="let c of categories">
+        <span style="font-size:18px;width:24px">{{ c.icon }}</span>
+        <div style="flex:1">
+          <div class="flex-between" style="font-size:12px;margin-bottom:3px">
+            <span>{{ c.name }}</span>
+            <span class="font-mono text-gold-c">{{ c.pct }}%</span>
+          </div>
+          <div class="prog-wrap" style="height:6px">
+            <div class="prog-fill" [style.width.%]="c.pct"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs gauges + top suppliers -->
+    <div class="glass p-22">
+      <h3 class="font-display an-title">Indicateurs clés</h3>
+      <div class="gauges-row">
+        <div class="gauge-item" *ngFor="let g of gauges">
+          <app-circle-progress [size]="76" [sw]="7" [pct]="g.pct" [color]="g.color">
+            <span class="font-mono" style="font-size:13px;font-weight:700" [style.color]="g.color">{{ g.val }}</span>
+          </app-circle-progress>
+          <div class="text-muted" style="font-size:11px;margin-top:6px;text-align:center">{{ g.label }}</div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin:16px 0"></div>
+
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px">Top Fournisseurs</div>
+      <div class="sup-row" *ngFor="let s of topSuppliers; let i = index">
+        <span class="sup-rank font-mono">#{{ i+1 }}</span>
+        <span style="flex:1">{{ s.name }}</span>
+        <span class="font-mono text-gold-c" style="font-size:12px">{{ s.rev }}</span>
+        <span class="text-muted" style="font-size:11px;margin-left:8px">{{ s.groups }}</span>
+      </div>
+    </div>
+  </div>
+</div>

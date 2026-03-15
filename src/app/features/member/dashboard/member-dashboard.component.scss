@@ -1,0 +1,55 @@
+.md-page {}
+
+/* Welcome */
+.md-welcome {
+  background: linear-gradient(135deg, var(--primary) 0%, #065F46 100%);
+  border-radius: var(--r-xl); padding: 24px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; gap:16px; flex-wrap:wrap;
+}
+.mw-greeting { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#fff; }
+.mw-savings  { text-align:right; }
+.mws-label   { font-size:12px; color:rgba(255,255,255,.7); margin-bottom:3px; }
+.mws-val     { font-size:28px; font-weight:800; color:#fff; margin-bottom:6px; }
+
+/* KPIs */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 16px; margin-bottom: 20px;
+  @media (max-width:900px) { grid-template-columns:repeat(2,1fr); }
+}
+
+/* Alert */
+.md-alert { margin-bottom: 24px; }
+
+/* Grid */
+.md-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:20px;
+  @media (max-width:900px) { grid-template-columns:1fr; }
+}
+
+/* Section headers */
+.md-section-head  { margin-bottom: 14px; }
+.md-section-title { font-size: 16px; font-weight: 700; color:var(--txt); }
+
+/* Group items */
+.mg-list { display:flex; flex-direction:column; gap:12px; }
+.mg-card {
+  display: flex; gap: 14px; padding: 16px;
+  align-items: flex-start;
+  &:hover { transform:translateY(-2px); }
+}
+.mg-emoji-wrap {
+  width: 52px; height: 52px; border-radius: var(--r-lg);
+  background: var(--primary-l);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 26px; flex-shrink:0;
+  &.threshold { background: var(--orange-l); }
+}
+.mg-body   { flex:1; min-width:0; }
+.mg-top    { gap:8px; margin-bottom:8px; align-items:flex-start; flex-wrap:wrap; }
+.mg-name   { font-size:13.5px; font-weight:700; color:var(--txt); }
+.mg-prog-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.mg-prog   { flex:1; height:6px; }
+.mg-pct    { font-size:11px; font-weight:700; color:var(--primary); flex-shrink:0; }
+.mg-footer { }
+.mg-price  { display:block; font-size:16px; font-weight:800; color:var(--txt); margin-top:2px; }

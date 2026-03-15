@@ -1,0 +1,47 @@
+.pay-page { max-width: 540px; margin: 0 auto; }
+
+.pay-steps {
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 36px; gap: 0;
+}
+.ps-item   { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ps-circle {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--muted); transition: all var(--t);
+  &.active { background: linear-gradient(135deg,var(--gold),#E8920A); color:#0A0E1A; }
+  &.done   { background: linear-gradient(135deg,var(--ok),#0AB572); color:#0A0E1A; }
+}
+.ps-label  { font-size: 11px; }
+.ps-line   { width: 60px; height: 1px; background: rgba(255,255,255,.1); margin: 0 4px; margin-bottom: 22px; &.done { background:var(--gold); } }
+
+.pay-body    { display: flex; flex-direction: column; gap: 16px; }
+.pay-card    { padding: 20px; }
+.pay-product { align-items: center; }
+
+.pay-amount {
+  padding: 28px; text-align: center;
+  background: linear-gradient(135deg, rgba(245,166,35,.04), rgba(0,212,255,.02));
+}
+.pay-total { font-size: 52px; font-weight: 800; color: var(--gold); line-height: 1; }
+
+.methods-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+.pay-processing { padding: 20px 0; }
+.proc-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; }
+
+.pay-success { padding: 12px 0; }
+.suc-circle {
+  width: 90px; height: 90px;
+  background: rgba(16,217,139,.1); border: 3px solid var(--ok); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px; margin: 0 auto 24px; color: var(--ok);
+}
+.suc-details { padding: 18px; margin-bottom: 24px; text-align: left; }
+.suc-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: 13px;
+  &:last-child { border-bottom: none; }
+}

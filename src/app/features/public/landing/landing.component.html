@@ -1,0 +1,245 @@
+<app-navbar></app-navbar>
+
+<!-- ══ HERO SECTION ══════════════════════════════════════════════ -->
+<section class="hero bg-gradient-hero">
+  <div class="container hero-inner">
+
+    <div class="hero-left anim-fade">
+      <!-- Badge -->
+      <div class="hero-badge">
+        <span>🇧🇫</span> Plateforme #1 d'achats groupés au Burkina Faso
+      </div>
+
+      <h1 class="hero-title font-display">
+        Achetez <span class="hero-highlight">ensemble</span>,<br>
+        économisez jusqu'à <span class="hero-pct">40%</span>
+      </h1>
+
+      <p class="hero-sub">
+        Rejoignez des milliers de Burkinabè qui font des économies
+        en achetant en groupe. Paiement simple via Orange Money & Moov Money.
+      </p>
+
+      <!-- Counters -->
+      <div class="hero-stats">
+        <div class="hs-item">
+          <div class="hs-val font-mono font-display">{{ membersCount | number }}</div>
+          <div class="hs-lbl">Membres actifs</div>
+        </div>
+        <div class="hs-divider"></div>
+        <div class="hs-item">
+          <div class="hs-val font-mono font-display">{{ groupsCount }}+</div>
+          <div class="hs-lbl">Groupes réussis</div>
+        </div>
+        <div class="hs-divider"></div>
+        <div class="hs-item">
+          <div class="hs-val font-mono font-display">{{ formatSaved() }}</div>
+          <div class="hs-lbl">XOF économisés</div>
+        </div>
+      </div>
+
+      <div class="hero-ctas anim-fade-2">
+        <button class="btn-orange btn-xl btn-round" (click)="goToGroups()">
+          🔥 Voir les groupes actifs
+        </button>
+        <button class="btn-white btn-xl btn-round" (click)="goToRegister()">
+          Créer mon compte gratuit
+        </button>
+      </div>
+
+      <!-- Payment methods -->
+      <div class="hero-payments anim-fade-3">
+        <span class="hp-label">Paiements acceptés :</span>
+        <span *ngFor="let p of ['🟠 Orange Money','🔵 Moov Money','🟢 Ligdicash','💳 Carte']"
+              class="hp-item">{{ p }}</span>
+      </div>
+    </div>
+
+    <div class="hero-right anim-float">
+      <div class="hero-card-wrap">
+        <!-- Floating group card -->
+        <div class="hf-card">
+          <div class="hf-card-header">
+            <span style="font-size:28px">📱</span>
+            <div>
+              <div class="hf-card-name font-display">Samsung Galaxy A55</div>
+              <div class="hf-card-cat">Électronique</div>
+            </div>
+            <span class="sticker sticker-hot">🔥 Chaud</span>
+          </div>
+          <div class="hf-progress-label">
+            <span>8/10 participants</span>
+            <span class="font-mono" style="font-weight:700;color:var(--orange)">80%</span>
+          </div>
+          <div class="prog-wrap" style="height:10px;margin-bottom:12px">
+            <div class="prog-fill orange" style="width:80%"></div>
+          </div>
+          <div class="hf-price-row">
+            <div>
+              <div style="font-size:11px;text-decoration:line-through;color:rgba(255,255,255,.5)">285 000 XOF</div>
+              <div class="font-mono hf-price">188 600 XOF</div>
+            </div>
+            <div class="hf-savings">
+              <div style="font-size:10px">Économie</div>
+              <div class="font-mono" style="font-weight:800;font-size:15px">96 400 XOF</div>
+            </div>
+          </div>
+          <button class="btn-orange btn-blk btn-round" style="font-size:13px;margin-top:10px"
+                  (click)="goToGroups()">
+            Rejoindre ce groupe
+          </button>
+        </div>
+
+        <!-- Mini cards flottants -->
+        <div class="hf-mini hf-mini-1">
+          <span>❄️</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--txt)">Climatiseur</div>
+            <div style="font-size:10px;color:var(--primary);font-weight:700">-30% · 6/6 ✅</div>
+          </div>
+        </div>
+        <div class="hf-mini hf-mini-2">
+          <span>🌾</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--txt)">Riz 50kg</div>
+            <div style="font-size:10px;color:var(--orange);font-weight:700">-27% · 14/20</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CATÉGORIES ════════════════════════════════════════════════ -->
+<section class="section-sm bg-white">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="sh-label">🛍️ Parcourir</div>
+      <h2>Toutes les <span class="gradient-primary">catégories</span></h2>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-pill" *ngFor="let c of mock.categories" (click)="goToCatalog()">
+        <span class="cp-icon">{{ c.icon }}</span>
+        <span class="cp-name">{{ c.name }}</span>
+        <span class="cp-count">{{ c.productCount }} produits</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ GROUPES ACTIFS ════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="flex-between section-head" style="margin-bottom:32px">
+      <div>
+        <div class="sh-label">🔥 À ne pas manquer</div>
+        <h2>Groupes qui <span class="gradient-primary">se remplissent vite</span></h2>
+      </div>
+      <button class="btn-outline-primary btn-round" (click)="goToGroups()">
+        Voir tous les groupes →
+      </button>
+    </div>
+
+    <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+    <div class="groups-grid" *ngIf="!loading">
+      <app-group-card
+        *ngFor="let g of groups"
+        [group]="g"
+        (join)="onJoinGroup($event)"
+        (details)="onJoinGroup($event)">
+      </app-group-card>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMMENT ÇA MARCHE ══════════════════════════════════════════ -->
+<section class="section bg-section">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="sh-label">✨ Simple & Rapide</div>
+      <h2>Comment ça <span class="gradient-primary">marche ?</span></h2>
+      <p>Économisez en 4 étapes simples</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-item" *ngFor="let s of howItWorks; let i = index">
+        <div class="step-num bg-gradient-primary" [class.orange]="i % 2 !== 0">{{ s.n }}</div>
+        <div class="step-icon-wrap" [class.orange]="i % 2 !== 0">
+          <span style="font-size:32px">{{ s.icon }}</span>
+        </div>
+        <h3 class="step-title font-display">{{ s.title }}</h3>
+        <p class="step-desc text-muted">{{ s.desc }}</p>
+        <div class="step-arrow" *ngIf="i < howItWorks.length - 1">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CHIFFRES CLÉS ═════════════════════════════════════════════ -->
+<section class="section bg-gradient-primary">
+  <div class="container">
+    <div class="big-stats">
+      <div class="bs-item" *ngFor="let s of stats">
+        <span class="bs-icon">{{ s.icon }}</span>
+        <div class="bs-val font-display font-mono">{{ s.val }}</div>
+        <div class="bs-lbl">{{ s.label }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TÉMOIGNAGES ════════════════════════════════════════════════ -->
+<section class="section bg-white">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="sh-label">⭐ Ils témoignent</div>
+      <h2>Ce que disent nos <span class="gradient-primary">membres</span></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card card" *ngFor="let t of testimonials; let i = index">
+        <div class="tc-quote">"</div>
+        <p class="tc-text">{{ t.text }}</p>
+        <div class="tc-stars">
+          <span *ngFor="let s of [1,2,3,4,5]"
+                [style.color]="s <= t.rating ? '#F4A902' : '#E2E8F0'">★</span>
+        </div>
+        <div class="tc-author">
+          <app-avatar [name]="t.name" [size]="44"
+                      [bg]="['#0DA487','#FF8C00','#7B2FBE'][i]"></app-avatar>
+          <div>
+            <div class="tc-name font-display">{{ t.name }}</div>
+            <div class="text-muted" style="font-size:12px">📍 {{ t.city }} · {{ t.role }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ═════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box bg-gradient-primary">
+      <div class="cta-left">
+        <h2 class="cta-title font-display">Prêt à économiser avec vos proches ?</h2>
+        <p class="cta-sub">Inscription gratuite en 2 minutes. Pas de frais cachés.</p>
+        <div class="cta-btns">
+          <button class="btn-white btn-xl btn-round" (click)="goToRegister()">
+            🚀 Créer mon compte gratuit
+          </button>
+          <button class="btn-outline btn-xl btn-round"
+                  style="border-color:rgba(255,255,255,.4);color:#fff"
+                  (click)="goToGroups()">
+            Parcourir les groupes
+          </button>
+        </div>
+      </div>
+      <div class="cta-right">
+        <div class="cta-emoji">🛒</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

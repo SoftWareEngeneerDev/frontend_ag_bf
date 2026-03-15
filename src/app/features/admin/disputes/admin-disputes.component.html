@@ -1,0 +1,59 @@
+<div>
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Litiges</h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ openCount }} litige(s) ouvert(s) —
+        {{ urgentCount }} urgents
+      </p>
+    </div>
+    <span class="badge-err">⚠️ {{ urgentCount }} urgents</span>
+  </div>
+
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <div class="dis-list">
+    <div class="glass dis-card" *ngFor="let d of filtered"
+         [style.borderColor]="d.urgent ? 'rgba(255,77,106,.3)' : 'var(--border)'">
+
+      <div class="dis-head">
+        <div class="dis-left">
+          <div class="flex gap-8" style="align-items:center;margin-bottom:4px">
+            <span class="font-mono" style="font-size:11px;color:var(--muted)">{{ d.id }}</span>
+            <span *ngIf="d.urgent" class="badge-err" style="font-size:10px">⚡ Urgent</span>
+          </div>
+          <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">{{ d.reason }}</div>
+          <div class="text-muted" style="font-size:12px">
+            Produit : <strong style="color:var(--txt)">{{ d.product }}</strong> ·
+            Plaignant : <strong style="color:var(--txt)">{{ d.reporter }}</strong>
+          </div>
+        </div>
+        <div class="dis-right">
+          <span [class]="statusClass(d.status)">{{ statusLabel(d.status) }}</span>
+          <div class="font-mono dis-amount">{{ d.amount | currencyXof }}</div>
+          <div class="text-muted" style="font-size:11px">{{ d.date }}</div>
+        </div>
+      </div>
+
+      <div class="dis-actions">
+        <ng-container *ngIf="d.status === 'OPEN'">
+          <button class="btn-cyan  btn-sm">🔍 Prendre en charge</button>
+          <button class="btn-ok    btn-sm">✅ Résoudre</button>
+          <button class="btn-ghost btn-sm">📩 Contacter parties</button>
+        </ng-container>
+        <ng-container *ngIf="d.status === 'IN_PROGRESS'">
+          <button class="btn-gold  btn-sm">💰 Rembourser</button>
+          <button class="btn-ok    btn-sm">✅ Clôturer</button>
+          <button class="btn-ghost btn-sm">📩 Message</button>
+        </ng-container>
+        <ng-container *ngIf="d.status === 'RESOLVED'">
+          <button class="btn-ghost btn-sm">📋 Voir détails</button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

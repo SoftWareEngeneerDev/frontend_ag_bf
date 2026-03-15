@@ -1,0 +1,20 @@
+<div class="auth-wrap">
+  <div class="auth-left">
+    <app-logo [size]="20"></app-logo>
+    <div class="al-center">
+      <div class="al-icon">🎉</div>
+      <h2 class="font-display al-title">Bienvenue dans la <span class="text-gold">communauté</span></h2>
+    </div>
+    <p class="text-muted al-footer">© 2024 AchatGroupéBF</p>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form-wrap text-center">
+      <div style="font-size:64px;margin-bottom:12px">🎉</div>
+      <h2 class="font-display" style="font-size:32px;font-weight:800;margin-bottom:8px">
+        Bienvenue <span class="text-gold">{{ auth.currentUser()?.fullName?.split(' ')?.[0] }} !</span>
+      </h2>
+      <p class="text-muted" style="font-size:15px;margin-bottom:32px">Compte activé. Prêt à économiser ?</p>
+      <button class="btn-gold btn-blk btn-lg" (click)="go()">Explorer les groupes actifs 🚀</button>
+    </div>
+  </div>
+</div>
