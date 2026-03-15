@@ -1,0 +1,120 @@
+<div>
+  <!-- En-tête -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Groupes d'achat</h2>
+      <p class="text-muted" style="font-size:13px">{{ filtered.length }} groupe(s) affiché(s)</p>
+    </div>
+    <input class="inp" style="width:280px" placeholder="🔍  Rechercher groupe, produit, fournisseur..."
+           [(ngModel)]="search">
+  </div>
+
+  <!-- Stats rapides -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ groups.length }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Total groupes</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ openCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Ouverts</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ thresholdCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Seuil atteint</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#888">{{ completedCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Terminés</div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <!-- Tableau -->
+  <div class="glass">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Groupe</th>
+          <th>Fournisseur</th>
+          <th>Statut</th>
+          <th>Membres</th>
+          <th>Réduction</th>
+          <th>Prix actuel</th>
+          <th>Expire dans</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let g of filtered">
+          <!-- Groupe / Produit -->
+          <td>
+            <div class="flex gap-10" style="align-items:center">
+              <span style="font-size:20px">{{ g.product.emoji }}</span>
+              <div>
+                <div style="font-weight:500;font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                  {{ g.product.name }}
+                </div>
+                <div class="text-muted font-mono" style="font-size:11px">{{ g.id }}</div>
+              </div>
+            </div>
+          </td>
+          <!-- Fournisseur -->
+          <td class="text-muted" style="font-size:12px">{{ g.supplier.companyName }}</td>
+          <!-- Statut -->
+          <td><span [class]="statusClass(g.status)">{{ statusLabel(g.status) }}</span></td>
+          <!-- Membres -->
+          <td>
+            <div>
+              <div class="flex gap-6 mb-4" style="align-items:center">
+                <span class="font-mono" style="font-size:13px;font-weight:600"
+                      [style.color]="fillColor(g)">{{ g.currentCount }}</span>
+                <span class="text-muted" style="font-size:12px">/ {{ g.minParticipants }}</span>
+              </div>
+              <div class="prog-wrap" style="width:80px;height:4px">
+                <div class="prog-fill" [style.width.%]="fillPercent(g)"
+                     [style.background]="fillColor(g)"></div>
+              </div>
+            </div>
+          </td>
+          <!-- Réduction -->
+          <td>
+            <span class="font-mono" style="font-size:13px;font-weight:600;color:#10D98B">
+              -{{ g.discountPercent }}%
+            </span>
+          </td>
+          <!-- Prix actuel -->
+          <td class="font-mono" style="font-size:12px">{{ formatXOF(g.currentPrice) }}</td>
+          <!-- Expiration -->
+          <td>
+            <span class="font-mono" style="font-size:12px"
+                  [style.color]="isExpiringSoon(g.expiresAt) ? '#FF4D6A' : 'inherit'">
+              {{ formatExpiry(g.expiresAt) }}
+            </span>
+          </td>
+          <!-- Actions -->
+          <td>
+            <div class="flex gap-6">
+              <button class="btn-ghost btn-sm" [routerLink]="['/admin/groups', g.id]">Voir</button>
+              <button class="btn-err btn-sm"
+                      *ngIf="g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED'">
+                Fermer
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <div style="font-size:36px;margin-bottom:12px">🔥</div>
+      <p class="text-muted">Aucun groupe trouvé pour cette recherche.</p>
+    </div>
+  </div>
+</div>

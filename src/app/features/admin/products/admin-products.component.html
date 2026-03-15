@@ -1,0 +1,129 @@
+<div>
+  <!-- En-tête -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Produits</h2>
+      <p class="text-muted" style="font-size:13px">{{ filtered.length }} produit(s) affiché(s)</p>
+    </div>
+    <input class="inp" style="width:280px" placeholder="🔍  Rechercher produit, fournisseur..."
+           [(ngModel)]="search">
+  </div>
+
+  <!-- Stats rapides -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ products.length }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Total produits</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ activeCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Actifs</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ pendingCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">En attente</div>
+    </div>
+    <div class="glass" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#FF4D6A">{{ rejectedCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:3px">Rejetés</div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <!-- Tableau -->
+  <div class="glass">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Catégorie</th>
+          <th>Fournisseur</th>
+          <th>Prix solo</th>
+          <th>Prix groupe</th>
+          <th>Stock</th>
+          <th>Note</th>
+          <th>Groupes</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of filtered">
+          <!-- Produit -->
+          <td>
+            <div class="flex gap-10" style="align-items:center">
+              <span style="font-size:22px">{{ p.emoji }}</span>
+              <div>
+                <div style="font-weight:500;font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                <div class="text-muted font-mono" style="font-size:11px">{{ p.id }}</div>
+              </div>
+            </div>
+          </td>
+          <!-- Catégorie -->
+          <td>
+            <span style="font-size:12px">{{ p.category.icon }} {{ p.category.name }}</span>
+          </td>
+          <!-- Fournisseur -->
+          <td class="text-muted" style="font-size:12px">{{ p.supplier.companyName }}</td>
+          <!-- Prix solo -->
+          <td class="font-mono" style="font-size:12px">{{ formatXOF(p.soloPrice) }}</td>
+          <!-- Prix groupe -->
+          <td>
+            <div>
+              <span class="font-mono" style="font-size:12px;color:#10D98B">{{ formatXOF(p.minGroupPrice ?? 0) }}</span>
+              <div class="text-muted" style="font-size:11px">
+                -{{ ((1 - (p.minGroupPrice ?? 0) / p.soloPrice) * 100).toFixed(0) }}%
+              </div>
+            </div>
+          </td>
+          <!-- Stock -->
+          <td>
+            <span class="font-mono" style="font-size:13px"
+                  [style.color]="p.stock > 50 ? '#10D98B' : p.stock > 10 ? '#F5A623' : '#FF4D6A'">
+              {{ p.stock }}
+            </span>
+          </td>
+          <!-- Note -->
+          <td>
+            <div class="flex gap-4" style="align-items:center">
+              <span style="color:#F5A623;font-size:12px">★</span>
+              <span class="font-mono" style="font-size:12px">{{ p.rating }}</span>
+              <span class="text-muted" style="font-size:11px">({{ p.reviewCount }})</span>
+            </div>
+          </td>
+          <!-- Groupes actifs -->
+          <td class="font-mono" style="text-align:center">
+            <span [style.color]="p.activeGroupCount > 0 ? '#00D4FF' : 'var(--muted)'">
+              {{ p.activeGroupCount }}
+            </span>
+          </td>
+          <!-- Statut -->
+          <td><span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
+          <!-- Actions -->
+          <td>
+            <div class="flex gap-6">
+              <button class="btn-ghost btn-sm" [routerLink]="['/admin/products', p.id]">Voir</button>
+              <ng-container *ngIf="p.status === 'PENDING'">
+                <button class="btn-ok  btn-sm">Approuver</button>
+                <button class="btn-err btn-sm">Rejeter</button>
+              </ng-container>
+              <button class="btn-err btn-sm" *ngIf="p.status === 'ACTIVE'">Désactiver</button>
+              <button class="btn-ok  btn-sm" *ngIf="p.status === 'INACTIVE'">Réactiver</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <div style="font-size:36px;margin-bottom:12px">📦</div>
+      <p class="text-muted">Aucun produit trouvé pour cette recherche.</p>
+    </div>
+  </div>
+</div>

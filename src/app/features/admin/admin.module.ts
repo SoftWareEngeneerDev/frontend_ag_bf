@@ -13,15 +13,21 @@ import { AdminPaymentsComponent } from './payments/admin-payments.component';
 import { AdminDisputesComponent } from './disputes/admin-disputes.component';
 import { AdminAnalyticsComponent } from './analytics/admin-analytics.component';
 import { AdminLogsComponent }     from './logs/admin-logs.component';
+import { AdminUserDetailComponent }    from './users/admin-user-detail/admin-user-detail.component';
+import { AdminProductDetailComponent } from './products/admin-product-detail/admin-product-detail.component';
+import { AdminGroupDetailComponent }   from './groups/admin-group-detail/admin-group-detail.component';
 
 @NgModule({
   declarations: [
     AdminShellComponent,
     AdminDashboardComponent,
     AdminUsersComponent,
+    AdminUserDetailComponent,
     AdminSuppliersComponent,
     AdminProductsComponent,
+    AdminProductDetailComponent,
     AdminGroupsComponent,
+    AdminGroupDetailComponent,
     AdminPaymentsComponent,
     AdminDisputesComponent,
     AdminAnalyticsComponent,
@@ -37,9 +43,12 @@ import { AdminLogsComponent }     from './logs/admin-logs.component';
         children: [
           { path: '',          component: AdminDashboardComponent },
           { path: 'users',     component: AdminUsersComponent },
+          { path: 'users/:id', component: AdminUserDetailComponent },
           { path: 'suppliers', component: AdminSuppliersComponent },
-          { path: 'products',  component: AdminProductsComponent },
-          { path: 'groups',    component: AdminGroupsComponent },
+          { path: 'products',     component: AdminProductsComponent },
+          { path: 'products/:id', component: AdminProductDetailComponent },
+          { path: 'groups',       component: AdminGroupsComponent },
+          { path: 'groups/:id',   component: AdminGroupDetailComponent },
           { path: 'payments',  component: AdminPaymentsComponent },
           { path: 'disputes',  component: AdminDisputesComponent },
           { path: 'analytics', component: AdminAnalyticsComponent },

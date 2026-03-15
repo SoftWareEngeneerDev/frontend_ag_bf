@@ -1,0 +1,177 @@
+<div *ngIf="product; else notFound">
+
+  <!-- En-tête -->
+  <div class="flex-between mb-24">
+    <div class="flex gap-12" style="align-items:center">
+      <button class="btn-ghost btn-sm" (click)="goBack()">← Retour</button>
+      <div>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail produit</h2>
+        <p class="text-muted font-mono" style="font-size:12px">{{ product.id }}</p>
+      </div>
+    </div>
+    <div class="flex gap-8">
+      <ng-container *ngIf="product.status === 'PENDING'">
+        <button class="btn-ok  btn-sm">✅ Approuver</button>
+        <button class="btn-err btn-sm">✗ Rejeter</button>
+      </ng-container>
+      <button class="btn-err btn-sm" *ngIf="product.status === 'ACTIVE'">Désactiver</button>
+      <button class="btn-ok  btn-sm" *ngIf="product.status === 'INACTIVE'">Réactiver</button>
+    </div>
+  </div>
+
+  <!-- Carte identité produit -->
+  <div class="glass mb-20" style="padding:24px">
+    <div class="flex gap-20" style="align-items:flex-start">
+      <div style="font-size:56px;line-height:1">{{ product.emoji }}</div>
+      <div style="flex:1">
+        <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
+          <span style="font-size:20px;font-weight:700">{{ product.name }}</span>
+          <span [class]="statusClass">{{ statusLabel }}</span>
+        </div>
+        <div class="flex gap-20 text-muted mb-12" style="font-size:13px;flex-wrap:wrap">
+          <span>{{ product.category.icon }} {{ product.category.name }}</span>
+          <span>🏪 {{ product.supplier.companyName }}</span>
+          <span>⭐ {{ product.rating }}/5 ({{ product.reviewCount }} avis)</span>
+          <span>📅 Ajouté le {{ product.createdAt | date:'d MMM yyyy' }}</span>
+        </div>
+        <p class="text-muted" style="font-size:13px;line-height:1.5">{{ product.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats clés -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:var(--gold)">{{ formatXOF(product.soloPrice) }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Prix solo</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ formatXOF(product.minGroupPrice ?? 0) }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Meilleur prix groupe (-{{ discountPercent }}%)</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700" [style.color]="stockColor">{{ product.stock }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Unités en stock</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ product.activeGroupCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Groupes actifs</div>
+    </div>
+  </div>
+
+  <!-- Détails et fournisseur -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- Informations produit -->
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Informations produit</h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:45%">Identifiant</td>
+            <td class="font-mono" style="font-size:12px">{{ product.id }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Catégorie</td>
+            <td style="font-size:13px">{{ product.category.icon }} {{ product.category.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Prix solo</td>
+            <td class="font-mono" style="font-size:13px">{{ formatXOF(product.soloPrice) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Prix groupe min.</td>
+            <td class="font-mono" style="font-size:13px;color:#10D98B">{{ formatXOF(product.minGroupPrice ?? 0) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Réduction max.</td>
+            <td style="font-size:13px;color:#10D98B;font-weight:600">-{{ discountPercent }}%</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Stock disponible</td>
+            <td class="font-mono" style="font-size:13px" [style.color]="stockColor">{{ product.stock }} unités</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Note moyenne</td>
+            <td>
+              <span style="color:#F5A623">★</span>
+              <span class="font-mono" style="font-size:13px"> {{ product.rating }}/5</span>
+              <span class="text-muted" style="font-size:11px"> ({{ product.reviewCount }} avis)</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Groupes actifs</td>
+            <td class="font-mono" style="font-size:13px;color:#00D4FF">{{ product.activeGroupCount }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Statut</td>
+            <td><span [class]="statusClass">{{ statusLabel }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fournisseur -->
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Fournisseur</h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:45%">Entreprise</td>
+            <td style="font-size:13px;font-weight:500">{{ product.supplier.companyName }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Contact</td>
+            <td style="font-size:13px">{{ product.supplier.contactName }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Téléphone</td>
+            <td class="font-mono" style="font-size:12px">{{ product.supplier.phone }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Email</td>
+            <td style="font-size:12px">{{ product.supplier.email }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Ville</td>
+            <td style="font-size:13px">{{ product.supplier.city }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Note fournisseur</td>
+            <td>
+              <span style="color:#F5A623">★</span>
+              <span class="font-mono" style="font-size:13px"> {{ product.supplier.rating }}/5</span>
+              <span class="text-muted" style="font-size:11px"> ({{ product.supplier.reviewCount }} avis)</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Taux de succès</td>
+            <td>
+              <div class="flex gap-8" style="align-items:center">
+                <div class="prog-wrap" style="width:60px;height:4px">
+                  <div class="prog-fill" [style.width.%]="product.supplier.successRate"></div>
+                </div>
+                <span class="font-mono" style="font-size:12px;color:#10D98B">{{ product.supplier.successRate }}%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Total groupes</td>
+            <td class="font-mono" style="font-size:13px">{{ product.supplier.totalGroups }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<ng-template #notFound>
+  <div style="text-align:center;padding:60px 0">
+    <div style="font-size:48px;margin-bottom:16px">📦</div>
+    <h3 style="font-weight:600;margin-bottom:8px">Produit introuvable</h3>
+    <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun produit.</p>
+    <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>
+  </div>
+</ng-template>

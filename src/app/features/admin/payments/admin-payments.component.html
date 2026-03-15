@@ -1,0 +1,110 @@
+<div>
+  <!-- En-tête -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Paiements</h2>
+      <p class="text-muted" style="font-size:13px">{{ filtered.length }} transaction(s) affichée(s)</p>
+    </div>
+    <input class="inp" style="width:300px" placeholder="🔍  Référence, utilisateur, produit..."
+           [(ngModel)]="search">
+  </div>
+
+  <!-- Stats rapides -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+    <div class="glass" style="padding:20px">
+      <div class="text-muted" style="font-size:11px;margin-bottom:6px">TOTAL ENCAISSÉ</div>
+      <div style="font-size:20px;font-weight:700;color:#10D98B">{{ formatXOF(totalSuccess) }}</div>
+    </div>
+    <div class="glass" style="padding:20px">
+      <div class="text-muted" style="font-size:11px;margin-bottom:6px">EN ATTENTE</div>
+      <div style="font-size:20px;font-weight:700;color:#F5A623">{{ formatXOF(totalPending) }}</div>
+    </div>
+    <div class="glass" style="padding:20px">
+      <div class="text-muted" style="font-size:11px;margin-bottom:6px">REMBOURSÉS</div>
+      <div style="font-size:20px;font-weight:700;color:#888">{{ formatXOF(totalRefunded) }}</div>
+    </div>
+    <div class="glass" style="padding:20px">
+      <div class="text-muted" style="font-size:11px;margin-bottom:6px">COMMISSIONS</div>
+      <div style="font-size:20px;font-weight:700;color:var(--gold)">{{ formatXOF(totalCommissions) }}</div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">{{ t }}</button>
+  </div>
+
+  <!-- Tableau -->
+  <div class="glass">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Utilisateur</th>
+          <th>Produit / Groupe</th>
+          <th>Type</th>
+          <th>Méthode</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of filtered">
+          <!-- Référence -->
+          <td>
+            <div class="font-mono" style="font-size:12px;font-weight:500">{{ p.reference }}</div>
+            <div class="text-muted font-mono" style="font-size:10px">{{ p.transactionId }}</div>
+          </td>
+          <!-- Utilisateur -->
+          <td>
+            <div style="font-weight:500;font-size:13px">{{ p.user }}</div>
+            <div class="text-muted font-mono" style="font-size:11px">{{ p.phone }}</div>
+          </td>
+          <!-- Produit / Groupe -->
+          <td>
+            <div style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+              {{ p.product }}
+            </div>
+            <div class="text-muted font-mono" style="font-size:10px">{{ p.groupId }}</div>
+          </td>
+          <!-- Type -->
+          <td><span [class]="typeClass(p.type)">{{ typeLabel(p.type) }}</span></td>
+          <!-- Méthode -->
+          <td>
+            <span style="font-size:13px">{{ methodIcon(p.method) }} {{ methodLabel(p.method) }}</span>
+          </td>
+          <!-- Montant -->
+          <td>
+            <span class="font-mono" style="font-size:13px;font-weight:600"
+                  [style.color]="p.type === 'REFUND' ? '#888' : p.type === 'COMMISSION' ? 'var(--gold)' : '#10D98B'">
+              {{ p.type === 'REFUND' ? '-' : '+' }}{{ formatXOF(p.amount) }}
+            </span>
+          </td>
+          <!-- Statut -->
+          <td><span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
+          <!-- Date -->
+          <td class="text-muted" style="font-size:12px">{{ p.date }}</td>
+          <!-- Actions -->
+          <td>
+            <div class="flex gap-6">
+              <button class="btn-ghost btn-sm">Voir</button>
+              <button class="btn-ok btn-sm"
+                      *ngIf="p.status === 'FAILED'">Relancer</button>
+              <button class="btn-err btn-sm"
+                      *ngIf="p.status === 'PENDING'">Annuler</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <div style="font-size:36px;margin-bottom:12px">💳</div>
+      <p class="text-muted">Aucune transaction trouvée pour cette recherche.</p>
+    </div>
+  </div>
+</div>

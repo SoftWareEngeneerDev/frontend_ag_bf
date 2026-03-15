@@ -40,7 +40,7 @@
           <td class="text-muted" style="font-size:12px">{{ u.joined }}</td>
           <td>
             <div class="flex gap-6">
-              <button class="btn-ghost btn-sm">Voir</button>
+              <button class="btn-ghost btn-sm" [routerLink]="['/admin/users', u.id]">Voir</button>
               <button class="btn-err btn-sm" *ngIf="u.status === 'ACTIVE'">Suspendre</button>
               <button class="btn-ok   btn-sm" *ngIf="u.status === 'SUSPENDED'">Réactiver</button>
             </div>

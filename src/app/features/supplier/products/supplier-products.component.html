@@ -67,7 +67,7 @@
 
         <!-- Rating -->
         <div class="sp-rating">
-          <span *ngFor="let i of stars(5)"
+          <span *ngFor="let i of stars()"
                 [style.color]="i < p.rating ? '#F5A623' : 'rgba(255,255,255,.2)'">★</span>
           <span class="text-muted" style="font-size:12px;margin-left:6px">
             {{ p.rating }}/5 ({{ p.reviewCount }} avis)
@@ -76,8 +76,150 @@
 
         <!-- Actions -->
         <div class="sp-actions">
-          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">✏️ Modifier</button>
-          <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center">👥 Créer un groupe</button>
+          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
+                  (click)="openEdit(p)">✏️ Modifier</button>
+          <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center"
+                  (click)="openCreateGroup(p)">👥 Créer un groupe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Modifier produit -->
+  <div class="modal-backdrop" *ngIf="showEditModal && selectedProduct" (click)="showEditModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <div>
+          <h3 class="font-display" style="font-size:17px;font-weight:700">✏️ Modifier le produit</h3>
+          <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.id }}</p>
+        </div>
+        <button class="btn-ghost btn-sm" (click)="showEditModal = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="inp-group">
+          <label>Nom du produit</label>
+          <input class="inp" [(ngModel)]="editForm.name" placeholder="Nom du produit">
+        </div>
+        <div class="inp-group">
+          <label>Description</label>
+          <textarea class="inp" rows="3" [(ngModel)]="editForm.description"
+                    placeholder="Décrivez votre produit..." style="resize:vertical"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Prix solo (XOF)</label>
+            <input class="inp" type="number" [(ngModel)]="editForm.soloPrice">
+          </div>
+          <div class="inp-group">
+            <label>Prix groupe min. (XOF)</label>
+            <input class="inp" type="number" [(ngModel)]="editForm.minGroupPrice">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Stock disponible</label>
+            <input class="inp" type="number" [(ngModel)]="editForm.stock">
+          </div>
+          <div class="inp-group">
+            <label>Catégorie</label>
+            <select class="inp" [(ngModel)]="editForm.category">
+              <option *ngFor="let c of categories">{{ c }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="alert-cyan alert" style="font-size:12px">
+          ℹ️ Les modifications seront soumises à validation avant publication.
+        </div>
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showEditModal = false">Annuler</button>
+          <button class="btn-gold"  style="flex:1;justify-content:center"
+                  (click)="showEditModal = false">Enregistrer →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Créer un groupe -->
+  <div class="modal-backdrop" *ngIf="showGroupModal && selectedProduct" (click)="showGroupModal = false">
+    <div class="modal-box glass" style="max-width:540px" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <div class="flex gap-12" style="align-items:center">
+          <span style="font-size:28px">{{ selectedProduct!.emoji }}</span>
+          <div>
+            <h3 class="font-display" style="font-size:17px;font-weight:700">👥 Créer un groupe</h3>
+            <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.name | truncate:38 }}</p>
+          </div>
+        </div>
+        <button class="btn-ghost btn-sm" (click)="showGroupModal = false">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Paramètres principaux -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Membres min.</label>
+            <input class="inp" type="number" [(ngModel)]="groupForm.minParticipants" min="2">
+          </div>
+          <div class="inp-group">
+            <label>Acompte (%)</label>
+            <input class="inp" type="number" [(ngModel)]="groupForm.depositPercent" min="5" max="50">
+          </div>
+          <div class="inp-group">
+            <label>Durée (jours)</label>
+            <input class="inp" type="number" [(ngModel)]="groupForm.expiresInDays" min="1" max="30">
+          </div>
+        </div>
+
+        <!-- Paliers de réduction -->
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:10px">
+            Paliers de réduction
+          </label>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div *ngFor="let tier of groupForm.tiers; let i = index"
+                 class="glass" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;padding:10px 14px">
+              <div class="inp-group" style="margin:0">
+                <label style="font-size:10px">Membres min.</label>
+                <input class="inp" type="number" [(ngModel)]="tier.minParticipants" min="2">
+              </div>
+              <div class="inp-group" style="margin:0">
+                <label style="font-size:10px">Réduction (%)</label>
+                <input class="inp" type="number" [(ngModel)]="tier.discountPercent" min="1" max="70">
+              </div>
+              <div style="text-align:center">
+                <div class="font-mono" style="font-size:11px;color:#10D98B;font-weight:700">
+                  -{{ tier.discountPercent }}%
+                </div>
+                <div class="text-muted" style="font-size:10px">
+                  {{ selectedProduct!.soloPrice * (1 - tier.discountPercent / 100) | number:'1.0-0' }} XOF
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aperçu -->
+        <div class="glass" style="padding:14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="text-muted" style="font-size:11px;margin-bottom:3px">MEILLEUR PRIX GROUPE</div>
+            <div class="font-mono" style="font-size:18px;font-weight:700;color:#10D98B">
+              {{ groupPricePreview | number:'1.0-0' }} XOF
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="text-muted" style="font-size:11px;margin-bottom:3px">ACOMPTE REQUIS</div>
+            <div class="font-mono" style="font-size:16px;font-weight:700;color:var(--gold)">
+              {{ (groupPricePreview * groupForm.depositPercent / 100) | number:'1.0-0' }} XOF
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showGroupModal = false">Annuler</button>
+          <button class="btn-cyan"  style="flex:1;justify-content:center"
+                  (click)="showGroupModal = false">Créer le groupe →</button>
         </div>
       </div>
     </div>

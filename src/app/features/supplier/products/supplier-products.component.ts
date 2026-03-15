@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../../core/services/product.service';
-import { AuthService }    from '../../../core/services/auth.service';
 import { FormatService }  from '../../../core/services/format.service';
 import { Product } from '../../../core/models';
 
@@ -16,7 +15,61 @@ export class SupplierProductsComponent implements OnInit {
   search   = '';
   activeTab = 'Tous';
   tabs = ['Tous','Approuvés','En attente','Rejetés'];
-  showAddModal = false;
+
+  showAddModal   = false;
+  showEditModal  = false;
+  showGroupModal = false;
+
+  selectedProduct: Product | null = null;
+
+  editForm = { name:'', description:'', soloPrice:0, minGroupPrice:0, stock:0, category:'' };
+
+  groupForm = {
+    minParticipants: 10,
+    depositPercent:  10,
+    expiresInDays:   7,
+    tiers: [
+      { minParticipants: 5,  discountPercent: 15 },
+      { minParticipants: 10, discountPercent: 25 },
+      { minParticipants: 15, discountPercent: 35 },
+    ]
+  };
+
+  categories = ['Électronique','Alimentaire','Textile & Mode','Maison & Jardin','Santé & Beauté','Agriculture'];
+
+  openEdit(p: Product): void {
+    this.selectedProduct = p;
+    this.editForm = {
+      name:          p.name,
+      description:   p.description,
+      soloPrice:     p.soloPrice,
+      minGroupPrice: p.minGroupPrice ?? 0,
+      stock:         p.stock,
+      category:      p.category.name,
+    };
+    this.showEditModal = true;
+  }
+
+  openCreateGroup(p: Product): void {
+    this.selectedProduct = p;
+    this.groupForm = {
+      minParticipants: 10,
+      depositPercent:  10,
+      expiresInDays:   7,
+      tiers: [
+        { minParticipants: 5,  discountPercent: 15 },
+        { minParticipants: 10, discountPercent: 25 },
+        { minParticipants: 15, discountPercent: 35 },
+      ]
+    };
+    this.showGroupModal = true;
+  }
+
+  get groupPricePreview(): number {
+    if (!this.selectedProduct) return 0;
+    const bestDiscount = Math.max(...this.groupForm.tiers.map(t => t.discountPercent));
+    return Math.round(this.selectedProduct.soloPrice * (1 - bestDiscount / 100));
+  }
 
   constructor(
     private productService: ProductService,
@@ -51,5 +104,5 @@ export class SupplierProductsComponent implements OnInit {
     return s === 'ACTIVE' ? 'Approuvé' : s === 'PENDING' ? 'En attente' : s === 'REJECTED' ? 'Rejeté' : s;
   }
 
-  stars(n: number): number[] { return Array(5).fill(0).map((_,i) => i); }
+  stars(): number[] { return Array(5).fill(0).map((_,i) => i); }
 }

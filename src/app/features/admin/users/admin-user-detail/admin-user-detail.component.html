@@ -1,0 +1,159 @@
+<div *ngIf="user; else notFound">
+
+  <!-- En-tête -->
+  <div class="flex-between mb-24">
+    <div class="flex gap-12" style="align-items:center">
+      <button class="btn-ghost btn-sm" (click)="goBack()">← Retour</button>
+      <div>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Profil utilisateur</h2>
+        <p class="text-muted" style="font-size:12px">{{ user.id }}</p>
+      </div>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn-err btn-sm" *ngIf="user.status === 'ACTIVE'">Suspendre</button>
+      <button class="btn-ok btn-sm"  *ngIf="user.status === 'SUSPENDED'">Réactiver</button>
+    </div>
+  </div>
+
+  <!-- Carte identité -->
+  <div class="glass mb-20" style="padding:24px">
+    <div class="flex gap-20" style="align-items:center">
+      <app-avatar [name]="user.name" [size]="64" [bg]="avatarBg"></app-avatar>
+      <div style="flex:1">
+        <div class="flex gap-10 mb-6" style="align-items:center">
+          <span style="font-size:20px;font-weight:700">{{ user.name }}</span>
+          <span [class]="roleBadge">{{ roleLabel }}</span>
+          <span [class]="statusBadge">{{ statusLabel }}</span>
+        </div>
+        <div class="flex gap-24 text-muted" style="font-size:13px">
+          <span>📞 {{ user.phone }}</span>
+          <span>✉️ {{ user.email }}</span>
+          <span>📍 {{ user.city }}</span>
+          <span>🗓️ Inscrit le {{ user.joined }}</span>
+        </div>
+      </div>
+      <!-- Score de confiance -->
+      <div style="text-align:center;min-width:90px">
+        <div style="font-size:28px;font-weight:700;color:var(--gold)">{{ user.score }}</div>
+        <div class="text-muted" style="font-size:11px">Score de confiance</div>
+        <div class="prog-wrap" style="width:80px;height:6px;margin:6px auto 0">
+          <div class="prog-fill" [style.width.%]="user.score"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ user.groups }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Groupes rejoints</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ user.ordersCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Commandes</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:var(--gold)">{{ formatXOF(user.totalSaved) }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Total économisé</div>
+    </div>
+    <div class="glass" style="padding:20px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ user.referralCount }}</div>
+      <div class="text-muted" style="font-size:12px;margin-top:4px">Parrainages</div>
+    </div>
+  </div>
+
+  <!-- Informations détaillées -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Informations du compte</h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:40%">Identifiant</td>
+            <td class="font-mono" style="font-size:12px">{{ user.id }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Nom complet</td>
+            <td style="font-weight:500;font-size:13px">{{ user.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Téléphone</td>
+            <td class="font-mono" style="font-size:12px">{{ user.phone }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Email</td>
+            <td style="font-size:12px">{{ user.email }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Ville</td>
+            <td style="font-size:13px">{{ user.city }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Rôle</td>
+            <td><span [class]="roleBadge">{{ roleLabel }}</span></td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Statut</td>
+            <td><span [class]="statusBadge">{{ statusLabel }}</span></td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Inscrit le</td>
+            <td style="font-size:12px">{{ user.joined }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Activité financière</h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:50%">Total paiements</td>
+            <td class="font-mono" style="font-size:13px;color:var(--gold)">{{ formatXOF(user.paymentsTotal) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Économies réalisées</td>
+            <td class="font-mono" style="font-size:13px;color:#10D98B">{{ formatXOF(user.totalSaved) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Commandes</td>
+            <td class="font-mono" style="font-size:13px">{{ user.ordersCount }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Groupes actifs</td>
+            <td class="font-mono" style="font-size:13px">{{ user.groups }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Parrainages</td>
+            <td class="font-mono" style="font-size:13px">{{ user.referralCount }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Score de confiance</td>
+            <td>
+              <div class="flex gap-8" style="align-items:center">
+                <div class="prog-wrap" style="width:60px;height:4px">
+                  <div class="prog-fill" [style.width.%]="user.score"></div>
+                </div>
+                <span class="font-mono" style="font-size:12px;color:var(--gold)">{{ user.score }}/100</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<ng-template #notFound>
+  <div style="text-align:center;padding:60px 0">
+    <div style="font-size:48px;margin-bottom:16px">🔍</div>
+    <h3 style="font-weight:600;margin-bottom:8px">Utilisateur introuvable</h3>
+    <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun utilisateur.</p>
+    <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>
+  </div>
+</ng-template>
