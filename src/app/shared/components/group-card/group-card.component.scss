@@ -1,59 +1,274 @@
-.gc-card { cursor:pointer; overflow:hidden; }
+:host { display: block; }
 
-/* Image zone */
-.gc-img {
+// ── Carte principale ────────────────────────────────────────────────
+.gc-card {
+  background: var(--bg-white, #fff);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+  cursor: pointer;
+  transition: box-shadow .28s ease, transform .28s ease;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: 0 10px 32px rgba(0, 0, 0, .14);
+    transform: translateY(-5px);
+
+    .gc-img      { transform: scale(1.06); }
+    .gc-actions  { opacity: 1; pointer-events: all; }
+  }
+}
+
+// ── Zone image ──────────────────────────────────────────────────────
+.gc-img-wrap {
   position: relative;
-  background: linear-gradient(135deg, #E6F7F4 0%, #F0FDF9 100%);
-  padding: 28px 20px 20px;
-  text-align: center;
+  height: 230px;
+  overflow: hidden;
+  background: #f3f4f6;
 }
-.gc-emoji-bg {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: var(--bg-white); box-shadow: var(--shadow);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 4px;
+
+.gc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .45s ease;
 }
-.gc-emoji { font-size: 44px; display: block; }
-.gc-sticker-status { position: absolute; top: 12px; left: 12px; font-size: 11px; }
+
+// Badges (coin haut-gauche)
+.gc-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  i { font-size: 10px; }
+}
+.gc-badge-hot  { background: var(--gold, #F4A902); color: #fff; }
+.gc-badge-open { background: var(--primary, #0DA487); color: #fff; }
+
+// Remise (coin haut-droit)
 .gc-discount {
-  position: absolute; top: 12px; right: 12px;
-  background: var(--orange); color: #fff;
-  font-size: 13px; font-weight: 800; border-radius: var(--r-full);
-  padding: 4px 10px; font-family: 'JetBrains Mono', monospace;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--orange, #FF8C00);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 6px;
+  padding: 5px 11px;
 }
 
-/* Body */
-.gc-body { padding: 16px; }
-.gc-cat  { font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: .5px; }
-.gc-name { font-size: 14px; font-weight: 700; color: var(--txt); line-height: 1.35; margin: 5px 0 12px; min-height: 38px; }
-
-/* Participants */
-.gc-part-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.gc-avatars  { display:flex; gap:-4px; }
-.gc-av {
-  width:24px; height:24px; border-radius:50%; border:2px solid #fff;
-  display:flex; align-items:center; justify-content:center;
-  font-size:9px; font-weight:800; color:#fff; font-family:'Syne',sans-serif;
-  margin-left:-4px; &:first-child { margin-left:0; }
+// Boutons d'action au survol (colonne côté droit, centrée verticalement)
+.gc-actions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease;
 }
-.gc-av-plus { background:var(--bg3); color:var(--muted) !important; font-size:9px; }
-.gc-part-label { font-size:12px; color:var(--muted); font-weight:500; }
 
-/* Progress */
-.gc-prog-wrap { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-.gc-pct { font-size:12px; font-weight:700; color:var(--primary); }
+.gc-act-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+  color: var(--txt, #111);
+  font-size: 14px;
+  transition: background .18s, color .18s, transform .18s;
 
-/* Price */
-.gc-price-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
-.gc-old-price { font-size:12px; color:var(--light); text-decoration:line-through; margin-bottom:2px; }
-.gc-price     { font-size:20px; font-weight:800; color:var(--txt); }
-.gc-economy   { text-align:right; background:var(--primary-l); border-radius:var(--r-sm); padding:6px 10px; }
-.gc-eco-label { font-size:10px; color:var(--primary); font-weight:600; }
-.gc-eco-val   { font-size:13px; font-weight:800; color:var(--primary); }
+  &:hover {
+    background: var(--primary, #0DA487);
+    color: #fff;
+    transform: scale(1.1);
+  }
+}
 
-/* Countdown */
-.gc-countdown { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-.gc-cd-icon   { font-size:14px; }
+.gc-act-fav:hover {
+  background: #E63946;
+}
 
-/* CTA */
-.gc-cta { font-size:13px; font-weight:700; border-radius:var(--r); }
+// ── Corps ───────────────────────────────────────────────────────────
+.gc-body {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.gc-cat {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #888);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.gc-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--txt, #111);
+  line-height: 1.4;
+  margin: 0 0 10px;
+  min-height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Étoiles ─────────────────────────────────────────────────────────
+.gc-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.gc-stars {
+  display: flex;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.gc-star-on  { color: #F4A902; }
+.gc-star-off { color: #dde0e4; }
+
+.gc-review-count {
+  font-size: 12px;
+  color: var(--muted, #888);
+}
+
+// ── Progression ─────────────────────────────────────────────────────
+.gc-progress {
+  margin-bottom: 14px;
+}
+
+.gc-prog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted, #888);
+  margin-bottom: 6px;
+}
+
+.gc-prog-icon { font-size: 11px; margin-right: 4px; color: var(--primary, #0DA487); }
+
+.gc-pct {
+  font-weight: 700;
+  color: var(--primary, #0DA487);
+  &.gc-pct-full { color: var(--gold, #F4A902); }
+}
+
+.gc-prog-track {
+  height: 7px;
+  background: #eef0f3;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gc-prog-fill {
+  height: 100%;
+  background: var(--primary, #0DA487);
+  border-radius: 4px;
+  transition: width .4s ease;
+
+  &.full { background: var(--gold, #F4A902); }
+}
+
+// ── Prix + countdown ────────────────────────────────────────────────
+.gc-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gc-prices { display: flex; flex-direction: column; gap: 2px; }
+
+.gc-old-price {
+  font-size: 12px;
+  color: var(--light, #b0b5be);
+  text-decoration: line-through;
+}
+
+.gc-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary, #0DA487);
+  font-family: var(--font-mono, 'Roboto', monospace);
+}
+
+.gc-countdown-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted, #888);
+}
+
+.gc-cd-icon { font-size: 13px; color: var(--orange, #FF8C00); }
+
+// ── CTA ─────────────────────────────────────────────────────────────
+.gc-cta {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--r, 8px);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  i { font-size: 13px; }
+}
+
+// ── Alerte seuil atteint ─────────────────────────────────────────────
+.gc-hot-alert {
+  margin-top: 10px;
+  background: #FFF8E1;
+  border: 1px solid #F4A902;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #92600A;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  i { color: var(--gold, #F4A902); }
+}
+
+// ── Responsive ──────────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .gc-img-wrap { height: 190px; }
+  .gc-price    { font-size: 17px; }
+  .gc-cta      { font-size: 12px; padding: 10px; }
+}

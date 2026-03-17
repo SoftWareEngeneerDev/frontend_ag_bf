@@ -13,7 +13,7 @@
   <div class="sup-grid">
     <div class="glass sup-card" *ngFor="let s of filtered">
       <div class="sup-head">
-        <div class="sup-icon">🏪</div>
+        <div class="sup-icon"><i class="fa-solid fa-store"></i></div>
         <div class="sup-info">
           <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">{{ s.companyName }}</div>
           <div class="text-muted" style="font-size:12px">{{ s.contactName }} · {{ s.city }}</div>
@@ -34,13 +34,13 @@
       </div>
 
       <div class="sup-contact text-muted">
-        <span>📧 {{ s.email }}</span>
-        <span>📞 {{ s.phone }}</span>
+        <span><i class="fa-solid fa-envelope"></i> {{ s.email }}</span>
+        <span><i class="fa-solid fa-phone"></i> {{ s.phone }}</span>
       </div>
 
       <div class="sup-actions">
         <ng-container *ngIf="s.status === 'PENDING'">
-          <button class="btn-gold btn-sm" style="flex:1;justify-content:center">✅ Approuver</button>
+          <button class="btn-gold btn-sm" style="flex:1;justify-content:center"><i class="fa-solid fa-circle-check"></i> Approuver</button>
           <button class="btn-err  btn-sm" style="flex:1;justify-content:center">✗ Rejeter</button>
         </ng-container>
         <ng-container *ngIf="s.status === 'APPROVED'">

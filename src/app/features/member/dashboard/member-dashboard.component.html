@@ -1,103 +1,198 @@
 <div class="md-page">
 
-  <!-- Welcome banner -->
-  <div class="md-welcome">
-    <div class="mw-left">
-      <div class="mw-greeting">{{ greeting }} {{ firstName }} ! 🌅</div>
-      <p class="text-muted" style="font-size:14px;margin-top:4px">
-        Vous participez à <strong class="text-primary">{{ myGroups.length }} groupes actifs</strong>
-      </p>
+  <!-- ══ HERO PERSONNALISÉ ══════════════════════════════════════════ -->
+  <div class="md-hero">
+    <div class="mdh-left">
+      <app-avatar [name]="firstName" [size]="64" bg="linear-gradient(135deg,#0DA487,#065F46)"></app-avatar>
+      <div class="mdh-info">
+        <p class="mdh-greeting">{{ greeting }},</p>
+        <h2 class="mdh-name">{{ firstName }} !</h2>
+        <p class="mdh-sub">
+          <i class="fa-solid fa-users"></i> {{ myGroups.length }} groupes actifs
+          &nbsp;·&nbsp;
+          <i class="fa-solid fa-star" style="color:#F4A902"></i> Score 95/100
+        </p>
+      </div>
     </div>
-    <div class="mw-savings">
-      <div class="mws-label">Total économisé</div>
-      <div class="mws-val font-display font-mono">47 500 XOF</div>
-      <span class="badge-ok" style="font-size:11px">↑ +12% ce mois</span>
+
+    <div class="mdh-savings">
+      <div class="mdh-sav-label">
+        <i class="fa-solid fa-piggy-bank"></i> Total économisé
+      </div>
+      <div class="mdh-sav-val">47 500 XOF</div>
+      <span class="mdh-sav-trend">
+        <i class="fa-solid fa-arrow-trend-up"></i> +12% ce mois
+      </span>
+    </div>
+
+    <div class="mdh-actions">
+      <button class="mdh-btn" (click)="goGroups()">
+        <i class="fa-solid fa-users"></i><span>Mes groupes</span>
+      </button>
+      <button class="mdh-btn mdh-btn-gold" (click)="goPayment()">
+        <i class="fa-solid fa-credit-card"></i><span>Payer</span>
+      </button>
+      <button class="mdh-btn mdh-btn-ghost" (click)="goBrowse()">
+        <i class="fa-solid fa-compass"></i><span>Parcourir</span>
+      </button>
     </div>
   </div>
 
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <app-stats-card *ngFor="let k of kpis"
-      [icon]="k.icon" [value]="k.val" [label]="k.label" [sub]="k.sub" [color]="k.color">
-    </app-stats-card>
+  <!-- ══ KPI STRIP ═════════════════════════════════════════════════ -->
+  <div class="md-kpi-grid">
+    <div class="md-kpi" *ngFor="let k of kpis">
+      <div class="md-kpi-icon" [style.background]="k.bg" [style.color]="k.color">
+        <i [class]="k.icon"></i>
+      </div>
+      <div class="md-kpi-data">
+        <div class="md-kpi-val">{{ k.val }}</div>
+        <div class="md-kpi-label">{{ k.label }}</div>
+        <div class="md-kpi-sub">{{ k.sub }}</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Threshold alert -->
-  <div class="alert-orange alert md-alert" *ngIf="myGroups.length > 0">
-    <span style="font-size:20px">🎯</span>
-    <div>
-      <strong>Seuil atteint !</strong> Le Climatiseur 12000 BTU a atteint son minimum.
-      Payez le solde avant le 20 mars pour confirmer votre commande.
+  <!-- ══ ALERTE URGENTE (seuil atteint) ════════════════════════════ -->
+  <div class="md-urgent" *ngIf="urgentGroup">
+    <div class="mdu-left">
+      <div class="mdu-pulse">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <div class="mdu-title">Action requise — Seuil atteint !</div>
+        <div class="mdu-desc">
+          <strong>{{ urgentGroup.product.name }}</strong> a atteint son minimum.
+          Payez le solde de <strong>{{ urgentGroup.currentPrice - urgentGroup.depositAmount | currencyXof }}</strong>
+          avant l'expiration pour confirmer votre commande.
+        </div>
+      </div>
     </div>
-    <button class="btn-orange btn-sm btn-round" style="margin-left:auto;flex-shrink:0"
-            (click)="goPayment()">
-      Payer maintenant →
+    <button class="btn-gold btn-round mdu-cta" (click)="goPayment()">
+      <i class="fa-solid fa-credit-card"></i> Payer maintenant
     </button>
   </div>
 
-  <div class="md-grid">
-    <!-- Left: mes groupes -->
-    <div class="md-col-main">
-      <div class="flex-between md-section-head">
-        <h3 class="font-display md-section-title">Mes groupes actifs</h3>
-        <button class="btn-outline btn-sm btn-round" (click)="goGroups()">Voir tout →</button>
+  <!-- ══ CONTENU PRINCIPAL ══════════════════════════════════════════ -->
+  <div class="md-main-grid">
+
+    <!-- ── Mes groupes actifs ─────────────────────────────────────── -->
+    <div class="md-panel">
+      <div class="md-panel-head">
+        <div class="md-panel-title">
+          <i class="fa-solid fa-layer-group"></i> Mes groupes actifs
+        </div>
+        <button class="md-see-all" (click)="goGroups()">Voir tout <i class="fa-solid fa-arrow-right"></i></button>
       </div>
 
       <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-      <div class="mg-list" *ngIf="!loading">
-        <div class="mg-item" *ngFor="let g of myGroups">
-          <div class="mg-card card">
-            <div class="mg-left">
-              <div class="mg-emoji-wrap" [class.threshold]="isThreshold(g)">
-                {{ g.product.emoji }}
-              </div>
+      <div class="mg-cards" *ngIf="!loading">
+        <div class="mg-item" *ngFor="let g of myGroups" [class.mg-item-hot]="isThreshold(g)">
+
+          <div class="mg-item-img">
+            <img [src]="productImage(g)" [alt]="g.product.name" loading="lazy">
+            <span class="mg-item-badge" *ngIf="isThreshold(g)">
+              <i class="fa-solid fa-fire"></i>
+            </span>
+          </div>
+
+          <div class="mg-item-body">
+            <div class="mg-item-top">
+              <span class="mg-item-name">{{ g.product.name | truncate:32 }}</span>
+              <span class="mg-item-status" [class.hot]="isThreshold(g)">
+                {{ isThreshold(g) ? 'Seuil atteint' : 'Actif' }}
+              </span>
             </div>
-            <div class="mg-body">
-              <div class="flex-between mg-top">
-                <span class="font-display mg-name">{{ g.product.name | truncate:35 }}</span>
-                <span [class]="'badge-' + (isThreshold(g) ? 'orange' : 'primary')">
-                  {{ isThreshold(g) ? '✅ Seuil atteint' : '● Actif' }}
+
+            <div class="mg-item-supplier">{{ g.supplier.companyName }}</div>
+
+            <div class="mg-item-prog">
+              <div class="mg-prog-track">
+                <div class="mg-prog-fill"
+                     [class.hot]="isThreshold(g)"
+                     [style.width.%]="progressPct(g)"></div>
+              </div>
+              <span class="mg-prog-pct">{{ progressPct(g) }}%</span>
+            </div>
+
+            <div class="mg-item-foot">
+              <div class="mg-item-prices">
+                <span class="mg-item-price">{{ g.currentPrice | currencyXof }}</span>
+                <span class="mg-item-members">
+                  <i class="fa-solid fa-users"></i>
+                  {{ g.currentCount }}/{{ g.minParticipants }}
                 </span>
               </div>
-              <div class="mg-prog-row">
-                <div class="prog-wrap mg-prog">
-                  <div class="prog-fill" [class.orange]="isThreshold(g)"
-                       [style.width.%]="progressPct(g)"></div>
-                </div>
-                <span class="mg-pct font-mono">{{ progressPct(g) }}%</span>
-              </div>
-              <div class="flex-between mg-footer">
-                <div>
-                  <span class="text-muted" style="font-size:12px">
-                    {{ g.currentCount }}/{{ g.minParticipants }} membres
-                  </span>
-                  <span class="mg-price font-mono">{{ g.currentPrice | currencyXof }}</span>
-                </div>
-                <button [class]="'btn-' + (isThreshold(g) ? 'orange' : 'outline-primary') + ' btn-sm btn-round'"
+              <div class="mg-item-actions">
+                <app-countdown [expiresAt]="g.expiresAt"></app-countdown>
+                <button [class]="isThreshold(g) ? 'btn-gold btn-sm btn-round' : 'btn-outline-primary btn-sm btn-round'"
                         (click)="isThreshold(g) ? goPayment() : goGroupDetail(g)">
-                  {{ isThreshold(g) ? '💳 Payer le solde' : 'Voir →' }}
+                  {{ isThreshold(g) ? 'Payer' : 'Voir →' }}
                 </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <app-empty-state *ngIf="myGroups.length === 0"
+          icon="fa-solid fa-users" title="Aucun groupe actif"
+          description="Rejoignez votre premier groupe pour commencer à économiser.">
+          <button class="btn-primary" (click)="goBrowse()">Parcourir les groupes</button>
+        </app-empty-state>
+      </div>
+    </div>
+
+    <!-- ── Colonne droite ─────────────────────────────────────────── -->
+    <div class="md-side">
+
+      <!-- Timeline activité -->
+      <div class="md-panel">
+        <div class="md-panel-head">
+          <div class="md-panel-title">
+            <i class="fa-solid fa-clock-rotate-left"></i> Activité récente
+          </div>
+          <button class="md-see-all" (click)="goNotifications()">Tout voir <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <div class="md-timeline">
+          <div class="mt-item" *ngFor="let t of timeline; let last = last">
+            <div class="mt-icon-col">
+              <div class="mt-icon" [style.background]="t.color + '20'" [style.color]="t.color">
+                <i [class]="t.icon"></i>
+              </div>
+              <div class="mt-line" *ngIf="!last"></div>
+            </div>
+            <div class="mt-body">
+              <div class="mt-text">{{ t.text }}</div>
+              <div class="mt-meta">
+                <span class="mt-time">{{ t.time }}</span>
+                <button *ngIf="t.action" class="mt-action" [style.color]="'#F4A902'"
+                        (click)="goPayment()">{{ t.action }} →</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Right: notifications -->
-    <div class="md-col-side">
-      <div class="flex-between md-section-head">
-        <h3 class="font-display md-section-title">Notifications</h3>
-        <button class="btn-outline btn-sm btn-round" (click)="goNotifications()">Voir tout →</button>
+      <!-- Parrainage -->
+      <div class="md-referral">
+        <div class="mdr-icon"><i class="fa-solid fa-gift"></i></div>
+        <div class="mdr-info">
+          <div class="mdr-title">Invitez vos proches</div>
+          <div class="mdr-desc">Gagnez <strong>2 500 XOF</strong> par ami inscrit</div>
+          <div class="mdr-code">
+            <span class="mdr-code-val">KOFI7A2F</span>
+            <button class="mdr-copy" title="Copier">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        <button class="btn-gold btn-sm btn-round mdr-btn">
+          <i class="fa-solid fa-share-nodes"></i> Partager
+        </button>
       </div>
-      <div class="card-flat">
-        <app-notification-item
-          *ngFor="let n of notifs"
-          [notif]="n"
-          (clicked)="notifService.markRead(n.id)">
-        </app-notification-item>
-      </div>
+
     </div>
   </div>
 

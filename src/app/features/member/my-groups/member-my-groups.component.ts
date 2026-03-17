@@ -41,6 +41,6 @@ export class MyGroupsComponent implements OnInit {
   pct(g: Group): number { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
   isHot(g: Group): boolean { return g.status === 'THRESHOLD_REACHED'; }
 
-  goPayment(g: Group): void { this.router.navigate(['/member/payment']); }
+  onJoin(g: Group):    void { g.status === 'THRESHOLD_REACHED' ? this.router.navigate(['/member/payment']) : this.goDetail(g); }
   goDetail(g: Group):  void { this.router.navigate(['/groups', g.id]); }
 }

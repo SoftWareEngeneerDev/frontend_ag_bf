@@ -35,7 +35,7 @@
       </div>
 
       <div class="alert-cyan alert anim-fade-2">
-        🔒 Votre paiement est sécurisé. Le fournisseur ne sera payé qu'après confirmation de livraison.
+        <i class="fa-solid fa-shield-halved"></i> Votre paiement est sécurisé. Le fournisseur ne sera payé qu'après confirmation de livraison.
       </div>
 
       <button class="btn-gold btn-blk btn-lg" (click)="step = 2">Continuer →</button>
@@ -51,7 +51,7 @@
         <div class="pay-opt" *ngFor="let m of methods"
              [class.selected]="selMethod === m.id"
              (click)="selMethod = m.id">
-          <span style="font-size:24px">{{ m.icon }}</span>
+          <i [class]="m.icon" [style.color]="m.color" style="font-size:22px;width:28px;text-align:center"></i>
           <div style="flex:1">
             <div style="font-weight:600;font-size:15px">{{ m.name }}</div>
             <div class="text-muted" style="font-size:12px">{{ m.sub }}</div>
@@ -80,11 +80,11 @@
     <!-- ── Étape 3 : Traitement ── -->
     <ng-container *ngIf="step === 3">
       <div class="pay-processing text-center">
-        <div class="proc-icon anim-pulse">💳</div>
+        <div class="proc-icon anim-pulse"><i class="fa-solid fa-credit-card"></i></div>
         <h3 class="font-display" style="font-size:22px;font-weight:800;margin-bottom:8px">Traitement en cours...</h3>
         <p class="text-muted">Connexion sécurisée avec {{ methodLabel }}...</p>
         <div class="alert-cyan alert" style="margin-top:20px;text-align:left">
-          🔒 Connexion chiffrée SSL · Paiement sécurisé par CinetPay
+          <i class="fa-solid fa-lock"></i> Connexion chiffrée SSL · Paiement sécurisé par CinetPay
         </div>
       </div>
     </ng-container>

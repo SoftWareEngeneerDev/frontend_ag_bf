@@ -55,13 +55,23 @@ export class CatalogComponent implements OnInit {
   onCat(id: string): void    { this.selCat = id; this.apply(); }
   onSort(v: string): void    { this.sortBy = v; this.apply(); }
 
-  goDetail(p: Product): void { this.router.navigate(['/catalog']); }
-  goGroups(p: Product): void { this.router.navigate(['/groups']); }
+  goDetail(_p: Product): void { this.router.navigate(['/catalog']); }
+  goGroups(_p: Product): void { this.router.navigate(['/groups']); }
 
   discount(p: Product): number {
     if (!p.minGroupPrice) return 0;
     return Math.round((1 - p.minGroupPrice / p.soloPrice) * 100);
   }
 
-  stars(n: number): string[] { return Array(5).fill('').map((_,i) => i < Math.floor(n) ? '★' : '☆'); }
+  imageUrl(p: Product): string {
+    return p.images?.[0] ?? `https://picsum.photos/seed/${p.id}/600/420`;
+  }
+
+  stars(n: number): ('full' | 'half' | 'empty')[] {
+    return [1, 2, 3, 4, 5].map(i => {
+      if (n >= i)       return 'full';
+      if (n >= i - 0.5) return 'half';
+      return 'empty';
+    });
+  }
 }

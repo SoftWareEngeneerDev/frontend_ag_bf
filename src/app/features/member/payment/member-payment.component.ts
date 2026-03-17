@@ -20,10 +20,10 @@ export class PaymentComponent {
   group: Group = this.mock.groups[1]; // groupe seuil atteint
 
   methods = [
-    { id:'ORANGE_MONEY' as PaymentMethod, icon:'🟠', name:'Orange Money',  sub:'Le plus utilisé au BF' },
-    { id:'MOOV_MONEY'   as PaymentMethod, icon:'🔵', name:'Moov Money',    sub:'Rapide et sécurisé' },
-    { id:'LIGDICASH'    as PaymentMethod, icon:'🟢', name:'Ligdicash',      sub:'Paiement numérique' },
-    { id:'CARD'         as PaymentMethod, icon:'💳', name:'Carte bancaire', sub:'Visa / Mastercard' },
+    { id:'ORANGE_MONEY' as PaymentMethod, icon:'fa-solid fa-mobile-screen-button', color:'#FF6B00', name:'Orange Money',  sub:'Le plus utilisé au BF' },
+    { id:'MOOV_MONEY'   as PaymentMethod, icon:'fa-solid fa-mobile-screen-button', color:'#0066CC', name:'Moov Money',    sub:'Rapide et sécurisé' },
+    { id:'LIGDICASH'    as PaymentMethod, icon:'fa-solid fa-mobile-screen-button', color:'#00A651', name:'Ligdicash',     sub:'Paiement numérique' },
+    { id:'CARD'         as PaymentMethod, icon:'fa-solid fa-credit-card',          color:'#6B7280', name:'Carte bancaire',sub:'Visa / Mastercard' },
   ];
 
   now   = new Date();

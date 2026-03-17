@@ -30,7 +30,7 @@
 
       <!-- Progression circulaire -->
       <div class="glass gd-card">
-        <h3 class="font-display gd-card-title">📊 Progression du groupe</h3>
+        <h3 class="font-display gd-card-title"><i class="fa-solid fa-chart-line"></i> Progression du groupe</h3>
         <div class="gd-progress-wrap">
           <app-circle-progress [size]="130" [sw]="12" [pct]="pct" [color]="isThreshold ? '#10D98B' : '#F5A623'">
             <span class="font-display cp-val">{{ group.currentCount }}/{{ group.minParticipants }}</span>
@@ -41,10 +41,10 @@
             <div class="font-mono gd-pct">{{ pct }}%</div>
             <div class="text-muted" style="font-size:13px; margin-bottom:12px">de complétion</div>
             <span class="badge-ok" *ngIf="!isThreshold">
-              🎯 Plus que {{ group.minParticipants - group.currentCount }} place(s) !
+              <i class="fa-solid fa-bullseye"></i> Plus que {{ group.minParticipants - group.currentCount }} place(s) !
             </span>
             <span class="badge-gold anim-pulse" *ngIf="isThreshold">
-              ✅ Seuil atteint !
+              <i class="fa-solid fa-circle-check"></i> Seuil atteint !
             </span>
             <!-- Mini avatars membres -->
             <div class="member-avs" style="margin-top:14px">
@@ -62,7 +62,7 @@
 
       <!-- Compte à rebours -->
       <div class="glass gd-card">
-        <h3 class="font-display gd-card-title">⏱ Temps restant</h3>
+        <h3 class="font-display gd-card-title"><i class="fa-solid fa-clock"></i> Temps restant</h3>
         <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
         <div *ngIf="isThreshold" class="alert-gold alert" style="margin-top:12px">
           ⚠️ Payez le solde avant l'expiration pour confirmer votre commande.
@@ -71,7 +71,7 @@
 
       <!-- Modalités -->
       <div class="glass gd-card">
-        <h3 class="font-display gd-card-title">💰 Modalités de paiement</h3>
+        <h3 class="font-display gd-card-title"><i class="fa-solid fa-sack-dollar"></i> Modalités de paiement</h3>
         <div class="modal-grid">
           <div class="modal-item" *ngFor="let m of [
             {k:'Dépôt requis',    v:'10% du prix',                  gold:true},
@@ -84,10 +84,10 @@
           </div>
         </div>
         <div class="alert-cyan alert" style="margin-top:14px">
-          🔒 Votre dépôt est sécurisé en escrow jusqu'à la livraison confirmée
+          <i class="fa-solid fa-shield-halved"></i> Votre dépôt est sécurisé en escrow jusqu'à la livraison confirmée
         </div>
         <div class="pay-icons">
-          <span *ngFor="let p of ['🟠 Orange Money','🔵 Moov Money','🟢 Ligdicash','💳 Carte']"
+          <span *ngFor="let p of ['Orange Money','Moov Money','Ligdicash','Carte']"
                 class="badge-grey">{{ p }}</span>
         </div>
       </div>
@@ -98,7 +98,7 @@
 
       <!-- Paliers de prix -->
       <div class="glass gd-card">
-        <h3 class="font-display gd-card-title">📈 Paliers de prix</h3>
+        <h3 class="font-display gd-card-title"><i class="fa-solid fa-tags"></i> Paliers de prix</h3>
         <table class="tbl">
           <thead>
             <tr><th>Participants</th><th>Réduction</th><th>Prix/pers.</th></tr>
@@ -129,17 +129,17 @@
           <span class="font-mono font-display cta-amount">{{ group.depositAmount | currencyXof }}</span>
         </div>
         <button class="btn-gold btn-blk btn-lg" (click)="joinGroup()">
-          💳 Rejoindre — Dépôt {{ group.depositAmount | currencyXof }}
+          <i class="fa-solid fa-credit-card"></i> Rejoindre — Dépôt {{ group.depositAmount | currencyXof }}
         </button>
         <p class="text-muted" style="font-size:11px; text-align:center; margin-top:10px">
-          🔒 Paiement 100% sécurisé via CinetPay
+          <i class="fa-solid fa-lock"></i> Paiement 100% sécurisé via CinetPay
         </p>
       </div>
 
       <!-- Fournisseur -->
       <div class="glass gd-card gd-supplier">
         <div class="sup-header">
-          <div class="sup-icon">🏪</div>
+          <div class="sup-icon"><i class="fa-solid fa-store"></i></div>
           <div>
             <div class="font-display sup-name">{{ group.supplier.companyName }}</div>
             <span class="badge-ok" style="font-size:10px">✓ Fournisseur vérifié</span>

@@ -1,4 +1,6 @@
-<div>
+<div class="mg-page">
+
+  <!-- Onglets filtres -->
   <div class="tab-nav mb-24">
     <button class="tab-btn" *ngFor="let t of tabs"
             [class.active]="activeTab === t"
@@ -8,57 +10,19 @@
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="👥" title="Aucun groupe dans cette catégorie"
+    icon="fa-solid fa-users" title="Aucun groupe dans cette catégorie"
     description="Vous n'avez pas encore de groupe ici.">
     <a routerLink="/groups" class="btn-gold">Rejoindre un groupe</a>
   </app-empty-state>
 
-  <div class="mg-list" *ngIf="!loading && filtered.length > 0">
-    <div class="glass mg-card" *ngFor="let g of filtered">
-      <div class="flex gap-16">
-        <div class="mg-emoji">{{ g.product.emoji }}</div>
-        <div class="mg-body">
-          <div class="flex-between mg-head">
-            <div>
-              <div class="font-display mg-name">{{ g.product.name }}</div>
-              <div class="text-muted mg-meta">{{ g.supplier.companyName }} · {{ g.product.category.name }}</div>
-            </div>
-            <span [class]="fmt.groupStatusClass(g.status) + (isHot(g) ? ' anim-pulse' : '')">
-              ● {{ g.status | groupStatusLabel }}
-            </span>
-          </div>
-
-          <div class="mg-progress">
-            <div class="flex-between" style="font-size:12px; margin-bottom:5px">
-              <span class="text-muted">{{ g.currentCount }}/{{ g.minParticipants }} participants</span>
-              <span class="font-mono" style="color:var(--gold)">{{ pct(g) }}%</span>
-            </div>
-            <div class="prog-wrap" style="height:8px">
-              <div class="prog-fill" [class.ok]="isHot(g)" [style.width.%]="pct(g)"></div>
-            </div>
-          </div>
-
-          <div class="flex-between mg-footer">
-            <div>
-              <div class="font-mono mg-price">{{ g.currentPrice | currencyXof }}</div>
-              <div class="text-ok" style="font-size:11px">
-                Économie : {{ (g.product.soloPrice - g.currentPrice) | currencyXof }}
-              </div>
-            </div>
-            <app-countdown [expiresAt]="g.expiresAt"></app-countdown>
-            <div class="flex gap-8">
-              <button class="btn-gold btn-sm" *ngIf="isHot(g)" (click)="goPayment(g)">
-                💳 Payer le solde
-              </button>
-              <button class="btn-ghost btn-sm" (click)="goDetail(g)">Voir →</button>
-            </div>
-          </div>
-
-          <div class="alert-gold alert" *ngIf="isHot(g)" style="margin-top:12px; font-size:12px">
-            ⚠️ Seuil atteint ! Payez le solde avant l'expiration.
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="mg-grid" *ngIf="!loading && filtered.length > 0">
+    <app-group-card
+      *ngFor="let g of filtered"
+      [group]="g"
+      [memberView]="true"
+      (join)="onJoin(g)"
+      (details)="goDetail(g)">
+    </app-group-card>
   </div>
+
 </div>

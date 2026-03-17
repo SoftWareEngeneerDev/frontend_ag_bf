@@ -5,7 +5,7 @@
       <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Groupes d'achat</h2>
       <p class="text-muted" style="font-size:13px">{{ filtered.length }} groupe(s) affiché(s)</p>
     </div>
-    <input class="inp" style="width:280px" placeholder="🔍  Rechercher groupe, produit, fournisseur..."
+    <input class="inp" style="width:280px" placeholder="Rechercher groupe, produit, fournisseur..."
            [(ngModel)]="search">
   </div>
 
@@ -113,7 +113,7 @@
     </table>
 
     <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px">🔥</div>
+      <div style="font-size:36px;margin-bottom:12px"><i class="fa-solid fa-fire" style="color:var(--orange)"></i></div>
       <p class="text-muted">Aucun groupe trouvé pour cette recherche.</p>
     </div>
   </div>

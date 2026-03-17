@@ -1,42 +1,66 @@
-<aside class="sidebar">
-  <!-- Logo -->
-  <div class="sb-logo">
-    <app-logo [size]="17"></app-logo>
-  </div>
+<div class="sb-host">
+  <!-- Overlay mobile -->
+  <div class="sb-overlay" [class.visible]="open" (click)="closeRequest.emit()"></div>
 
-  <!-- User card -->
-  <div class="sb-user">
-    <app-avatar [name]="user?.fullName || 'U'" [size]="38" [bg]="userBg"></app-avatar>
-    <div style="flex:1;min-width:0">
-      <div class="sb-user-name">{{ user?.fullName }}</div>
-      <div class="sb-user-role">
-        {{ user?.role === 'ADMIN' ? '🛡 Super Admin' : user?.role === 'SUPPLIER' ? '🏪 Fournisseur' : '👤 Membre' }}
+  <aside class="sidebar" [class.sidebar-open]="open">
+
+    <!-- Logo -->
+    <div class="sb-logo">
+      <app-logo [size]="17"></app-logo>
+    </div>
+
+    <!-- User card -->
+    <div class="sb-user">
+      <div class="sb-user-av">
+        <app-avatar [name]="user?.fullName || 'U'" [size]="40" [bg]="userBg"></app-avatar>
+        <span class="sb-online-dot"></span>
+      </div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">{{ user?.fullName }}</div>
+        <div class="sb-user-role">
+          <i [class]="roleIcon"></i> {{ roleLabel }}
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Nav -->
-  <nav style="flex:1; padding-bottom:12px">
-    <ng-container *ngFor="let item of items">
-      <div *ngIf="item.separator" class="divider" style="margin:8px 16px"></div>
-      <a *ngIf="!item.separator" class="nav-item"
-         [routerLink]="item.route" routerLinkActive="active">
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span class="nav-label">{{ item.label }}</span>
-        <span *ngIf="item.badge" class="nav-badge"
-              [style.background]="(item.badgeColor || 'var(--primary)') + '18'"
-              [style.color]="item.badgeColor || 'var(--primary)'">
-          {{ item.badge }}
+    <!-- Navigation -->
+    <nav class="sb-nav">
+      <ng-container *ngFor="let item of items">
+
+        <!-- Séparateur -->
+        <div *ngIf="item.separator" class="sb-sep"></div>
+
+        <!-- Lien -->
+        <a *ngIf="!item.separator"
+           class="nav-item"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: !!item.exact}"
+           (click)="closeRequest.emit()">
+          <span class="nav-icon">
+            <i [class]="item.icon"></i>
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+          <span *ngIf="item.badge"
+                class="nav-badge"
+                [style.background]="(item.badgeColor || 'var(--primary)') + '20'"
+                [style.color]="item.badgeColor || 'var(--primary)'">
+            {{ item.badge }}
+          </span>
+        </a>
+
+      </ng-container>
+    </nav>
+
+    <!-- Pied de sidebar -->
+    <div class="sb-footer">
+      <a class="nav-item sb-logout" (click)="auth.logout()">
+        <span class="nav-icon">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </span>
+        <span class="nav-label">Déconnexion</span>
       </a>
-    </ng-container>
-  </nav>
+    </div>
 
-  <!-- Footer -->
-  <div class="sb-footer">
-    <a class="nav-item sb-logout" (click)="auth.logout()">
-      <span class="nav-icon">🚪</span>
-      <span>Déconnexion</span>
-    </a>
-  </div>
-</aside>
+  </aside>
+</div>

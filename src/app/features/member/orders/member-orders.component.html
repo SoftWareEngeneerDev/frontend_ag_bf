@@ -8,7 +8,7 @@
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="📦" title="Aucune commande" description="Vous n'avez pas encore de commande ici.">
+    icon="fa-solid fa-box" title="Aucune commande" description="Vous n'avez pas encore de commande ici.">
   </app-empty-state>
 
   <div class="orders-list" *ngIf="!loading">
@@ -45,14 +45,14 @@
 
       <!-- Tracking -->
       <div class="alert-cyan alert" *ngIf="o.status === 'SHIPPED' && o.trackingCode">
-        📦 Code de suivi :
+        <i class="fa-solid fa-barcode"></i> Code de suivi :
         <strong class="font-mono">{{ o.trackingCode }}</strong>
         <button class="btn-ghost btn-sm" style="margin-left:auto">Suivre →</button>
       </div>
 
       <!-- Review -->
       <button class="btn-ghost btn-sm" *ngIf="o.status === 'DELIVERED'" style="margin-top:8px">
-        ⭐ Laisser un avis
+        <i class="fa-solid fa-star"></i> Laisser un avis
       </button>
     </div>
   </div>

@@ -1,57 +1,214 @@
-<div>
-  <div class="kpi-grid mb-24">
-    <app-stats-card *ngFor="let k of kpis"
-      [icon]="k.icon" [value]="k.val" [label]="k.label" [sub]="k.sub" [color]="k.color">
-    </app-stats-card>
-  </div>
+<div class="sup-page">
 
-  <div class="sup-grid mb-24">
-    <!-- Bar chart revenus -->
-    <div class="glass p-24">
-      <h3 class="font-display sup-chart-title">Ventes des 6 derniers mois</h3>
-      <div class="bar-chart">
-        <div class="bar-col" *ngFor="let v of chartData; let i = index">
-          <div class="bar-val text-muted">{{ (v/1000).toFixed(1) }}k</div>
-          <div class="bar-fill" [style.height.%]="(v/chartMax)*100" [class.active]="i === chartData.length-1"></div>
-          <div class="bar-lbl text-muted">{{ chartMonths[i] }}</div>
+  <!-- ══ PROFIL FOURNISSEUR ════════════════════════════════════════ -->
+  <div class="sup-hero">
+    <div class="suph-left">
+      <div class="suph-avatar">
+        <i class="fa-solid fa-store"></i>
+      </div>
+      <div class="suph-info">
+        <div class="suph-name">Tech Ouaga SARL</div>
+        <div class="suph-meta">
+          <span class="suph-badge">
+            <i class="fa-solid fa-circle-check"></i> Vérifié
+          </span>
+          <span class="suph-meta-item">
+            <i class="fa-solid fa-location-dot"></i> Ouagadougou
+          </span>
+          <span class="suph-meta-item">
+            <i class="fa-solid fa-calendar"></i> Depuis juin 2023
+          </span>
+        </div>
+        <div class="suph-stars">
+          <i *ngFor="let s of stars(4.8)"
+             [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+          <span class="suph-rating-val">4.8</span>
+          <span class="suph-rating-sub">(142 avis)</span>
         </div>
       </div>
     </div>
 
-    <!-- Donut statuts groupes -->
-    <div class="glass p-24">
-      <h3 class="font-display sup-chart-title">Statut des groupes</h3>
-      <div class="donut-wrap">
-        <div class="donut"></div>
+    <div class="suph-stats">
+      <div class="suph-stat">
+        <div class="suph-stat-val">47</div>
+        <div class="suph-stat-label">Groupes totaux</div>
       </div>
-      <div class="donut-legend">
-        <div class="dl-item" *ngFor="let d of [{c:'#F5A623',l:'Actifs',v:5},{c:'#00D4FF',l:'Seuil atteint',v:2},{c:'#10D98B',l:'Terminés',v:8}]">
-          <div class="dl-dot" [style.background]="d.c"></div>
-          <span class="text-muted dl-label">{{ d.l }}</span>
-          <span class="font-mono dl-val" [style.color]="d.c">{{ d.v }}</span>
+      <div class="suph-stat-div"></div>
+      <div class="suph-stat">
+        <div class="suph-stat-val">96%</div>
+        <div class="suph-stat-label">Taux de succès</div>
+      </div>
+      <div class="suph-stat-div"></div>
+      <div class="suph-stat">
+        <div class="suph-stat-val">12.4M</div>
+        <div class="suph-stat-label">XOF générés</div>
+      </div>
+    </div>
+
+    <div class="suph-actions">
+      <button class="suph-btn" (click)="goProducts()">
+        <i class="fa-solid fa-box-open"></i> Mes produits
+      </button>
+      <button class="suph-btn suph-btn-primary" (click)="goOrders()">
+        <i class="fa-solid fa-truck"></i> Commandes
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ KPIs ══════════════════════════════════════════════════════ -->
+  <div class="sup-kpi-grid">
+    <div class="sup-kpi" *ngFor="let k of kpis">
+      <div class="sup-kpi-icon" [style.background]="k.bg" [style.color]="k.color">
+        <i [class]="k.icon"></i>
+      </div>
+      <div class="sup-kpi-body">
+        <div class="sup-kpi-val">{{ k.val }}</div>
+        <div class="sup-kpi-label">{{ k.label }}</div>
+        <div class="sup-kpi-sub">{{ k.sub }}</div>
+      </div>
+      <div class="sup-kpi-trend" [class.up]="k.up" [class.down]="!k.up">
+        <i [class]="k.up ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
+        {{ k.trend }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHARTS ROW ═════════════════════════════════════════════════ -->
+  <div class="sup-charts-row">
+
+    <!-- Revenus 6 mois -->
+    <div class="sup-panel sup-panel-lg">
+      <div class="sup-panel-head">
+        <div class="sup-panel-title">
+          <i class="fa-solid fa-chart-column"></i> Revenus — 6 derniers mois
+        </div>
+        <span class="sup-panel-sub">Total : <strong style="color:var(--gold)">9.62M XOF</strong></span>
+      </div>
+      <div class="sup-bar-chart">
+        <div class="sbc-col" *ngFor="let v of chartData; let i = index">
+          <div class="sbc-val">{{ (v/1000).toFixed(0) }}k</div>
+          <div class="sbc-bar-wrap">
+            <div class="sbc-bar"
+                 [class.active]="i === chartData.length - 1"
+                 [style.height.%]="(v / chartMax) * 100">
+            </div>
+          </div>
+          <div class="sbc-lbl">{{ chartMonths[i] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statut des groupes -->
+    <div class="sup-panel">
+      <div class="sup-panel-head">
+        <div class="sup-panel-title">
+          <i class="fa-solid fa-chart-pie"></i> Statut des groupes
+        </div>
+      </div>
+      <div class="sup-donut-wrap">
+        <div class="sup-donut"></div>
+        <div class="sup-donut-center">
+          <div class="sdc-total">18</div>
+          <div class="sdc-label">groupes</div>
+        </div>
+      </div>
+      <div class="sup-legend">
+        <div class="sl-item" *ngFor="let d of groupStatus">
+          <div class="sl-dot" [style.background]="d.color"></div>
+          <span class="sl-label">{{ d.label }}</span>
+          <span class="sl-val" [style.color]="d.color">{{ d.val }}</span>
+          <div class="sl-bar-wrap">
+            <div class="sl-bar" [style.background]="d.color" [style.width.%]="d.pct"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Commandes urgentes -->
-  <div class="glass p-20">
-    <div class="flex gap-8 mb-16" style="align-items:center">
-      <h3 class="font-display" style="font-size:16px;font-weight:700">⚠️ Commandes urgentes</h3>
-      <span class="badge-err">3 en attente</span>
+  <!-- ══ COMMANDES URGENTES ═════════════════════════════════════════ -->
+  <div class="sup-panel">
+    <div class="sup-panel-head">
+      <div class="sup-panel-title">
+        <i class="fa-solid fa-triangle-exclamation" style="color:#FF4D6A"></i>
+        Commandes urgentes
+        <span class="sup-badge-err">3 en attente</span>
+      </div>
+      <button class="sup-see-all" (click)="goOrders()">Voir tout <i class="fa-solid fa-arrow-right"></i></button>
     </div>
-    <table class="tbl">
-      <thead><tr><th>Groupe</th><th>Produit</th><th>Participants</th><th>Montant</th><th>Statut</th><th>Action</th></tr></thead>
-      <tbody>
-        <tr *ngFor="let o of urgentOrders">
-          <td>{{ o.group }}</td>
-          <td class="text-muted">{{ o.product }}</td>
-          <td><span class="badge-ok">{{ o.participants }}</span></td>
-          <td class="font-mono" style="color:var(--gold);font-weight:700">{{ o.amount }}</td>
-          <td><span [class]="statusClass(o.status)">{{ o.status }}</span></td>
-          <td><button class="btn-gold btn-sm">Traiter</button></td>
-        </tr>
-      </tbody>
-    </table>
+
+    <div class="sup-orders-table">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Groupe / Produit</th>
+            <th>Participants</th>
+            <th>Montant total</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of urgentOrders">
+            <td>
+              <div class="sot-group">{{ o.group }}</div>
+              <div class="sot-product">{{ o.product }}</div>
+            </td>
+            <td>
+              <span class="sot-participants">
+                <i class="fa-solid fa-users"></i> {{ o.participants }}
+              </span>
+            </td>
+            <td class="sot-amount font-mono">{{ o.amount }}</td>
+            <td>
+              <span class="sot-status"
+                    [style.background]="o.statusColor + '18'"
+                    [style.color]="o.statusColor">
+                {{ o.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-gold btn-sm btn-round">
+                <i class="fa-solid fa-truck-fast"></i> Traiter
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- ══ TOP PRODUITS ═══════════════════════════════════════════════ -->
+  <div class="sup-panel">
+    <div class="sup-panel-head">
+      <div class="sup-panel-title">
+        <i class="fa-solid fa-trophy"></i> Top produits
+      </div>
+      <button class="sup-see-all" (click)="goProducts()">Gérer <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <div class="sup-top-products">
+      <div class="stp-item" *ngFor="let p of topProducts; let i = index">
+        <div class="stp-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+          #{{ i + 1 }}
+        </div>
+        <div class="stp-body">
+          <div class="stp-name">{{ p.name }}</div>
+          <div class="stp-meta">
+            <span><i class="fa-solid fa-layer-group"></i> {{ p.groups }} groupes</span>
+            <span class="stp-stars">
+              <i *ngFor="let s of stars(p.rating)"
+                 [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+            </span>
+          </div>
+        </div>
+        <div class="stp-revenue">
+          <div class="stp-rev-val">{{ p.revenue }}</div>
+          <div class="stp-rev-trend up">
+            <i class="fa-solid fa-arrow-trend-up"></i> {{ p.trend }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

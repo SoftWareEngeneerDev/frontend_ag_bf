@@ -1,12 +1,17 @@
 <div class="topbar">
-  <h1 class="topbar-title font-display">{{ title }}</h1>
+  <div class="tb-left">
+    <button class="tb-hamburger" (click)="menuToggle.emit()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <h1 class="topbar-title font-display">{{ title }}</h1>
+  </div>
   <div class="tb-actions">
     <div *ngIf="showSearch" class="tb-search-wrap">
-      <span class="tb-s-icon">🔍</span>
+      <i class="fa-solid fa-magnifying-glass tb-s-icon"></i>
       <input class="inp tb-search" placeholder="Rechercher...">
     </div>
     <a routerLink="/member/notifications" class="tb-notif">
-      🔔
+      <i class="fa-solid fa-bell"></i>
       <span class="nb-dot" *ngIf="notifs.unreadCount() > 0">{{ notifs.unreadCount() }}</span>
     </a>
     <app-avatar [name]="auth.currentUser()?.fullName || 'U'" [size]="34" [bg]="userBg"></app-avatar>

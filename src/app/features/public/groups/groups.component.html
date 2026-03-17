@@ -12,7 +12,7 @@
         Rejoignez un groupe et économisez jusqu'à 40% sur vos achats
       </p>
     </div>
-    <input class="inp gh-search" placeholder="🔍  Rechercher un groupe..."
+    <input class="inp gh-search" placeholder="Rechercher un groupe..."
            (input)="onSearch($any($event.target).value)">
   </div>
 
@@ -30,7 +30,7 @@
 
   <!-- Empty -->
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="👥" title="Aucun groupe trouvé"
+    icon="fa-solid fa-users" title="Aucun groupe trouvé"
     description="Aucun groupe ne correspond à vos critères pour le moment.">
     <button class="btn-gold" (click)="setTab('Tous')">Voir tous les groupes</button>
   </app-empty-state>

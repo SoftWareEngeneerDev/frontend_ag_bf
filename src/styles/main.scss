@@ -59,9 +59,14 @@
   --r-full:9999px;
 
   // Fonts
-  --font-display: 'Syne', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
+  --font-display:  'Jost', sans-serif;        // Titres, en-têtes
+  --font-body:     'Jost', sans-serif;        // Corps de texte (défaut)
+  --font-secondary:'Roboto', sans-serif;      // Éléments secondaires
+  --font-cursive:  'Charm', cursive;          // Décoratif cursif 1
+  --font-cursive2: 'Oregano', cursive;        // Décoratif cursif 2
+  --font-mono:     'Roboto', monospace;       // Montants, codes, IDs
+  --font-icon:     'Font Awesome 6 Free';     // Icônes FA
+  --font-flaticon: 'flaticon_shofy';          // Icônes projet
 
   // Transitions
   --t:      0.2s ease;
@@ -82,6 +87,7 @@ body {
   font-family: var(--font-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: var(--font-body); cursor: pointer; }
@@ -93,8 +99,11 @@ input, select, textarea { font-family: var(--font-body); }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; opacity: .5; }
 
 // ── TYPOGRAPHY ───────────────────────────────────────────────────
-.font-display { font-family: var(--font-display) !important; }
-.font-mono    { font-family: var(--font-mono) !important; }
+.font-display   { font-family: var(--font-display)   !important; }
+.font-secondary { font-family: var(--font-secondary) !important; }
+.font-cursive   { font-family: var(--font-cursive)   !important; }
+.font-cursive2  { font-family: var(--font-cursive2)  !important; }
+.font-mono      { font-family: var(--font-mono)      !important; }
 
 .text-primary  { color: var(--primary); }
 .text-orange   { color: var(--orange); }
@@ -531,3 +540,85 @@ input, select, textarea { font-family: var(--font-body); }
   background: linear-gradient(135deg, var(--primary-l), var(--bg-white));
 }
 .modal-body { padding:24px; display:flex; flex-direction:column; gap:16px; }
+
+// ── RESPONSIVE ───────────────────────────────────────────────────
+// Breakpoints : md ≤ 768px (mobile/tablette) · sm ≤ 480px (mobile)
+
+@media (max-width: 768px) {
+
+  // Layout principal
+  .shell-main    { margin-left: 0 !important; }
+  .shell-content { padding: 16px !important; }
+
+  // Tables : scroll horizontal
+  .glass { overflow-x: auto; }
+  .tbl   { min-width: 600px; }
+
+  // Grilles 4 colonnes → 2 colonnes
+  div[style*="repeat(4,1fr)"],
+  div[style*="repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  // Grilles 3 colonnes → 2 colonnes
+  div[style*="repeat(3,1fr)"],
+  div[style*="repeat(3, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  // Grilles 2 colonnes → 1 colonne
+  div[style*="1fr 1fr"],
+  div[style*="1fr 2fr"],
+  div[style*="2fr 1fr"],
+  div[style*="1.8fr 1fr"],
+  div[style*="1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  // Flex-between → wrap
+  .flex-between { flex-wrap: wrap; gap: 12px; }
+
+  // Modals plein écran
+  .modal-backdrop { padding: 0; align-items: flex-end; }
+  .modal-box      { max-width: 100% !important; border-radius: var(--r-xl) var(--r-xl) 0 0 !important; max-height: 92vh; overflow-y: auto; }
+
+  // Topbar
+  .topbar { padding: 0 16px; }
+
+  // KPI grids connus
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  // Produit grid fournisseur
+  .sp-grid { grid-template-columns: 1fr !important; }
+
+  // Padding réduit
+  .p-24 { padding: 16px !important; }
+  .p-28 { padding: 16px !important; }
+  .shell-content .glass { margin-bottom: 16px; }
+}
+
+@media (max-width: 480px) {
+
+  // Grilles 2 colonnes → 1 colonne
+  div[style*="repeat(4,1fr)"],
+  div[style*="repeat(4, 1fr)"],
+  div[style*="repeat(2,1fr)"],
+  div[style*="repeat(2, 1fr)"],
+  div[style*="repeat(3,1fr)"],
+  div[style*="repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-grid { grid-template-columns: 1fr !important; }
+
+  .shell-content { padding: 12px !important; }
+
+  // Titre topbar plus petit
+  .topbar-title { font-size: 14px !important; }
+
+  // Modals full height si nécessaire
+  .modal-box { max-height: 96vh; }
+
+  // Tabs scroll
+  .tab-nav { flex-wrap: nowrap; overflow-x: auto; }
+}

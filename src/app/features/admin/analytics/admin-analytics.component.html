@@ -21,7 +21,7 @@
     <div class="glass p-22">
       <h3 class="font-display an-title">Activité par catégorie</h3>
       <div class="cat-row" *ngFor="let c of categories">
-        <span style="font-size:18px;width:24px">{{ c.icon }}</span>
+        <i [class]="c.icon" style="font-size:18px;width:24px;text-align:center"></i>
         <div style="flex:1">
           <div class="flex-between" style="font-size:12px;margin-bottom:3px">
             <span>{{ c.name }}</span>

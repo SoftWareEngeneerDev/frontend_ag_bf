@@ -27,10 +27,10 @@
           <span [class]="statusClass">{{ statusLabel }}</span>
         </div>
         <div class="flex gap-20 text-muted" style="font-size:13px;flex-wrap:wrap">
-          <span>🏪 {{ group.supplier.companyName }}</span>
-          <span>📅 Créé le {{ formatDate(group.createdAt) }}</span>
+          <span><i class="fa-solid fa-store"></i> {{ group.supplier.companyName }}</span>
+          <span><i class="fa-solid fa-calendar"></i> Créé le {{ formatDate(group.createdAt) }}</span>
           <span [style.color]="isExpiringSoon ? '#FF4D6A' : 'inherit'">
-            ⏰ Expire dans {{ formatExpiry(group.expiresAt) }}
+            <i class="fa-solid fa-clock"></i> Expire dans {{ formatExpiry(group.expiresAt) }}
           </span>
         </div>
       </div>
@@ -159,7 +159,7 @@
         <div class="text-muted" style="font-size:12px">{{ group.supplier.phone }}</div>
         <div class="text-muted" style="font-size:12px">{{ group.supplier.city }}</div>
         <div class="flex gap-6 mt-8" style="align-items:center">
-          <span style="color:#F5A623;font-size:13px">★</span>
+          <i class="fa-solid fa-star" style="color:#F5A623;font-size:13px"></i>
           <span class="font-mono" style="font-size:13px">{{ group.supplier.rating }}/5</span>
           <span class="text-muted" style="font-size:11px">({{ group.supplier.reviewCount }} avis)</span>
           <span class="text-muted" style="font-size:12px">· {{ group.supplier.successRate }}% succès</span>
@@ -173,7 +173,7 @@
 
 <ng-template #notFound>
   <div style="text-align:center;padding:60px 0">
-    <div style="font-size:48px;margin-bottom:16px">🔥</div>
+    <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-fire" style="color:var(--orange)"></i></div>
     <h3 style="font-weight:600;margin-bottom:8px">Groupe introuvable</h3>
     <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun groupe.</p>
     <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>

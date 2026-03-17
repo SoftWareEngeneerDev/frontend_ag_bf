@@ -3,11 +3,11 @@
   <div class="auth-left">
     <div class="al-logo"><app-logo [size]="20"></app-logo></div>
     <div class="al-body">
-      <div class="al-icon">🎉</div>
+      <div class="al-icon"><i class="fa-solid fa-gift"></i></div>
       <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté</span> AchatGroupéBF</h2>
       <div class="al-features">
         <div class="al-feature" *ngFor="let f of ['Inscription gratuite et rapide','Première économie dès votre 1er groupe','Support client disponible 7j/7','Paiement sécurisé via mobile money']">
-          <span class="af-icon">✅</span>
+          <span class="af-icon"><i class="fa-solid fa-circle-check"></i></span>
           <span class="af-text">{{ f }}</span>
         </div>
       </div>
@@ -105,7 +105,7 @@
           <h2 class="font-display" style="font-size:28px;font-weight:800;margin-bottom:8px">
             Bienvenue <span class="text-primary">{{ user?.fullName?.split(' ')?.[0] }} !</span>
           </h2>
-          <p class="text-muted" style="margin-bottom:28px">Compte activé avec succès 🎉</p>
+          <p class="text-muted" style="margin-bottom:28px">Compte activé avec succès <i class="fa-solid fa-check"></i></p>
 
           <div class="wc-card card-flat p-20">
             <div class="flex gap-14" style="align-items:center;text-align:left;margin-bottom:16px">
@@ -128,7 +128,7 @@
           </div>
 
           <button class="btn-primary btn-blk btn-xl btn-round" (click)="goToDashboard()">
-            Explorer les groupes 🚀
+            <i class="fa-solid fa-rocket"></i> Explorer les groupes
           </button>
         </div>
       </ng-container>

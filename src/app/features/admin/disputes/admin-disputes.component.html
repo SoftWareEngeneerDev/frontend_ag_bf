@@ -41,13 +41,13 @@
 
       <div class="dis-actions">
         <ng-container *ngIf="d.status === 'OPEN'">
-          <button class="btn-cyan  btn-sm">🔍 Prendre en charge</button>
-          <button class="btn-ok    btn-sm">✅ Résoudre</button>
+          <button class="btn-cyan  btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Prendre en charge</button>
+          <button class="btn-ok    btn-sm"><i class="fa-solid fa-circle-check"></i> Résoudre</button>
           <button class="btn-ghost btn-sm">📩 Contacter parties</button>
         </ng-container>
         <ng-container *ngIf="d.status === 'IN_PROGRESS'">
-          <button class="btn-gold  btn-sm">💰 Rembourser</button>
-          <button class="btn-ok    btn-sm">✅ Clôturer</button>
+          <button class="btn-gold  btn-sm"><i class="fa-solid fa-sack-dollar"></i> Rembourser</button>
+          <button class="btn-ok    btn-sm"><i class="fa-solid fa-lock"></i> Clôturer</button>
           <button class="btn-ghost btn-sm">📩 Message</button>
         </ng-container>
         <ng-container *ngIf="d.status === 'RESOLVED'">

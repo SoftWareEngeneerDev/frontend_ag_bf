@@ -24,20 +24,25 @@ export class LandingComponent implements OnInit, OnDestroy {
   testimonials = this.mock.testimonials;
 
   howItWorks = [
-    { n:'01', icon:'🎯', title:'Choisissez un groupe',  desc:'Parcourez les groupes actifs et trouvez le produit qui vous intéresse.' },
-    { n:'02', icon:'💳', title:'Payez votre dépôt',     desc:'Verrouillez votre place en payant seulement 10% via Orange Money.' },
-    { n:'03', icon:'👥', title:'Le seuil est atteint',  desc:'Quand assez de membres rejoignent, le prix baisse automatiquement !' },
-    { n:'04', icon:'📦', title:'Recevez votre produit', desc:'Payez le solde et recevez votre commande à Ouagadougou.' },
+    { n:'01', icon:'fa-solid fa-crosshairs',  title:'Choisissez un groupe',  desc:'Parcourez les groupes actifs et trouvez le produit qui vous intéresse.' },
+    { n:'02', icon:'fa-solid fa-mobile-screen-button', title:'Payez votre dépôt', desc:'Verrouillez votre place en payant seulement 10% via Orange Money.' },
+    { n:'03', icon:'fa-solid fa-users-line',  title:'Le seuil est atteint',  desc:'Quand assez de membres rejoignent, le prix baisse automatiquement !' },
+    { n:'04', icon:'fa-solid fa-box-open',    title:'Recevez votre produit', desc:'Payez le solde et recevez votre commande à Ouagadougou.' },
   ];
 
   stats = [
-    { val:'5 247+',      label:'Membres actifs',    icon:'👥' },
-    { val:'89%',         label:'Taux de succès',    icon:'🏆' },
-    { val:'320+',        label:'Groupes réussis',   icon:'✅' },
-    { val:'48.5M XOF',   label:'Économisés',        icon:'💰' },
+    { val:'5 247+',     label:'Membres actifs',   icon:'fa-solid fa-users' },
+    { val:'89%',        label:'Taux de succès',   icon:'fa-solid fa-trophy' },
+    { val:'320+',       label:'Groupes réussis',  icon:'fa-solid fa-circle-check' },
+    { val:'48.5M XOF',  label:'Économisés',       icon:'fa-solid fa-sack-dollar' },
   ];
 
-  paymentMethods = ['🟠 Orange Money','🔵 Moov Money','🟢 Ligdicash','💳 Carte bancaire'];
+  paymentMethods = [
+    { label:'Orange Money', icon:'fa-solid fa-mobile-screen-button', color:'#FF6B00' },
+    { label:'Moov Money',   icon:'fa-solid fa-mobile-screen-button', color:'#0066CC' },
+    { label:'Ligdicash',    icon:'fa-solid fa-mobile-screen-button', color:'#00A651' },
+    { label:'Carte',        icon:'fa-solid fa-credit-card',          color:'#6B7280' },
+  ];
 
   constructor(
     private groupService: GroupService,

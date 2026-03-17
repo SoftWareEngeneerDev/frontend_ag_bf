@@ -16,7 +16,7 @@
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="👥" title="Aucun groupe" description="Créez votre premier groupe d'achat.">
+    icon="fa-solid fa-users" title="Aucun groupe" description="Créez votre premier groupe d'achat.">
     <button class="btn-gold" (click)="showCreateModal = true">+ Créer un groupe</button>
   </app-empty-state>
 
@@ -65,7 +65,7 @@
       </div>
 
       <div class="alert-gold alert" *ngIf="isHot(g)" style="margin-top:12px;font-size:12px">
-        ✅ Seuil atteint ! {{ g.currentCount }} commandes prêtes à confirmer.
+        <i class="fa-solid fa-circle-check"></i> Seuil atteint ! {{ g.currentCount }} commandes prêtes à confirmer.
       </div>
     </div>
   </div>
@@ -106,7 +106,7 @@
         </div>
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showCreateModal = false">Annuler</button>
-          <button class="btn-gold"  style="flex:1;justify-content:center" (click)="showCreateModal = false">Créer le groupe 🚀</button>
+          <button class="btn-gold"  style="flex:1;justify-content:center" (click)="showCreateModal = false"><i class="fa-solid fa-rocket"></i> Créer le groupe</button>
         </div>
       </div>
     </div>

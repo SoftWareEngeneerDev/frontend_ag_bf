@@ -1,12 +1,35 @@
 .topbar {
-  height:var(--topbar-h); background:var(--bg-white);
-  border-bottom:1px solid var(--border); box-shadow:var(--shadow-xs);
-  padding:0 28px; display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:50;
+  height: var(--topbar-h); background: var(--bg-white);
+  border-bottom: 1px solid var(--border); box-shadow: var(--shadow-xs);
+  padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
 }
-.topbar-title { font-size:18px; font-weight:700; color:var(--txt); }
-.tb-actions   { display:flex; align-items:center; gap:14px; }
-.tb-search-wrap { position:relative; }
-.tb-s-icon  { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; }
-.tb-search  { width:220px; padding-left:36px; padding-top:8px; padding-bottom:8px; }
-.tb-notif   { position:relative; cursor:pointer; font-size:20px; text-decoration:none; padding:6px; border-radius:var(--r); transition:background var(--t); &:hover{background:var(--bg2);} }
+.tb-left        { display: flex; align-items: center; gap: 12px; }
+.topbar-title   { font-size: 18px; font-weight: 700; color: var(--txt); }
+.tb-actions     { display: flex; align-items: center; gap: 14px; }
+.tb-search-wrap { position: relative; }
+.tb-s-icon      { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+.tb-search      { width: 220px; padding-left: 36px; padding-top: 8px; padding-bottom: 8px; }
+.tb-notif       { position: relative; cursor: pointer; font-size: 16px; color: var(--txt2); text-decoration: none; padding: 8px; border-radius: var(--r); transition: background var(--t); &:hover { background: var(--bg2); color: var(--txt); } }
+.nb-dot         { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; background: var(--red); color: #fff; border-radius: var(--r-full); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+
+// Hamburger — visible uniquement sur mobile
+.tb-hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 36px; height: 36px; padding: 6px;
+  background: var(--bg2); border: none; border-radius: var(--r-sm); cursor: pointer;
+  span {
+    display: block; height: 2px; background: var(--txt);
+    border-radius: 2px; transition: all var(--t);
+  }
+  &:hover { background: var(--bg3); }
+}
+
+@media (max-width: 768px) {
+  .topbar         { padding: 0 16px; }
+  .topbar-title   { font-size: 15px; }
+  .tb-hamburger   { display: flex; }
+  .tb-search-wrap { display: none; }
+  .tb-actions     { gap: 8px; }
+}

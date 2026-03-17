@@ -16,7 +16,7 @@
               [class.active]="activeTab === t"
               (click)="setTab(t)">{{ t }}</button>
     </div>
-    <input class="inp sp-search" placeholder="🔍  Rechercher un produit..."
+    <input class="inp sp-search" placeholder="Rechercher un produit..."
            (input)="onSearch($any($event.target).value)">
   </div>
 
@@ -25,7 +25,7 @@
 
   <!-- Empty -->
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="📦" title="Aucun produit"
+    icon="fa-solid fa-box" title="Aucun produit"
     description="Ajoutez votre premier produit pour commencer à vendre.">
     <button class="btn-gold" (click)="showAddModal = true">+ Ajouter un produit</button>
   </app-empty-state>
@@ -39,7 +39,7 @@
         <span class="sp-emoji">{{ p.emoji }}</span>
         <span [class]="statusClass(p.status) + ' sp-status'">{{ statusLabel(p.status) }}</span>
         <span class="badge-err sp-active" *ngIf="p.activeGroupCount > 0">
-          🔥 {{ p.activeGroupCount }} groupe{{ p.activeGroupCount > 1 ? 's' : '' }}
+          <i class="fa-solid fa-fire"></i> {{ p.activeGroupCount }} groupe{{ p.activeGroupCount > 1 ? 's' : '' }}
         </span>
       </div>
 
@@ -67,8 +67,8 @@
 
         <!-- Rating -->
         <div class="sp-rating">
-          <span *ngFor="let i of stars()"
-                [style.color]="i < p.rating ? '#F5A623' : 'rgba(255,255,255,.2)'">★</span>
+          <i *ngFor="let i of stars()" class="fa-solid fa-star"
+             [style.color]="i < p.rating ? '#F5A623' : 'rgba(255,255,255,.2)'"></i>
           <span class="text-muted" style="font-size:12px;margin-left:6px">
             {{ p.rating }}/5 ({{ p.reviewCount }} avis)
           </span>
@@ -79,7 +79,7 @@
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
                   (click)="openEdit(p)">✏️ Modifier</button>
           <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center"
-                  (click)="openCreateGroup(p)">👥 Créer un groupe</button>
+                  (click)="openCreateGroup(p)"><i class="fa-solid fa-users-plus"></i> Créer un groupe</button>
         </div>
       </div>
     </div>
@@ -147,7 +147,7 @@
         <div class="flex gap-12" style="align-items:center">
           <span style="font-size:28px">{{ selectedProduct!.emoji }}</span>
           <div>
-            <h3 class="font-display" style="font-size:17px;font-weight:700">👥 Créer un groupe</h3>
+            <h3 class="font-display" style="font-size:17px;font-weight:700"><i class="fa-solid fa-users-plus"></i> Créer un groupe</h3>
             <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.name | truncate:38 }}</p>
           </div>
         </div>

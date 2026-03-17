@@ -4,18 +4,23 @@
   <div class="auth-left">
     <div class="al-logo"><app-logo [size]="20"></app-logo></div>
     <div class="al-body">
-      <div class="al-icon">🛒</div>
+      <div class="al-icon"><i class="fa-solid fa-cart-shopping"></i></div>
       <h2 class="al-title">
         Ensemble, on <span class="al-highlight">économise plus</span> au Burkina Faso
       </h2>
       <div class="al-features">
         <div class="al-feature" *ngFor="let f of [
-          {icon:'🔒', text:'Paiements 100% sécurisés'},
-          {icon:'👥', text:'5 247 membres actifs'},
-          {icon:'⭐', text:'Note 4.8/5 — 2 000 avis'},
+          {icon:'fa-solid fa-lock', text:'Paiements 100% sécurisés'},
+          {icon:'fa-solid fa-users', text:'5 247 membres actifs'},
+          {icon:'fa-solid fa-star', text:'Note 4.8/5 — 2 000 avis'},
           {icon:'🇧🇫', text:'100% Made in Burkina Faso'}
         ]">
-          <span class="af-icon">{{ f.icon }}</span>
+          <span class="af-icon">
+            <ng-container *ngIf="f.icon.startsWith('fa-'); else textIcon">
+              <i [class]="f.icon"></i>
+            </ng-container>
+            <ng-template #textIcon>{{ f.icon }}</ng-template>
+          </span>
           <span class="af-text">{{ f.text }}</span>
         </div>
       </div>
@@ -36,7 +41,7 @@
         <div class="inp-group">
           <label>Téléphone ou email</label>
           <div class="inp-icon-wrap">
-            <span class="inp-icon">📞</span>
+            <i class="fa-solid fa-phone inp-icon"></i>
             <input class="inp" formControlName="phone" placeholder="+226 76 52 86 09">
           </div>
         </div>
@@ -44,7 +49,7 @@
         <div class="inp-group">
           <label>Mot de passe</label>
           <div class="inp-icon-wrap">
-            <span class="inp-icon">🔑</span>
+            <i class="fa-solid fa-key inp-icon"></i>
             <input class="inp" type="password" formControlName="password" placeholder="••••••••">
           </div>
         </div>
@@ -71,7 +76,7 @@
         <div class="demo-title">🧪 Accès démo rapide</div>
         <div class="demo-btns">
           <button class="btn-outline btn-sm btn-round" (click)="demoLogin('MEMBER')">👤 Membre</button>
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')">🏪 Fournisseur</button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')"><i class="fa-solid fa-store"></i> Fournisseur</button>
           <button class="btn-outline btn-sm btn-round" (click)="demoLogin('ADMIN')">🛡 Admin</button>
         </div>
       </div>

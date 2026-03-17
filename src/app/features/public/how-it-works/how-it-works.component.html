@@ -12,7 +12,7 @@
   <div class="hiw-steps">
     <div class="hiw-step" *ngFor="let s of steps; let i = index">
       <div class="hs-num font-display" [class.gold]="i % 2 === 0">{{ s.n }}</div>
-      <div class="hs-icon">{{ s.icon }}</div>
+      <div class="hs-icon"><i [class]="s.icon"></i></div>
       <div class="hs-content">
         <h3 class="font-display hs-title">{{ s.title }}</h3>
         <p class="text-muted hs-desc">{{ s.desc }}</p>
@@ -43,7 +43,7 @@
     <p class="text-muted" style="margin-bottom:28px;font-size:16px">
       Rejoignez 5 247 membres et économisez sur vos achats dès aujourd'hui
     </p>
-    <button class="btn-gold btn-xl" (click)="goRegister()">Créer mon compte gratuitement 🚀</button>
+    <button class="btn-gold btn-xl" (click)="goRegister()"><i class="fa-solid fa-rocket"></i> Créer mon compte gratuitement</button>
   </div>
 </div>
 
