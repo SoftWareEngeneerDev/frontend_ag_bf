@@ -1,0 +1,7 @@
+// Table scroll handled globally via .glass + .tbl in main.scss
+// Responsive toolbar handled globally via .flex-between
+
+@media (max-width: 600px) {
+  // Ensure action buttons in table don't overflow
+  .flex.gap-6 { flex-wrap: wrap; }
+}

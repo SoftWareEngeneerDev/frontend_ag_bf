@@ -1,0 +1,15 @@
+.ap-prod-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--primary-l); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .tbl { min-width: 580px; }
+  .glass { overflow-x: auto; }
+}
+@media (max-width: 480px) {
+  .flex-between { flex-direction: column; align-items: stretch; }
+  .flex-between .btn { width: 100%; justify-content: center; }
+}

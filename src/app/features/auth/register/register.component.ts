@@ -12,6 +12,9 @@ export class RegisterComponent {
   step = 1;
   form: FormGroup;
   pwStrength = 0;
+  showPassword = false;
+
+  get loading(): boolean { return this.auth.isLoading(); }
 
   steps = ['Infos', 'Vérification', 'Bienvenue'];
 

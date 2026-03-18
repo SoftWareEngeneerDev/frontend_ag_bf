@@ -1,123 +1,217 @@
-<div>
+<div class="prof-page">
 
-  <!-- Header profil -->
-  <div class="glass-gold prof-header">
+  <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+  <div class="prof-header card">
     <div class="ph-left">
       <div class="ph-av-wrap">
-        <app-avatar [name]="user?.fullName || 'U'" [size]="72" bg="#F5A623"></app-avatar>
-        <div class="ph-av-edit">✏️</div>
+        <app-avatar [name]="user?.fullName || 'U'" [size]="72" bg="linear-gradient(135deg,#F5A623,#E67E00)"></app-avatar>
+        <button class="ph-av-edit" title="Modifier la photo">
+          <i class="fa-solid fa-camera"></i>
+        </button>
       </div>
       <div>
         <div class="font-display ph-name">{{ user?.fullName }}</div>
-        <div class="text-muted ph-meta"><i class="fa-solid fa-phone"></i> {{ user?.phone }} · <i class="fa-solid fa-location-dot"></i> {{ user?.city }}</div>
-        <div class="flex gap-8" style="margin-top:6px">
-          <span class="badge-cyan">Membre</span>
-          <span class="badge-ok">✓ Vérifié</span>
+        <div class="ph-meta">
+          <i class="fa-solid fa-phone"></i> {{ user?.phone }}
+          &nbsp;·&nbsp;
+          <i class="fa-solid fa-location-dot"></i> {{ user?.city }}
+        </div>
+        <div class="flex gap-8" style="margin-top:8px">
+          <span class="badge-primary"><i class="fa-solid fa-user"></i> Membre</span>
+          <span class="badge-ok"><i class="fa-solid fa-circle-check"></i> Vérifié</span>
         </div>
       </div>
     </div>
 
     <div class="ph-stats">
-      <div class="ph-stat" *ngFor="let s of [
-        {v:'5', l:'Achats'},
-        {v:'47 500 XOF', l:'Économisés'},
-        {v:'6 mois', l:'Membre depuis'}
-      ]">
-        <div class="font-mono ph-stat-v">{{ s.v }}</div>
-        <div class="text-muted ph-stat-l">{{ s.l }}</div>
+      <div class="ph-stat">
+        <div class="ph-stat-v">5</div>
+        <div class="ph-stat-l">Achats</div>
+      </div>
+      <div class="ph-stat-divider"></div>
+      <div class="ph-stat">
+        <div class="ph-stat-v">47 500 XOF</div>
+        <div class="ph-stat-l">Économisés</div>
+      </div>
+      <div class="ph-stat-divider"></div>
+      <div class="ph-stat">
+        <div class="ph-stat-v">6 mois</div>
+        <div class="ph-stat-l">Membre depuis</div>
       </div>
     </div>
 
-    <app-circle-progress [size]="76" [sw]="7" [pct]="95" color="#10D98B">
-      <span class="font-mono" style="font-size:18px;font-weight:800;color:var(--ok)">95</span>
-    </app-circle-progress>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
-            [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
-  </div>
-
-  <!-- ── Infos ── -->
-  <ng-container *ngIf="activeTab === 'Infos'">
-    <div class="glass p-24">
-      <form [formGroup]="form" class="prof-form">
-        <div class="inp-group" *ngFor="let f of [
-          {ctrl:'fullName', label:'Nom complet'},
-          {ctrl:'email',    label:'Email'},
-          {ctrl:'phone',    label:'Téléphone'},
-          {ctrl:'city',     label:'Ville'}
-        ]">
-          <label>{{ f.label }}</label>
-          <input class="inp" [formControlName]="f.ctrl">
-        </div>
-        <button class="btn-gold" type="button" (click)="save()">Sauvegarder les modifications</button>
-      </form>
+    <div class="ph-score">
+      <app-circle-progress [size]="76" [sw]="7" [pct]="95" color="#0DA487">
+        <span class="font-mono" style="font-size:16px;font-weight:800;color:var(--primary)">95</span>
+      </app-circle-progress>
+      <div class="ph-score-label">Score<br>confiance</div>
     </div>
-  </ng-container>
+  </div>
 
-  <!-- ── Sécurité ── -->
-  <ng-container *ngIf="activeTab === 'Sécurité'">
-    <div class="glass p-24">
-      <h4 class="font-display" style="font-weight:700;margin-bottom:16px">Changer le mot de passe</h4>
-      <div class="prof-form">
-        <div class="inp-group" *ngFor="let l of ['Mot de passe actuel','Nouveau mot de passe','Confirmer']">
-          <label>{{ l }}</label>
+  <!-- ══ TABS ══════════════════════════════════════════════════════ -->
+  <div class="tab-nav" style="margin-bottom:20px">
+    <button class="tab-btn" *ngFor="let t of tabs"
+            [class.active]="activeTab === t.key"
+            (click)="activeTab = t.key">
+      <i [class]="t.icon"></i> {{ t.label }}
+    </button>
+  </div>
+
+  <!-- ── Infos personnelles ──────────────────────────────────────── -->
+  <div class="card p-24 anim-fade" *ngIf="activeTab === 'infos'">
+    <div class="prof-section-title">
+      <i class="fa-solid fa-user-pen"></i> Informations personnelles
+    </div>
+    <form [formGroup]="form" class="prof-form">
+      <div class="inp-group">
+        <label>Nom complet</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-user inp-icon"></i>
+          <input class="inp" formControlName="fullName" placeholder="Kofi Traoré">
+        </div>
+      </div>
+      <div class="inp-group">
+        <label>Email</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-envelope inp-icon"></i>
+          <input class="inp" formControlName="email" placeholder="kofi@exemple.com">
+        </div>
+      </div>
+      <div class="inp-group">
+        <label>Téléphone</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-phone inp-icon"></i>
+          <input class="inp" formControlName="phone" placeholder="+226 76 00 00 00">
+        </div>
+      </div>
+      <div class="inp-group">
+        <label>Ville</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-location-dot inp-icon"></i>
+          <input class="inp" formControlName="city" placeholder="Ouagadougou">
+        </div>
+      </div>
+    </form>
+    <button class="btn-primary btn-round" type="button" (click)="save()" [disabled]="saving">
+      <i *ngIf="saving" class="fa-solid fa-spinner anim-spin"></i>
+      <i *ngIf="!saving" class="fa-solid fa-floppy-disk"></i>
+      {{ saving ? 'Sauvegarde...' : 'Sauvegarder les modifications' }}
+    </button>
+  </div>
+
+  <!-- ── Sécurité ────────────────────────────────────────────────── -->
+  <div class="card p-24 anim-fade" *ngIf="activeTab === 'securite'">
+    <div class="prof-section-title">
+      <i class="fa-solid fa-shield-halved"></i> Sécurité du compte
+    </div>
+
+    <div class="prof-form" style="margin-bottom:24px">
+      <div class="inp-group">
+        <label>Mot de passe actuel</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-lock inp-icon"></i>
           <input class="inp" type="password" placeholder="••••••••">
         </div>
       </div>
-      <div class="divider"></div>
-      <div class="flex-between" style="margin-top:16px">
-        <div>
-          <div class="font-display" style="font-weight:600;margin-bottom:3px">Authentification 2FA</div>
-          <div class="text-muted" style="font-size:13px">Sécurisez votre compte avec un code SMS</div>
+      <div class="inp-group">
+        <label>Nouveau mot de passe</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-key inp-icon"></i>
+          <input class="inp" type="password" placeholder="••••••••">
         </div>
-        <div class="toggle toggle-on"></div>
       </div>
-      <button class="btn-gold" style="margin-top:20px">Mettre à jour</button>
+      <div class="inp-group">
+        <label>Confirmer le nouveau mot de passe</label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-key inp-icon"></i>
+          <input class="inp" type="password" placeholder="••••••••">
+        </div>
+      </div>
     </div>
-  </ng-container>
 
-  <!-- ── Notifications ── -->
-  <ng-container *ngIf="activeTab === 'Notifications'">
-    <div class="glass p-24">
-      <div class="notif-row" *ngFor="let n of notifSettings">
-        <div>
-          <div style="font-weight:500;font-size:14px;margin-bottom:2px">{{ n.label }}</div>
-          <div class="text-muted" style="font-size:12px">{{ n.desc }}</div>
-        </div>
-        <div class="toggle" [class.toggle-on]="n.on" (click)="toggleNotif(n)"></div>
-      </div>
-    </div>
-  </ng-container>
+    <div class="divider" style="margin-bottom:20px"></div>
 
-  <!-- ── Parrainage ── -->
-  <ng-container *ngIf="activeTab === 'Parrainage'">
-    <div class="glass p-24">
-      <div class="text-center ref-hero">
-        <div style="font-size:48px;margin-bottom:12px">🎁</div>
-        <h3 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px">Invitez vos amis et gagnez !</h3>
-        <p class="text-muted" style="font-size:14px;margin-bottom:24px">Pour chaque ami inscrit avec votre code, vous gagnez 500 XOF de crédit</p>
-      </div>
-      <div class="glass-gold ref-code">
-        <div class="text-muted" style="font-size:12px;margin-bottom:6px">Votre code personnel</div>
-        <div class="font-mono" style="font-size:28px;font-weight:800;color:var(--gold);letter-spacing:5px">
-          {{ user?.referralCode }}
+    <div class="sec-2fa">
+      <div class="sec-2fa-info">
+        <div class="sec-2fa-title">
+          <i class="fa-solid fa-mobile-screen-button" style="color:var(--primary)"></i>
+          Authentification à 2 facteurs
+        </div>
+        <div class="text-muted" style="font-size:13px;margin-top:4px">
+          Protégez votre compte avec un code envoyé par SMS à chaque connexion.
         </div>
       </div>
-      <div class="ref-stats">
-        <div class="ref-stat glass" *ngFor="let s of [{v:'3',l:'Amis parrainés'},{v:'1 500 XOF',l:'Crédits gagnés'},{v:'2',l:'Achats parrainage'}]">
-          <div class="font-mono" style="font-size:20px;font-weight:800;color:var(--gold)">{{ s.v }}</div>
-          <div class="text-muted" style="font-size:11px;margin-top:3px">{{ s.l }}</div>
-        </div>
+      <div class="toggle toggle-on" title="Activé"></div>
+    </div>
+
+    <button class="btn-primary btn-round" style="margin-top:20px">
+      <i class="fa-solid fa-check"></i> Mettre à jour la sécurité
+    </button>
+  </div>
+
+  <!-- ── Préférences notifications ────────────────────────────────── -->
+  <div class="card p-24 anim-fade" *ngIf="activeTab === 'notifications'">
+    <div class="prof-section-title">
+      <i class="fa-solid fa-bell"></i> Préférences de notifications
+    </div>
+    <div class="notif-row" *ngFor="let n of notifSettings">
+      <div class="notif-row-info">
+        <div class="notif-row-label">{{ n.label }}</div>
+        <div class="text-muted" style="font-size:12px">{{ n.desc }}</div>
       </div>
-      <div class="flex gap-10" style="margin-top:16px">
-        <button class="btn-gold" style="flex:1;justify-content:center">📋 Copier le code</button>
-        <button class="btn-ghost" style="flex:1;justify-content:center">📲 Partager</button>
+      <div class="toggle" [class.toggle-on]="n.on" (click)="toggleNotif(n)"
+           [title]="n.on ? 'Désactiver' : 'Activer'"></div>
+    </div>
+  </div>
+
+  <!-- ── Parrainage ─────────────────────────────────────────────── -->
+  <div class="anim-fade" *ngIf="activeTab === 'parrainage'">
+
+    <!-- Hero parrainage -->
+    <div class="card ref-hero">
+      <div class="ref-hero-icon">
+        <i class="fa-solid fa-gift"></i>
+      </div>
+      <h3 class="font-display" style="font-size:20px;font-weight:800;margin-bottom:8px">
+        Invitez vos amis, gagnez ensemble !
+      </h3>
+      <p class="text-muted" style="font-size:14px;max-width:420px;margin:0 auto 24px">
+        Pour chaque ami inscrit et ayant fait un premier achat avec votre code, vous recevez <strong>500 XOF</strong> de crédit.
+      </p>
+
+      <!-- Code -->
+      <div class="ref-code-box">
+        <div class="ref-code-label">Votre code de parrainage</div>
+        <div class="ref-code-val font-mono">{{ user?.referralCode }}</div>
+        <button class="ref-copy-btn" (click)="copyCode()">
+          <i class="fa-solid fa-copy"></i> Copier
+        </button>
+      </div>
+
+      <div class="ref-actions">
+        <button class="btn-primary btn-round">
+          <i class="fa-solid fa-share-nodes"></i> Partager le lien
+        </button>
+        <button class="btn-outline-primary btn-round">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </button>
       </div>
     </div>
-  </ng-container>
+
+    <!-- Stats parrainage -->
+    <div class="ref-stats-grid">
+      <div class="card ref-stat-card" *ngFor="let s of [
+        {icon:'fa-solid fa-users', color:'#0DA487', bg:'#E6FAF5', v:'3',        l:'Amis parrainés'},
+        {icon:'fa-solid fa-sack-dollar', color:'#F4A902', bg:'#FFF8E6', v:'1 500 XOF', l:'Crédits gagnés'},
+        {icon:'fa-solid fa-cart-shopping', color:'#7B2FBE', bg:'#F3EAFF', v:'2',  l:'Achats parrainage'}
+      ]">
+        <div class="ref-stat-icon" [style.background]="s.bg" [style.color]="s.color">
+          <i [class]="s.icon"></i>
+        </div>
+        <div class="ref-stat-val font-mono">{{ s.v }}</div>
+        <div class="ref-stat-label">{{ s.l }}</div>
+      </div>
+    </div>
+  </div>
 
 </div>

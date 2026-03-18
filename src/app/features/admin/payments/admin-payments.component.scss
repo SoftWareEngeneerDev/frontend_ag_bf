@@ -1,0 +1,6 @@
+// Stats grid (repeat(4,1fr)) and table scroll handled globally via main.scss
+// Responsive toolbar handled globally via .flex-between
+
+@media (max-width: 600px) {
+  .flex.gap-6 { flex-wrap: wrap; }
+}

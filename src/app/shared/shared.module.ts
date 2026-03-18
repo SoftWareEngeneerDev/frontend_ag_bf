@@ -15,6 +15,7 @@ import { NotificationItemComponent } from './components/notification-item/notifi
 import { GroupCardComponent }        from './components/group-card/group-card.component';
 import { LoadingSpinnerComponent }   from './components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent }       from './components/empty-state/empty-state.component';
+import { ToastContainerComponent }  from './components/toast/toast-container.component';
 
 // ── Pipes ─────────────────────────────────────────────────────────
 import { CurrencyXofPipe }       from './pipes/currency-xof.pipe';
@@ -28,6 +29,7 @@ const COMPONENTS = [
   ProgressBarComponent, CountdownComponent, CircleProgressComponent,
   StatsCardComponent, NotificationItemComponent,
   GroupCardComponent, LoadingSpinnerComponent, EmptyStateComponent,
+  ToastContainerComponent,
 ];
 
 const PIPES = [

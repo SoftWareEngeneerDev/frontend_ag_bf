@@ -1,0 +1,17 @@
+// Grids (repeat(4,1fr), 1fr 1fr) handled globally via main.scss inline style selectors
+
+@media (max-width: 600px) {
+  // Identity card: avatar + info stacks vertically
+  .flex.gap-20 { flex-wrap: wrap; }
+
+  // Contact info items wrap
+  .flex.gap-24 { flex-wrap: wrap; gap: 10px !important; }
+
+  // Header actions wrap
+  .flex-between { flex-wrap: wrap; gap: 10px; }
+}
+
+@media (max-width: 480px) {
+  // Trust score block full width
+  div[style*="min-width:90px"] { min-width: unset !important; width: 100%; text-align: left !important; }
+}

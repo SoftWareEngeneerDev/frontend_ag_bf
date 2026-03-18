@@ -3,7 +3,7 @@
   <!-- En-tête -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()">← Retour</button>
+      <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour</button>
       <div>
         <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Profil utilisateur</h2>
         <p class="text-muted" style="font-size:12px">{{ user.id }}</p>
@@ -154,6 +154,6 @@
     <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-user" style="color:var(--primary)"></i></div>
     <h3 style="font-weight:600;margin-bottom:8px">Utilisateur introuvable</h3>
     <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun utilisateur.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>
+    <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</button>
   </div>
 </ng-template>

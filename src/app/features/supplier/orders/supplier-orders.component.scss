@@ -1,1 +1,17 @@
-.so-header { margin-bottom: 20px; flex-wrap:wrap; gap:12px; }
+.so-header { margin-bottom: 20px; flex-wrap:wrap; gap:12px; display: flex; align-items: center; justify-content: space-between; }
+
+.so-prod-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--primary-l); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .glass { overflow-x: auto; }
+  .tbl   { min-width: 540px; }
+  .so-header { flex-direction: column; align-items: stretch; }
+}
+@media (max-width: 480px) {
+  .so-header .btn { width: 100%; justify-content: center; }
+}

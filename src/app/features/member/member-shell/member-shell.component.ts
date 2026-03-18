@@ -21,11 +21,14 @@ import { NotificationService } from '../../../core/services/notification.service
   `,
   styles: [`
     .shell-wrap    { display:flex; }
-    .shell-main    { margin-left:var(--sidebar-w); flex:1; min-height:100vh; }
+    .shell-main    { margin-left:var(--sidebar-w); flex:1; min-height:100vh; overflow-x:hidden; }
     .shell-content { padding:28px; }
     @media (max-width:768px) {
       .shell-main    { margin-left:0; }
       .shell-content { padding:16px; }
+    }
+    @media (max-width:480px) {
+      .shell-content { padding:12px; }
     }
   `]
 })

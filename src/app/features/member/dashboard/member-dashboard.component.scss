@@ -9,6 +9,8 @@
   margin-bottom: 24px;
   flex-wrap: wrap;
   box-shadow: 0 8px 32px rgba(13,164,135,.25);
+  @media (max-width: 768px) { padding: 20px; gap: 20px; }
+  @media (max-width: 480px) { padding: 16px; gap: 14px; flex-direction: column; align-items: flex-start; }
 }
 
 .mdh-left {
@@ -41,6 +43,8 @@
   flex-direction: column;
   gap: 8px;
   min-width: 140px;
+  @media (max-width: 480px) { flex-direction: row; flex-wrap: wrap; min-width: unset; width: 100%; }
+  @media (max-width: 480px) { .mdh-btn { flex: 1; justify-content: center; } }
 }
 
 .mdh-btn {
@@ -120,6 +124,8 @@
   margin-bottom: 24px;
   flex-wrap: wrap;
   box-shadow: 0 4px 16px rgba(244,169,2,.15);
+  @media (max-width: 600px) { padding: 14px 16px; gap: 14px; }
+  @media (max-width: 480px) { flex-direction: column; align-items: flex-start; }
 }
 
 .mdu-left {
@@ -147,7 +153,9 @@
 
 .mdu-title { font-size: 15px; font-weight: 800; color: #92600A; margin-bottom: 4px; }
 .mdu-desc  { font-size: 13px; color: #78540D; line-height: 1.5; }
-.mdu-cta   { flex-shrink: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; padding: 12px 22px; }
+.mdu-cta   { flex-shrink: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; padding: 12px 22px;
+  @media (max-width: 480px) { width: 100%; justify-content: center; padding: 12px; }
+}
 
 // ══ GRILLE PRINCIPALE ══════════════════════════════════════════════
 .md-main-grid {
@@ -336,6 +344,22 @@
   background: none; border: none; cursor: pointer;
   padding: 0;
   &:hover { text-decoration: underline; }
+}
+
+// ══ RESPONSIVE GLOBAL ══════════════════════════════════════════════
+@media (max-width: 600px) {
+  .mg-cards      { padding: 12px; gap: 10px; }
+  .mg-item       { padding: 12px; gap: 10px; }
+  .mg-item-img   { width: 52px; height: 52px; }
+  .md-timeline   { padding: 12px 14px; }
+  .md-panel-head { padding: 14px 16px; }
+}
+@media (max-width: 480px) {
+  .mg-item-top   { flex-wrap: wrap; gap: 4px; }
+  .mg-item-foot  { gap: 6px; }
+  .mdh-savings   { width: 100%; }
+  .md-referral   { padding: 14px !important; gap: 10px !important; }
+  .mdr-btn       { width: 100%; justify-content: center; }
 }
 
 // ══ PARRAINAGE ═════════════════════════════════════════════════════

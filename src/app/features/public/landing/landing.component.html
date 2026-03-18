@@ -171,7 +171,9 @@
         </div>
         <h3 class="step-title font-display">{{ s.title }}</h3>
         <p class="step-desc text-muted">{{ s.desc }}</p>
-        <div class="step-arrow" *ngIf="i < howItWorks.length - 1">→</div>
+        <div class="step-arrow" *ngIf="i < howItWorks.length - 1">
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
       </div>
     </div>
   </div>

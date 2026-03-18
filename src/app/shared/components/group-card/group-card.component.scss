@@ -268,7 +268,15 @@
 
 // ── Responsive ──────────────────────────────────────────────────────
 @media (max-width: 480px) {
-  .gc-img-wrap { height: 190px; }
+  .gc-img-wrap { height: 180px; }
   .gc-price    { font-size: 17px; }
   .gc-cta      { font-size: 12px; padding: 10px; }
+  .gc-body     { padding: 12px 14px 14px; }
+  .gc-name     { font-size: 13px; min-height: 36px; }
+  .gc-actions  { display: none; }   // hover actions inutiles sur touch
+}
+
+@media (max-width: 360px) {
+  .gc-img-wrap { height: 160px; }
+  .gc-price    { font-size: 15px; }
 }

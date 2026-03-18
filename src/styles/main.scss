@@ -80,7 +80,10 @@
 
 // ── RESET ────────────────────────────────────────────────────────
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 14px; }
+html {
+  scroll-behavior: smooth; font-size: 14px;
+  overflow-x: hidden;   // ← empêche le scroll horizontal
+}
 body {
   background: var(--bg);
   color: var(--txt);
@@ -88,6 +91,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;   // ← empêche le scroll horizontal
+  min-width: 320px;     // ← largeur minimale raisonnable
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: var(--font-body); cursor: pointer; }
@@ -257,7 +262,22 @@ input, select, textarea { font-family: var(--font-body); }
 
 .inp-icon-wrap { position: relative;
   .inp { padding-left: 42px; }
-  .inp-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+  .inp-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; color: var(--muted); }
+  &:has(.inp-eye) .inp { padding-right: 44px; }
+}
+
+.inp-eye {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 15px; padding: 4px;
+  transition: color var(--t);
+  &:hover { color: var(--txt); }
+}
+
+.error-msg {
+  font-size: 12px; color: #E63946;
+  margin-top: 5px; display: flex; align-items: center; gap: 5px;
+  i { flex-shrink: 0; }
 }
 
 .inp-prefix { display: flex; gap: 8px;
@@ -355,6 +375,7 @@ input, select, textarea { font-family: var(--font-body); }
   background: linear-gradient(135deg, var(--primary), #0BC5A5);
   color: #fff; text-align: center; padding: 8px 20px;
   font-size: 13px; font-weight: 500; letter-spacing: .3px;
+  @media (max-width: 480px) { font-size: 11px; padding: 7px 12px; }
 }
 
 // ── SECTION HEADER ───────────────────────────────────────────────
@@ -377,8 +398,11 @@ input, select, textarea { font-family: var(--font-body); }
   padding: 18px 16px; border-radius: var(--r-lg); cursor: pointer;
   background: var(--bg-white); border: 2px solid transparent;
   box-shadow: var(--shadow-xs); transition: all var(--t); text-align: center;
-  .cp-icon { font-size: 32px; }
-  .cp-name { font-size: 12px; font-weight: 600; color: var(--txt2); white-space: nowrap; }
+  .cp-icon { font-size: 32px; @media (max-width: 480px) { font-size: 26px; } }
+  .cp-name { font-size: 12px; font-weight: 600; color: var(--txt2); white-space: normal; word-break: break-word;
+    @media (max-width: 480px) { font-size: 11px; }
+  }
+  @media (max-width: 480px) { padding: 14px 10px; gap: 6px; }
   &:hover, &.active {
     border-color: var(--primary); background: var(--primary-l);
     transform: translateY(-2px); box-shadow: var(--shadow-green);
@@ -502,7 +526,11 @@ input, select, textarea { font-family: var(--font-body); }
 .shell-content{ padding:28px; }
 
 // ── LAYOUT UTILITIES ─────────────────────────────────────────────
-.container    { max-width:var(--max-w); margin:0 auto; padding:0 24px; }
+.container {
+  max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+  @media (max-width: 480px) { padding: 0 16px; }
+  @media (max-width: 360px) { padding: 0 12px; }
+}
 .flex         { display:flex; }
 .flex-col     { display:flex; flex-direction:column; }
 .flex-center  { display:flex; align-items:center; justify-content:center; }
@@ -520,8 +548,8 @@ input, select, textarea { font-family: var(--font-body); }
 .text-right  { text-align:right; }
 
 // ── SECTION PADDING ──────────────────────────────────────────────
-.section { padding:64px 0; }
-.section-sm { padding:40px 0; }
+.section    { padding: 64px 0; @media (max-width: 768px) { padding: 40px 0; } @media (max-width: 480px) { padding: 28px 0; } }
+.section-sm { padding: 40px 0; @media (max-width: 768px) { padding: 28px 0; } @media (max-width: 480px) { padding: 20px 0; } }
 
 // ── MODALS ───────────────────────────────────────────────────────
 .modal-backdrop {
@@ -544,6 +572,12 @@ input, select, textarea { font-family: var(--font-body); }
 // ── RESPONSIVE ───────────────────────────────────────────────────
 // Breakpoints : md ≤ 768px (mobile/tablette) · sm ≤ 480px (mobile)
 
+// ── md ≤ 900px ──────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+// ── md ≤ 768px ──────────────────────────────────────────────────
 @media (max-width: 768px) {
 
   // Layout principal
@@ -552,7 +586,10 @@ input, select, textarea { font-family: var(--font-body); }
 
   // Tables : scroll horizontal
   .glass { overflow-x: auto; }
-  .tbl   { min-width: 600px; }
+  .tbl   { min-width: 560px; }
+
+  // Masquer colonnes de table moins critiques
+  .tbl-col-hide-md { display: none !important; }
 
   // Grilles 4 colonnes → 2 colonnes
   div[style*="repeat(4,1fr)"],
@@ -578,7 +615,7 @@ input, select, textarea { font-family: var(--font-body); }
   // Flex-between → wrap
   .flex-between { flex-wrap: wrap; gap: 12px; }
 
-  // Modals plein écran
+  // Modals plein écran (bottom sheet sur mobile)
   .modal-backdrop { padding: 0; align-items: flex-end; }
   .modal-box      { max-width: 100% !important; border-radius: var(--r-xl) var(--r-xl) 0 0 !important; max-height: 92vh; overflow-y: auto; }
 
@@ -595,8 +632,19 @@ input, select, textarea { font-family: var(--font-body); }
   .p-24 { padding: 16px !important; }
   .p-28 { padding: 16px !important; }
   .shell-content .glass { margin-bottom: 16px; }
+
+  // Tabs nav scroll
+  .tab-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab-nav::-webkit-scrollbar { height: 0; }
+
+  // Cards empilées
+  .card { border-radius: var(--r-lg); }
+
+  // Boutons pleine largeur sur petits écrans
+  .btn-block-sm { width: 100% !important; justify-content: center; }
 }
 
+// ── sm ≤ 480px ──────────────────────────────────────────────────
 @media (max-width: 480px) {
 
   // Grilles 2 colonnes → 1 colonne
@@ -621,4 +669,21 @@ input, select, textarea { font-family: var(--font-body); }
 
   // Tabs scroll
   .tab-nav { flex-wrap: nowrap; overflow-x: auto; }
+
+  // Taille des boutons réduite
+  .btn      { padding: 10px 16px; font-size: 13px; }
+  .btn-sm   { padding: 7px 12px;  font-size: 12px; }
+
+  // Réduire padding des cartes
+  .card     { padding: 14px !important; }
+
+  // Masquer éléments optionnels
+  .hide-xs  { display: none !important; }
+
+  // Inputs de recherche pleine largeur dans les en-têtes
+  .flex-between .inp,
+  .flex-between input.inp { width: 100% !important; }
+
+  // Toolbar avec input + bouton → colonne
+  .flex.gap-10 > .inp { width: 100% !important; }
 }

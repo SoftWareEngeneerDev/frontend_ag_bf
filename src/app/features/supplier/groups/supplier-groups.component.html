@@ -24,7 +24,10 @@
     <div class="glass sg-card" *ngFor="let g of filtered">
 
       <div class="sg-top">
-        <span class="sg-emoji">{{ g.product.emoji }}</span>
+        <div class="sg-img">
+          <img [src]="g.product.images[0] || 'https://picsum.photos/seed/' + g.product.id + '/64/64'"
+               [alt]="g.product.name" loading="lazy">
+        </div>
         <div class="sg-info">
           <div class="font-display sg-name">{{ g.product.name | truncate:45 }}</div>
           <div class="text-muted sg-meta">
@@ -59,7 +62,9 @@
           </div>
         </div>
         <div class="flex gap-8">
-          <button class="btn-gold btn-sm" *ngIf="isHot(g)">📋 Confirmer commandes</button>
+          <button class="btn-gold btn-sm" *ngIf="isHot(g)">
+            <i class="fa-solid fa-clipboard-check"></i> Confirmer commandes
+          </button>
           <button class="btn-ghost btn-sm">Voir détail →</button>
         </div>
       </div>
@@ -75,7 +80,9 @@
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
         <h3 class="font-display" style="font-size:17px;font-weight:700">Créer un groupe d'achat</h3>
-        <button class="btn-ghost btn-sm" (click)="showCreateModal = false">✕</button>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showCreateModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="inp-group">

@@ -56,7 +56,9 @@
           <!-- Groupe / Produit -->
           <td>
             <div class="flex gap-10" style="align-items:center">
-              <span style="font-size:20px">{{ g.product.emoji }}</span>
+              <div class="ag-prod-icon">
+                <i [class]="g.product.category.icon"></i>
+              </div>
               <div>
                 <div style="font-weight:500;font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                   {{ g.product.name }}

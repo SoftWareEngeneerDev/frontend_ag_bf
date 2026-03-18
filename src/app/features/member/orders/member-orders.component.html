@@ -1,59 +1,91 @@
 <div>
-  <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of ['Toutes (3)','En cours (1)','Expédiées (1)','Livrées (2)']"
-            [class.active]="activeTab === t.split(' ')[0]"
-            (click)="setTab(t.split(' ')[0])">{{ t }}</button>
+  <!-- Tabs filtre -->
+  <div class="tab-nav" style="margin-bottom:20px">
+    <button class="tab-btn" *ngFor="let t of tabList"
+            [class.active]="activeTab === t.key"
+            (click)="setTab(t.key)">
+      <i [class]="t.icon"></i> {{ t.label }}
+      <span *ngIf="t.count > 0" class="tab-count">{{ t.count }}</span>
+    </button>
   </div>
 
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="fa-solid fa-box" title="Aucune commande" description="Vous n'avez pas encore de commande ici.">
+    icon="fa-solid fa-box-open" title="Aucune commande"
+    description="Vous n'avez pas encore de commande ici.">
+    <button class="btn-primary btn-round" style="margin-top:8px" routerLink="/groups">
+      <i class="fa-solid fa-compass"></i> Parcourir les groupes
+    </button>
   </app-empty-state>
 
   <div class="orders-list" *ngIf="!loading">
-    <div class="glass order-card" *ngFor="let o of filtered">
+    <div class="card order-card" *ngFor="let o of filtered">
 
-      <!-- Header -->
-      <div class="flex-between order-head">
-        <div class="flex gap-14" style="align-items:center">
-          <span style="font-size:36px">{{ o.product.emoji }}</span>
-          <div>
-            <div class="font-display order-name">{{ o.product.name }}</div>
-            <div class="font-mono text-muted" style="font-size:12px">
-              Réf: {{ o.id }} · {{ o.createdAt | date:'dd MMM yyyy' }}
+      <!-- ── En-tête commande ── -->
+      <div class="order-head">
+        <div class="order-head-left">
+          <div class="order-img">
+            <img [src]="productImage(o)" [alt]="o.product.name" loading="lazy">
+          </div>
+          <div class="order-info">
+            <div class="order-name">{{ o.product.name }}</div>
+            <div class="order-ref">
+              <i class="fa-solid fa-hashtag"></i> {{ o.id }}
+              &nbsp;·&nbsp;
+              <i class="fa-regular fa-calendar"></i> {{ o.createdAt | date:'dd MMM yyyy' }}
+            </div>
+            <div class="order-supplier text-muted">
+              <i class="fa-solid fa-store"></i> {{ o.product.supplier.companyName }}
             </div>
           </div>
         </div>
-        <div class="text-right">
-          <span [class]="fmt.orderStatusClass(o.status)">● {{ o.status | orderStatusLabel }}</span>
-          <div class="font-mono order-amount">{{ o.amount | currencyXof }}</div>
+        <div class="order-head-right">
+          <span [class]="fmt.orderStatusClass(o.status)" class="order-status-badge">
+            <i [class]="statusIcon(o.status)"></i> {{ o.status | orderStatusLabel }}
+          </span>
+          <div class="order-amount font-mono">{{ o.amount | currencyXof }}</div>
         </div>
       </div>
 
-      <!-- Timeline -->
+      <!-- ── Timeline de progression ── -->
       <div class="order-timeline">
-        <div class="ot-item" *ngFor="let s of steps; let i = index">
-          <div class="ot-dot" [class.done]="i <= stepIndex(o.status)">
-            {{ i <= stepIndex(o.status) ? '✓' : i + 1 }}
+        <div class="ot-item" *ngFor="let s of timelineSteps; let i = index">
+          <div class="ot-connector" *ngIf="i > 0" [class.done]="i <= stepIndex(o.status)"></div>
+          <div class="ot-dot" [class.done]="i <= stepIndex(o.status)" [class.active]="i === stepIndex(o.status)">
+            <i [class]="i <= stepIndex(o.status) ? 'fa-solid fa-check' : s.icon"></i>
           </div>
-          <div class="ot-label" [class.text-gold-c]="i <= stepIndex(o.status)">{{ s }}</div>
-          <div class="ot-line" *ngIf="i < steps.length - 1"
-               [class.done]="i < stepIndex(o.status)"></div>
+          <div class="ot-label" [class.ot-label-done]="i <= stepIndex(o.status)">{{ s.label }}</div>
         </div>
       </div>
 
-      <!-- Tracking -->
-      <div class="alert-cyan alert" *ngIf="o.status === 'SHIPPED' && o.trackingCode">
-        <i class="fa-solid fa-barcode"></i> Code de suivi :
-        <strong class="font-mono">{{ o.trackingCode }}</strong>
-        <button class="btn-ghost btn-sm" style="margin-left:auto">Suivre →</button>
+      <!-- ── Tracking ── -->
+      <div class="order-tracking alert-info alert" *ngIf="o.status === 'SHIPPED' && o.trackingCode">
+        <i class="fa-solid fa-truck-fast" style="font-size:16px;flex-shrink:0"></i>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:13px;margin-bottom:2px">Votre commande est en route !</div>
+          <div style="font-size:12px">
+            Code de suivi : <strong class="font-mono">{{ o.trackingCode }}</strong>
+          </div>
+        </div>
+        <button class="btn-primary btn-sm btn-round">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Suivre
+        </button>
       </div>
 
-      <!-- Review -->
-      <button class="btn-ghost btn-sm" *ngIf="o.status === 'DELIVERED'" style="margin-top:8px">
-        <i class="fa-solid fa-star"></i> Laisser un avis
-      </button>
+      <!-- ── Actions ── -->
+      <div class="order-actions" *ngIf="o.status === 'DELIVERED'">
+        <button class="btn-outline btn-sm btn-round">
+          <i class="fa-solid fa-rotate-left"></i> Retour
+        </button>
+        <button class="btn-primary btn-sm btn-round">
+          <i class="fa-solid fa-star"></i> Laisser un avis
+        </button>
+        <button class="btn-outline-primary btn-sm btn-round">
+          <i class="fa-solid fa-cart-plus"></i> Recommander
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

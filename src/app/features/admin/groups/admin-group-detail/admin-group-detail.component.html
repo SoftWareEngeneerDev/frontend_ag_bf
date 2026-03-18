@@ -3,7 +3,7 @@
   <!-- En-tête -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()">← Retour</button>
+      <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour</button>
       <div>
         <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail groupe</h2>
         <p class="text-muted font-mono" style="font-size:12px">{{ group.id }}</p>
@@ -20,7 +20,10 @@
   <!-- Carte identité groupe -->
   <div class="glass mb-20" style="padding:24px">
     <div class="flex gap-20" style="align-items:flex-start">
-      <div style="font-size:48px;line-height:1">{{ group.product.emoji }}</div>
+      <div class="agd-prod-img">
+        <img [src]="group.product.images[0] || 'https://picsum.photos/seed/' + group.product.id + '/80/80'"
+             [alt]="group.product.name" loading="lazy">
+      </div>
       <div style="flex:1">
         <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
           <span style="font-size:18px;font-weight:700">{{ group.product.name }}</span>
@@ -144,7 +147,9 @@
             <td class="font-mono" style="font-size:12px">{{ formatXOF(tier.price) }}</td>
             <td>
               <span class="badge-ok" style="font-size:10px"
-                    *ngIf="group.currentCount >= tier.minParticipants">✓ Atteint</span>
+                    *ngIf="group.currentCount >= tier.minParticipants">
+                <i class="fa-solid fa-check"></i> Atteint
+              </span>
             </td>
           </tr>
         </tbody>
@@ -176,6 +181,6 @@
     <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-fire" style="color:var(--orange)"></i></div>
     <h3 style="font-weight:600;margin-bottom:8px">Groupe introuvable</h3>
     <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun groupe.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>
+    <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</button>
   </div>
 </ng-template>

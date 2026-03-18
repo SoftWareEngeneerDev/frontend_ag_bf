@@ -4,160 +4,344 @@
 
 <div *ngIf="!loading && group" class="gd-page">
 
-  <!-- Back -->
-  <button class="btn-ghost btn-sm gd-back" (click)="goBack()">← Retour aux groupes</button>
+  <!-- Breadcrumb -->
+  <div class="gd-breadcrumb">
+    <button class="gd-bread-btn" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Tous les groupes
+    </button>
+    <span class="gd-bread-sep">/</span>
+    <span class="gd-bread-cat">{{ group.product.category.name }}</span>
+    <span class="gd-bread-sep">/</span>
+    <span class="gd-bread-name">{{ group.product.name | truncate:40 }}</span>
+  </div>
 
-  <!-- Hero banner -->
-  <div class="gd-hero">
-    <span class="gd-emoji">{{ group.product.emoji }}</span>
-    <div class="gd-hero-info">
-      <span [class]="fmt.groupStatusClass(group.status) + ' gd-status'">
-        ● {{ group.status | groupStatusLabel }}
-      </span>
-      <h1 class="font-display gd-title">{{ group.product.name }}</h1>
-      <p class="text-muted">
-        par <strong style="color:var(--txt)">{{ group.supplier.companyName }}</strong>
-        · {{ group.product.category.name }}
+  <!-- ══ SECTION PRODUIT : GALERIE + INFO ══════════════════════════ -->
+  <div class="gd-product-section">
+
+    <!-- Thumbnails verticaux -->
+    <div class="gd-thumbs">
+      <div class="gd-thumb" *ngFor="let img of productImages; let i = index"
+           [class.active]="activeImg === i"
+           (click)="activeImg = i">
+        <img [src]="img" [alt]="group.product.name + ' photo ' + (i+1)" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Image principale -->
+    <div class="gd-main-img">
+      <img [src]="productImages[activeImg]"
+           [alt]="group.product.name" loading="eager"
+           class="gd-main-photo">
+
+      <!-- Badges overlay -->
+      <div class="gd-img-badges">
+        <span class="gd-badge-discount">-{{ group.discountPercent }}%</span>
+        <span class="gd-badge-status" [class.hot]="group.status === 'THRESHOLD_REACHED'">
+          <i [class]="group.status === 'THRESHOLD_REACHED' ? 'fa-solid fa-fire' : 'fa-solid fa-circle-dot'"></i>
+          {{ group.status | groupStatusLabel }}
+        </span>
+      </div>
+
+      <!-- Navigation flèches -->
+      <button class="gd-arrow gd-arrow-left" *ngIf="activeImg > 0"
+              (click)="activeImg = activeImg - 1">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="gd-arrow gd-arrow-right" *ngIf="activeImg < productImages.length - 1"
+              (click)="activeImg = activeImg + 1">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <!-- Dots navigation -->
+      <div class="gd-dots">
+        <span class="gd-dot" *ngFor="let img of productImages; let i = index"
+              [class.active]="activeImg === i"
+              (click)="activeImg = i"></span>
+      </div>
+    </div>
+
+    <!-- Panel informations produit -->
+    <div class="gd-info">
+
+      <!-- Catégorie -->
+      <div class="gd-category">
+        <i [class]="group.product.category.icon"></i>
+        {{ group.product.category.name }}
+      </div>
+
+      <!-- Nom + statut -->
+      <h1 class="gd-name">{{ group.product.name }}</h1>
+
+      <!-- Rating + stock -->
+      <div class="gd-meta-row">
+        <div class="gd-stars">
+          <i *ngFor="let s of stars(group.product.rating)"
+             [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+          <span class="gd-rating-val">{{ group.product.rating }}/5</span>
+          <span class="gd-reviews">({{ group.product.reviewCount }} avis)</span>
+        </div>
+        <div class="gd-stock">
+          <i class="fa-solid fa-circle-check"></i>
+          En stock ({{ group.product.stock }} disp.)
+        </div>
+      </div>
+
+      <!-- Description -->
+      <p class="gd-desc">
+        {{ descExpanded ? group.product.description : descShort }}
+        <button *ngIf="!descExpanded && group.product.description.length > 120"
+                class="gd-see-more" (click)="descExpanded = true">Voir plus</button>
+        <button *ngIf="descExpanded"
+                class="gd-see-more" (click)="descExpanded = false">Réduire</button>
       </p>
+
+      <div class="gd-divider"></div>
+
+      <!-- Prix -->
+      <div class="gd-price-row">
+        <span class="gd-price-solo">{{ group.product.soloPrice | currencyXof }}</span>
+        <span class="gd-price-group">{{ group.currentPrice | currencyXof }}</span>
+        <span class="gd-discount-chip">-{{ group.discountPercent }}%</span>
+      </div>
+      <div class="gd-savings-line">
+        <i class="fa-solid fa-piggy-bank"></i>
+        Économie de <strong>{{ (group.product.soloPrice - group.currentPrice) | currencyXof }}</strong> par rapport au prix solo
+      </div>
+
+      <div class="gd-divider"></div>
+
+      <!-- Progression du groupe mini -->
+      <div class="gd-group-mini">
+        <div class="gd-group-mini-head">
+          <span><i class="fa-solid fa-users"></i> Participants</span>
+          <span class="font-mono">{{ group.currentCount }}<span class="text-muted">/{{ group.minParticipants }}</span></span>
+        </div>
+        <div class="gd-prog-track">
+          <div class="gd-prog-fill" [class.ok]="group.status === 'THRESHOLD_REACHED'"
+               [style.width.%]="pct"></div>
+        </div>
+        <div class="gd-group-mini-foot">
+          <span class="badge-ok" *ngIf="group.status !== 'THRESHOLD_REACHED'">
+            <i class="fa-solid fa-bullseye"></i>
+            Plus que {{ group.minParticipants - group.currentCount }} place(s) pour atteindre le seuil
+          </span>
+          <span class="badge-gold anim-pulse" *ngIf="group.status === 'THRESHOLD_REACHED'">
+            <i class="fa-solid fa-fire"></i> Seuil atteint — Commandez maintenant !
+          </span>
+        </div>
+      </div>
+
+      <!-- Quantité -->
+      <div class="gd-qty-row">
+        <div class="gd-qty-label">Quantité</div>
+        <div class="gd-qty-ctrl">
+          <button class="gd-qty-btn" (click)="qty > 1 ? qty = qty - 1 : null">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <span class="gd-qty-val">{{ qty }}</span>
+          <button class="gd-qty-btn" (click)="qty < 10 ? qty = qty + 1 : null">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <button class="gd-add-btn" (click)="joinGroup()">
+          <i class="fa-solid fa-users-plus"></i> Rejoindre le groupe
+        </button>
+      </div>
+
+      <!-- Buy Now -->
+      <button class="gd-buy-btn" (click)="joinGroup()">
+        <i class="fa-solid fa-credit-card"></i>
+        Payer le dépôt — {{ group.depositAmount | currencyXof }}
+      </button>
+
+      <!-- Liens secondaires -->
+      <div class="gd-links">
+        <button class="gd-link-btn">
+          <i class="fa-solid fa-shuffle"></i> Comparer
+        </button>
+        <button class="gd-link-btn">
+          <i class="fa-regular fa-heart"></i> Favoris
+        </button>
+        <button class="gd-link-btn">
+          <i class="fa-regular fa-circle-question"></i> Poser une question
+        </button>
+      </div>
+
+      <!-- Garanties -->
+      <div class="gd-guarantees">
+        <div class="gd-guarantee">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div>
+            <strong>Dépôt sécurisé</strong>
+            <span>Payez 10% maintenant, le reste à confirmation</span>
+          </div>
+        </div>
+        <div class="gd-guarantee">
+          <i class="fa-solid fa-rotate-left"></i>
+          <div>
+            <strong>Remboursé si annulé</strong>
+            <span>Votre dépôt est remboursé si le groupe n'atteint pas le seuil</span>
+          </div>
+        </div>
+        <div class="gd-guarantee">
+          <i class="fa-solid fa-truck-fast"></i>
+          <div>
+            <strong>Livraison suivie</strong>
+            <span>Livraison avec code de suivi incluse</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- Contenu 2 colonnes -->
-  <div class="gd-body">
+  <!-- ══ SECTION DÉTAILS BAS DE PAGE ══════════════════════════════ -->
+  <div class="gd-details-section">
 
-    <!-- Colonne gauche -->
-    <div class="gd-left">
+    <!-- Progression & Compte à rebours -->
+    <div class="gd-details-grid">
 
-      <!-- Progression circulaire -->
-      <div class="glass gd-card">
-        <h3 class="font-display gd-card-title"><i class="fa-solid fa-chart-line"></i> Progression du groupe</h3>
+      <!-- Progression détaillée -->
+      <div class="card gd-detail-card">
+        <h3 class="gd-detail-title">
+          <i class="fa-solid fa-chart-line"></i> Progression du groupe
+        </h3>
         <div class="gd-progress-wrap">
-          <app-circle-progress [size]="130" [sw]="12" [pct]="pct" [color]="isThreshold ? '#10D98B' : '#F5A623'">
-            <span class="font-display cp-val">{{ group.currentCount }}/{{ group.minParticipants }}</span>
-            <span class="text-muted cp-lbl">participants</span>
+          <app-circle-progress [size]="120" [sw]="11" [pct]="pct"
+                               [color]="isThreshold ? '#10D98B' : '#0DA487'">
+            <span class="cp-val font-display">{{ group.currentCount }}/{{ group.minParticipants }}</span>
+            <span class="cp-lbl text-muted">membres</span>
           </app-circle-progress>
-
-          <div class="gd-prog-info">
-            <div class="font-mono gd-pct">{{ pct }}%</div>
-            <div class="text-muted" style="font-size:13px; margin-bottom:12px">de complétion</div>
-            <span class="badge-ok" *ngIf="!isThreshold">
-              <i class="fa-solid fa-bullseye"></i> Plus que {{ group.minParticipants - group.currentCount }} place(s) !
-            </span>
-            <span class="badge-gold anim-pulse" *ngIf="isThreshold">
-              <i class="fa-solid fa-circle-check"></i> Seuil atteint !
-            </span>
-            <!-- Mini avatars membres -->
-            <div class="member-avs" style="margin-top:14px">
-              <app-avatar
-                *ngFor="let av of memberAvatars.slice(0, group.currentCount); let i = index"
-                [name]="av" [size]="26" [bg]="avatarBgs[i]">
-              </app-avatar>
-              <div class="av-more" *ngIf="group.minParticipants - group.currentCount > 0">
-                +{{ group.minParticipants - group.currentCount }}
-              </div>
+          <div class="gd-prog-stats">
+            <div class="gd-prog-stat">
+              <div class="gd-prog-stat-v font-mono">{{ pct }}%</div>
+              <div class="gd-prog-stat-l text-muted">Complétion</div>
             </div>
+            <div class="gd-prog-stat">
+              <div class="gd-prog-stat-v font-mono">{{ group.currentCount }}</div>
+              <div class="gd-prog-stat-l text-muted">Inscrits</div>
+            </div>
+            <div class="gd-prog-stat">
+              <div class="gd-prog-stat-v font-mono">{{ group.minParticipants - group.currentCount }}</div>
+              <div class="gd-prog-stat-l text-muted">Restants</div>
+            </div>
+          </div>
+        </div>
+        <!-- Avatars membres -->
+        <div class="gd-member-avs">
+          <app-avatar *ngFor="let av of memberAvatars.slice(0, group.currentCount); let i = index"
+                      [name]="av" [size]="28" [bg]="avatarBgs[i]">
+          </app-avatar>
+          <div class="av-more" *ngIf="group.minParticipants - group.currentCount > 0">
+            +{{ group.minParticipants - group.currentCount }}
           </div>
         </div>
       </div>
 
       <!-- Compte à rebours -->
-      <div class="glass gd-card">
-        <h3 class="font-display gd-card-title"><i class="fa-solid fa-clock"></i> Temps restant</h3>
+      <div class="card gd-detail-card">
+        <h3 class="gd-detail-title">
+          <i class="fa-solid fa-clock"></i> Temps restant
+        </h3>
         <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
-        <div *ngIf="isThreshold" class="alert-gold alert" style="margin-top:12px">
-          ⚠️ Payez le solde avant l'expiration pour confirmer votre commande.
+        <div *ngIf="isThreshold" class="alert-gold alert" style="margin-top:14px">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Payez le solde avant l'expiration pour confirmer votre commande.
         </div>
       </div>
-
-      <!-- Modalités -->
-      <div class="glass gd-card">
-        <h3 class="font-display gd-card-title"><i class="fa-solid fa-sack-dollar"></i> Modalités de paiement</h3>
-        <div class="modal-grid">
-          <div class="modal-item" *ngFor="let m of [
-            {k:'Dépôt requis',    v:'10% du prix',                  gold:true},
-            {k:'Montant dépôt',   v:(group.depositAmount | currencyXof), gold:true},
-            {k:'Prix actuel',     v:(group.currentPrice  | currencyXof), gold:true},
-            {k:'Économie vs solo',v:(group.product.soloPrice - group.currentPrice | currencyXof), gold:false}
-          ]">
-            <div class="text-muted modal-k">{{ m.k }}</div>
-            <div class="font-mono modal-v" [class.text-gold-c]="m.gold" [class.text-ok]="!m.gold">{{ m.v }}</div>
-          </div>
-        </div>
-        <div class="alert-cyan alert" style="margin-top:14px">
-          <i class="fa-solid fa-shield-halved"></i> Votre dépôt est sécurisé en escrow jusqu'à la livraison confirmée
-        </div>
-        <div class="pay-icons">
-          <span *ngFor="let p of ['Orange Money','Moov Money','Ligdicash','Carte']"
-                class="badge-grey">{{ p }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Colonne droite -->
-    <div class="gd-right">
 
       <!-- Paliers de prix -->
-      <div class="glass gd-card">
-        <h3 class="font-display gd-card-title"><i class="fa-solid fa-tags"></i> Paliers de prix</h3>
-        <table class="tbl">
-          <thead>
-            <tr><th>Participants</th><th>Réduction</th><th>Prix/pers.</th></tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let t of group.pricingTiers; let i = index"
-                [class.tier-active]="i === currentTierIndex(group.pricingTiers)">
-              <td>
-                ≥ {{ t.minParticipants }} pers.
-                <span *ngIf="i === currentTierIndex(group.pricingTiers)"
-                      class="badge-cyan" style="font-size:9px; margin-left:6px">actuel</span>
-              </td>
-              <td><span class="badge-ok">{{ t.discountPercent }}%</span></td>
-              <td class="font-mono tier-price">{{ t.price | currencyXof }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="card gd-detail-card">
+        <h3 class="gd-detail-title">
+          <i class="fa-solid fa-tags"></i> Paliers de prix
+        </h3>
+        <div class="gd-tiers">
+          <div class="gd-tier" *ngFor="let t of group.pricingTiers; let i = index"
+               [class.active]="i === currentTierIndex(group.pricingTiers)">
+            <div class="gd-tier-members">
+              <i class="fa-solid fa-users"></i>
+              ≥ {{ t.minParticipants }} pers.
+              <span class="badge-cyan gd-tier-curr" *ngIf="i === currentTierIndex(group.pricingTiers)">
+                actuel
+              </span>
+            </div>
+            <div class="gd-tier-right">
+              <span class="gd-tier-disc">-{{ t.discountPercent }}%</span>
+              <span class="gd-tier-price font-mono">{{ t.price | currencyXof }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- CTA rejoindre -->
-      <div class="glass-gold gd-card gd-cta">
-        <h3 class="font-display" style="font-size:18px; margin-bottom:6px">Rejoindre ce groupe</h3>
-        <p class="text-muted" style="font-size:13px; margin-bottom:18px">
-          Payez seulement 10% maintenant et verrouillez votre place !
-        </p>
-        <div class="cta-amount-box">
-          <span class="text-muted" style="font-size:13px">Dépôt à payer</span>
-          <span class="font-mono font-display cta-amount">{{ group.depositAmount | currencyXof }}</span>
+      <!-- Modalités paiement -->
+      <div class="card gd-detail-card">
+        <h3 class="gd-detail-title">
+          <i class="fa-solid fa-sack-dollar"></i> Modalités de paiement
+        </h3>
+        <div class="gd-payment-grid">
+          <div class="gd-payment-item" *ngFor="let m of [
+            {icon:'fa-solid fa-percent',          k:'Dépôt requis',     v:'10% du prix',                                    color:'var(--primary)'},
+            {icon:'fa-solid fa-coins',            k:'Montant dépôt',    v:(group.depositAmount | currencyXof),              color:'var(--primary)'},
+            {icon:'fa-solid fa-tag',              k:'Prix groupe actuel',v:(group.currentPrice  | currencyXof),              color:'var(--primary)'},
+            {icon:'fa-solid fa-piggy-bank',       k:'Économie vs solo', v:(group.product.soloPrice - group.currentPrice | currencyXof), color:'#10D98B'}
+          ]">
+            <div class="gd-pi-icon" [style.color]="m.color">
+              <i [class]="m.icon"></i>
+            </div>
+            <div>
+              <div class="gd-pi-label text-muted">{{ m.k }}</div>
+              <div class="gd-pi-val font-mono" [style.color]="m.color">{{ m.v }}</div>
+            </div>
+          </div>
         </div>
-        <button class="btn-gold btn-blk btn-lg" (click)="joinGroup()">
-          <i class="fa-solid fa-credit-card"></i> Rejoindre — Dépôt {{ group.depositAmount | currencyXof }}
-        </button>
-        <p class="text-muted" style="font-size:11px; text-align:center; margin-top:10px">
-          <i class="fa-solid fa-lock"></i> Paiement 100% sécurisé via CinetPay
-        </p>
+        <div class="alert-cyan alert" style="margin-top:14px;font-size:12px">
+          <i class="fa-solid fa-shield-halved"></i>
+          Dépôt sécurisé en escrow · Libéré au fournisseur après confirmation de livraison
+        </div>
+        <div class="gd-pay-methods">
+          <span class="badge-grey" *ngFor="let p of ['Orange Money','Moov Money','Ligdicash','Carte Visa']">
+            {{ p }}
+          </span>
+        </div>
       </div>
 
       <!-- Fournisseur -->
-      <div class="glass gd-card gd-supplier">
-        <div class="sup-header">
-          <div class="sup-icon"><i class="fa-solid fa-store"></i></div>
+      <div class="card gd-detail-card gd-supplier-card">
+        <h3 class="gd-detail-title">
+          <i class="fa-solid fa-store"></i> Fournisseur
+        </h3>
+        <div class="gd-sup-head">
+          <div class="gd-sup-avatar">
+            <i class="fa-solid fa-store"></i>
+          </div>
           <div>
-            <div class="font-display sup-name">{{ group.supplier.companyName }}</div>
-            <span class="badge-ok" style="font-size:10px">✓ Fournisseur vérifié</span>
+            <div class="gd-sup-name">{{ group.supplier.companyName }}</div>
+            <span class="badge-ok" style="font-size:10px">
+              <i class="fa-solid fa-check"></i> Fournisseur vérifié
+            </span>
           </div>
         </div>
-        <div class="sup-stats">
-          <div class="sup-stat" *ngFor="let s of [
-            {v: group.supplier.totalGroups.toString(), l:'Groupes'},
-            {v: group.supplier.successRate + '%', l:'Succès'},
-            {v: group.supplier.rating.toString(), l:'Note'}
+        <div class="gd-sup-stats">
+          <div class="gd-sup-stat" *ngFor="let s of [
+            {v: group.supplier.totalGroups.toString(), l:'Groupes créés',    icon:'fa-solid fa-layer-group'},
+            {v: group.supplier.successRate + '%',      l:'Taux de succès',   icon:'fa-solid fa-trophy'},
+            {v: group.supplier.rating + '/5',          l:'Note clients',     icon:'fa-solid fa-star'},
+            {v: group.supplier.reviewCount.toString(), l:'Avis clients',     icon:'fa-regular fa-comments'}
           ]">
-            <div class="font-mono sup-val">{{ s.v }}</div>
-            <div class="text-muted sup-lbl">{{ s.l }}</div>
+            <div class="gd-sup-stat-icon"><i [class]="s.icon"></i></div>
+            <div class="font-mono gd-sup-val">{{ s.v }}</div>
+            <div class="text-muted gd-sup-lbl">{{ s.l }}</div>
           </div>
+        </div>
+        <div class="gd-sup-contact text-muted">
+          <span><i class="fa-solid fa-location-dot"></i> {{ group.supplier.city }}</span>
+          <span><i class="fa-solid fa-phone"></i> {{ group.supplier.phone }}</span>
         </div>
       </div>
+
     </div>
   </div>
+
 </div>
 
 <app-footer></app-footer>

@@ -11,7 +11,7 @@
     <!-- Left: Logo -->
     <app-logo [size]="20"></app-logo>
 
-    <!-- Center: Nav links -->
+    <!-- Center: Nav links (desktop) -->
     <div class="nb-links">
       <a routerLink="/"         routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Accueil</a>
       <a routerLink="/groups"   routerLinkActive="active"><i class="fa-solid fa-fire"></i> Groupes actifs</a>
@@ -22,8 +22,8 @@
     <!-- Right: Actions -->
     <div class="nb-actions">
       <ng-container *ngIf="!auth.isLoggedIn(); else loggedIn">
-        <a routerLink="/auth/login"    class="btn-outline btn-sm">Connexion</a>
-        <a routerLink="/auth/register" class="btn-primary btn-sm">S'inscrire gratuitement</a>
+        <a routerLink="/auth/login"    class="btn-outline btn-sm nb-desktop-only">Connexion</a>
+        <a routerLink="/auth/register" class="btn-primary btn-sm nb-desktop-only">S'inscrire</a>
       </ng-container>
 
       <ng-template #loggedIn>
@@ -32,10 +32,51 @@
           <span class="nb-dot" *ngIf="notifs.unreadCount() > 0">{{ notifs.unreadCount() }}</span>
         </a>
         <a [routerLink]="auth.isAdmin() ? '/admin' : auth.isSupplier() ? '/supplier' : '/member'"
-           class="btn-primary btn-sm">
+           class="btn-primary btn-sm nb-desktop-only">
           Mon espace →
+        </a>
+      </ng-template>
+
+      <!-- Hamburger (mobile) -->
+      <button class="nb-hamburger" (click)="menuOpen = !menuOpen" [class.open]="menuOpen" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile menu drawer -->
+<div class="nb-drawer" [class.open]="menuOpen" (click)="menuOpen=false">
+  <div class="nb-drawer-inner" (click)="$event.stopPropagation()">
+    <div class="nb-drawer-links">
+      <a routerLink="/"             routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="menuOpen=false">
+        <i class="fa-solid fa-house"></i> Accueil
+      </a>
+      <a routerLink="/groups"       routerLinkActive="active" (click)="menuOpen=false">
+        <i class="fa-solid fa-fire"></i> Groupes actifs
+      </a>
+      <a routerLink="/catalog"      routerLinkActive="active" (click)="menuOpen=false">
+        <i class="fa-solid fa-grid-2"></i> Catalogue
+      </a>
+      <a routerLink="/how-it-works" routerLinkActive="active" (click)="menuOpen=false">
+        <i class="fa-solid fa-circle-question"></i> Comment ça marche ?
+      </a>
+    </div>
+    <div class="nb-drawer-actions">
+      <ng-container *ngIf="!auth.isLoggedIn(); else mobileLoggedIn">
+        <a routerLink="/auth/login"    class="btn-outline" (click)="menuOpen=false">
+          <i class="fa-solid fa-right-to-bracket"></i> Connexion
+        </a>
+        <a routerLink="/auth/register" class="btn-primary" (click)="menuOpen=false">
+          <i class="fa-solid fa-user-plus"></i> S'inscrire gratuitement
+        </a>
+      </ng-container>
+      <ng-template #mobileLoggedIn>
+        <a [routerLink]="auth.isAdmin() ? '/admin' : auth.isSupplier() ? '/supplier' : '/member'"
+           class="btn-primary" (click)="menuOpen=false">
+          <i class="fa-solid fa-layout-dashboard"></i> Mon espace →
         </a>
       </ng-template>
     </div>
   </div>
-</nav>
+</div>

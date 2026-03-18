@@ -14,7 +14,20 @@ export class OrdersComponent implements OnInit {
   loading = true;
   activeTab = 'Toutes';
 
-  steps = ['Créée','Confirmée','En préparation','Expédiée','Livrée'];
+  tabList = [
+    { key:'Toutes',     icon:'fa-solid fa-list',         label:'Toutes',    count:0 },
+    { key:'En cours',   icon:'fa-solid fa-clock',        label:'En cours',  count:0 },
+    { key:'Expédiées',  icon:'fa-solid fa-truck-fast',   label:'Expédiées', count:0 },
+    { key:'Livrées',    icon:'fa-solid fa-circle-check', label:'Livrées',   count:0 },
+  ];
+
+  timelineSteps = [
+    { icon:'fa-solid fa-file-circle-check', label:'Créée' },
+    { icon:'fa-solid fa-circle-check',      label:'Confirmée' },
+    { icon:'fa-solid fa-box',               label:'Préparation' },
+    { icon:'fa-solid fa-truck-fast',        label:'Expédiée' },
+    { icon:'fa-solid fa-house-circle-check',label:'Livrée' },
+  ];
 
   constructor(
     private orderService: OrderService,
@@ -25,6 +38,10 @@ export class OrdersComponent implements OnInit {
     this.orderService.getMyOrders().subscribe(o => {
       this.orders = this.filtered = o;
       this.loading = false;
+      this.tabList[0].count = o.length;
+      this.tabList[1].count = o.filter(x => ['CREATED','CONFIRMED','PROCESSING'].includes(x.status)).length;
+      this.tabList[2].count = o.filter(x => x.status === 'SHIPPED').length;
+      this.tabList[3].count = o.filter(x => x.status === 'DELIVERED').length;
     });
   }
 
@@ -39,5 +56,21 @@ export class OrdersComponent implements OnInit {
   stepIndex(status: string): number {
     const m: Record<string,number> = { CREATED:0, CONFIRMED:1, PROCESSING:2, SHIPPED:3, DELIVERED:4 };
     return m[status] ?? 0;
+  }
+
+  productImage(o: Order): string {
+    return o.product.images?.[0] ?? `https://picsum.photos/seed/${o.product.id}/80/80`;
+  }
+
+  statusIcon(status: string): string {
+    const icons: Record<string,string> = {
+      CREATED:    'fa-solid fa-file-pen',
+      CONFIRMED:  'fa-solid fa-circle-check',
+      PROCESSING: 'fa-solid fa-gear',
+      SHIPPED:    'fa-solid fa-truck-fast',
+      DELIVERED:  'fa-solid fa-house-circle-check',
+      CANCELLED:  'fa-solid fa-circle-xmark',
+    };
+    return icons[status] ?? 'fa-solid fa-circle';
   }
 }

@@ -36,7 +36,8 @@
 
       <!-- Image zone -->
       <div class="sp-img">
-        <span class="sp-emoji">{{ p.emoji }}</span>
+        <img [src]="p.images[0] || 'https://picsum.photos/seed/' + p.id + '/200/200'"
+             [alt]="p.name" loading="lazy" class="sp-prod-img">
         <span [class]="statusClass(p.status) + ' sp-status'">{{ statusLabel(p.status) }}</span>
         <span class="badge-err sp-active" *ngIf="p.activeGroupCount > 0">
           <i class="fa-solid fa-fire"></i> {{ p.activeGroupCount }} groupe{{ p.activeGroupCount > 1 ? 's' : '' }}
@@ -68,7 +69,7 @@
         <!-- Rating -->
         <div class="sp-rating">
           <i *ngFor="let i of stars()" class="fa-solid fa-star"
-             [style.color]="i < p.rating ? '#F5A623' : 'rgba(255,255,255,.2)'"></i>
+             [style.color]="i < p.rating ? '#F5A623' : 'var(--border2)'"></i>
           <span class="text-muted" style="font-size:12px;margin-left:6px">
             {{ p.rating }}/5 ({{ p.reviewCount }} avis)
           </span>
@@ -77,7 +78,7 @@
         <!-- Actions -->
         <div class="sp-actions">
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
-                  (click)="openEdit(p)">✏️ Modifier</button>
+                  (click)="openEdit(p)"><i class="fa-solid fa-pen"></i> Modifier</button>
           <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center"
                   (click)="openCreateGroup(p)"><i class="fa-solid fa-users-plus"></i> Créer un groupe</button>
         </div>
@@ -90,10 +91,14 @@
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
         <div>
-          <h3 class="font-display" style="font-size:17px;font-weight:700">✏️ Modifier le produit</h3>
+          <h3 class="font-display" style="font-size:17px;font-weight:700">
+            <i class="fa-solid fa-pen"></i> Modifier le produit
+          </h3>
           <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.id }}</p>
         </div>
-        <button class="btn-ghost btn-sm" (click)="showEditModal = false">✕</button>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showEditModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="inp-group">
@@ -128,7 +133,7 @@
           </div>
         </div>
         <div class="alert-cyan alert" style="font-size:12px">
-          ℹ️ Les modifications seront soumises à validation avant publication.
+          <i class="fa-solid fa-circle-info"></i> Les modifications seront soumises à validation avant publication.
         </div>
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center"
@@ -145,13 +150,18 @@
     <div class="modal-box glass" style="max-width:540px" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
         <div class="flex gap-12" style="align-items:center">
-          <span style="font-size:28px">{{ selectedProduct!.emoji }}</span>
+          <div class="sp-modal-img">
+            <img [src]="selectedProduct!.images[0] || 'https://picsum.photos/seed/' + selectedProduct!.id + '/60/60'"
+                 [alt]="selectedProduct!.name" loading="lazy">
+          </div>
           <div>
             <h3 class="font-display" style="font-size:17px;font-weight:700"><i class="fa-solid fa-users-plus"></i> Créer un groupe</h3>
             <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.name | truncate:38 }}</p>
           </div>
         </div>
-        <button class="btn-ghost btn-sm" (click)="showGroupModal = false">✕</button>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showGroupModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
       <div class="modal-body">
 
@@ -229,8 +239,12 @@
   <div class="modal-backdrop" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
-        <h3 class="font-display" style="font-size:17px;font-weight:700">Ajouter un produit</h3>
-        <button class="btn-ghost btn-sm" (click)="showAddModal = false">✕</button>
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-plus"></i> Ajouter un produit
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showAddModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="inp-group" *ngFor="let f of [
@@ -252,7 +266,7 @@
           </select>
         </div>
         <div class="alert-cyan alert">
-          ℹ️ Votre produit sera examiné par un admin avant d'être visible.
+          <i class="fa-solid fa-circle-info"></i> Votre produit sera examiné par un admin avant d'être visible.
         </div>
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showAddModal = false">Annuler</button>

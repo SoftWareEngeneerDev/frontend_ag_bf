@@ -7,7 +7,7 @@
         {{ urgentCount }} urgents
       </p>
     </div>
-    <span class="badge-err">⚠️ {{ urgentCount }} urgents</span>
+    <span class="badge-err"><i class="fa-solid fa-triangle-exclamation"></i> {{ urgentCount }} urgents</span>
   </div>
 
   <div class="tab-nav mb-24">
@@ -24,7 +24,9 @@
         <div class="dis-left">
           <div class="flex gap-8" style="align-items:center;margin-bottom:4px">
             <span class="font-mono" style="font-size:11px;color:var(--muted)">{{ d.id }}</span>
-            <span *ngIf="d.urgent" class="badge-err" style="font-size:10px">⚡ Urgent</span>
+            <span *ngIf="d.urgent" class="badge-err" style="font-size:10px">
+              <i class="fa-solid fa-bolt"></i> Urgent
+            </span>
           </div>
           <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">{{ d.reason }}</div>
           <div class="text-muted" style="font-size:12px">
@@ -43,15 +45,15 @@
         <ng-container *ngIf="d.status === 'OPEN'">
           <button class="btn-cyan  btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Prendre en charge</button>
           <button class="btn-ok    btn-sm"><i class="fa-solid fa-circle-check"></i> Résoudre</button>
-          <button class="btn-ghost btn-sm">📩 Contacter parties</button>
+          <button class="btn-ghost btn-sm"><i class="fa-solid fa-envelope"></i> Contacter parties</button>
         </ng-container>
         <ng-container *ngIf="d.status === 'IN_PROGRESS'">
           <button class="btn-gold  btn-sm"><i class="fa-solid fa-sack-dollar"></i> Rembourser</button>
           <button class="btn-ok    btn-sm"><i class="fa-solid fa-lock"></i> Clôturer</button>
-          <button class="btn-ghost btn-sm">📩 Message</button>
+          <button class="btn-ghost btn-sm"><i class="fa-solid fa-envelope"></i> Message</button>
         </ng-container>
         <ng-container *ngIf="d.status === 'RESOLVED'">
-          <button class="btn-ghost btn-sm">📋 Voir détails</button>
+          <button class="btn-ghost btn-sm"><i class="fa-solid fa-eye"></i> Voir détails</button>
         </ng-container>
       </div>
     </div>

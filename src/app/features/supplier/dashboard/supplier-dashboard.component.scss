@@ -11,6 +11,8 @@
   flex-wrap: wrap;
   box-shadow: 0 8px 32px rgba(0,212,255,.12);
   border: 1px solid rgba(0,212,255,.15);
+  @media (max-width: 768px) { padding: 20px; gap: 20px; }
+  @media (max-width: 480px) { padding: 16px; }
 }
 
 .suph-left {
@@ -19,6 +21,7 @@
   gap: 18px;
   flex: 1;
   min-width: 220px;
+  @media (max-width: 480px) { min-width: unset; width: 100%; }
 }
 
 .suph-avatar {
@@ -31,7 +34,9 @@
   box-shadow: 0 4px 16px rgba(0,212,255,.3);
 }
 
-.suph-name { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; font-family: var(--font-display); }
+.suph-name { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; font-family: var(--font-display);
+  @media (max-width: 480px) { font-size: 17px; }
+}
 
 .suph-meta {
   display: flex; align-items: center; gap: 12px;
@@ -67,6 +72,10 @@
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 12px;
   padding: 12px 20px;
+  @media (max-width: 600px) { padding: 8px 12px; flex-wrap: wrap; width: 100%; }
+}
+.suph-stat { text-align: center; padding: 0 24px;
+  @media (max-width: 600px) { padding: 8px 16px; }
 }
 
 .suph-stat { text-align: center; padding: 0 24px; }
@@ -74,7 +83,10 @@
 .suph-stat-label { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 2px; }
 .suph-stat-div   { width: 1px; height: 40px; background: rgba(255,255,255,.15); }
 
-.suph-actions { display: flex; flex-direction: column; gap: 8px; }
+.suph-actions { display: flex; flex-direction: column; gap: 8px;
+  @media (max-width: 600px) { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  @media (max-width: 600px) { .suph-btn { flex: 1; justify-content: center; } }
+}
 
 .suph-btn {
   display: flex; align-items: center; gap: 8px;
@@ -259,6 +271,23 @@
 .sl-val   { font-weight: 700; font-family: var(--font-mono); min-width: 20px; text-align: right; }
 .sl-bar-wrap { width: 60px; height: 5px; background: #eee; border-radius: 3px; overflow: hidden; }
 .sl-bar { height: 100%; border-radius: 3px; }
+
+// ══ RESPONSIVE GLOBAL ═══════════════════════════════════════════════
+@media (max-width: 600px) {
+  .sup-page         { gap: 14px; }
+  .sup-panel-head   { padding: 14px 16px; flex-wrap: wrap; }
+  .stp-item         { padding: 12px 14px; gap: 10px; }
+  .stp-meta         { flex-wrap: wrap; gap: 6px; }
+  .sup-bar-chart    { height: 120px; padding: 14px 14px 10px; gap: 6px; }
+}
+@media (max-width: 480px) {
+  .suph-stat-val    { font-size: 16px; }
+  .suph-stat        { padding: 6px 12px; }
+  .sup-kpi          { padding: 14px 16px; gap: 10px; }
+  .sup-kpi-icon     { width: 40px; height: 40px; font-size: 17px; }
+  .sup-kpi-val      { font-size: 15px; }
+  .stp-revenue      { display: none; }  // masquer revenus sur très petits écrans
+}
 
 // ══ TABLE COMMANDES ═════════════════════════════════════════════════
 .sup-orders-table { overflow-x: auto; }

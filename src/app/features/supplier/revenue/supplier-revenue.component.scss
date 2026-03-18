@@ -3,6 +3,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
 }
 
 .rev-chart  { display:flex; align-items:flex-end; gap:10px; height:150px; }
@@ -18,3 +19,9 @@
 .rev-legend { display:flex; gap:20px; margin-top:14px; }
 .rev-leg-item{ display:flex; align-items:center; gap:6px; font-size:12px; }
 .rev-leg-dot { width:10px; height:10px; border-radius:2px; }
+
+@media (max-width: 480px) {
+  .rev-legend { flex-wrap: wrap; gap: 10px; }
+  .glass { overflow-x: auto; }
+  .tbl   { min-width: 480px; }
+}

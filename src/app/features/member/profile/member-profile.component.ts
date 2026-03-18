@@ -8,8 +8,15 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls:  ['./member-profile.component.scss']
 })
 export class ProfileComponent {
-  activeTab = 'Infos';
-  tabs = ['Infos', 'Sécurité', 'Notifications', 'Parrainage'];
+  activeTab = 'infos';
+  saving = false;
+
+  tabs = [
+    { key:'infos',         icon:'fa-solid fa-user',        label:'Infos' },
+    { key:'securite',      icon:'fa-solid fa-shield-halved',label:'Sécurité' },
+    { key:'notifications', icon:'fa-solid fa-bell',         label:'Notifications' },
+    { key:'parrainage',    icon:'fa-solid fa-gift',         label:'Parrainage' },
+  ];
 
   form: FormGroup;
 
@@ -33,5 +40,14 @@ export class ProfileComponent {
 
   get user() { return this.auth.currentUser(); }
   toggleNotif(item: any): void { item.on = !item.on; }
-  save(): void { console.log('save', this.form.value); }
+
+  save(): void {
+    this.saving = true;
+    setTimeout(() => { this.saving = false; }, 1200);
+  }
+
+  copyCode(): void {
+    const code = this.user?.referralCode || '';
+    navigator.clipboard?.writeText(code);
+  }
 }

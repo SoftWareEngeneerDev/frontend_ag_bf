@@ -2,9 +2,12 @@
 
   <!-- Onglets filtres -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
-            [class.active]="activeTab === t"
-            (click)="setTab(t)">{{ t }}</button>
+    <button class="tab-btn" *ngFor="let t of tabList"
+            [class.active]="activeTab === t.key"
+            (click)="setTab(t.key)">
+      <i [class]="t.icon"></i> {{ t.label }}
+      <span *ngIf="t.count > 0" class="tab-count">{{ t.count }}</span>
+    </button>
   </div>
 
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>

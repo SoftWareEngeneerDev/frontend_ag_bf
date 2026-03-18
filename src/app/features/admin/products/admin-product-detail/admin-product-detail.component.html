@@ -3,7 +3,7 @@
   <!-- En-tête -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()">← Retour</button>
+      <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour</button>
       <div>
         <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail produit</h2>
         <p class="text-muted font-mono" style="font-size:12px">{{ product.id }}</p>
@@ -12,7 +12,7 @@
     <div class="flex gap-8">
       <ng-container *ngIf="product.status === 'PENDING'">
         <button class="btn-ok  btn-sm"><i class="fa-solid fa-circle-check"></i> Approuver</button>
-        <button class="btn-err btn-sm">✗ Rejeter</button>
+        <button class="btn-err btn-sm"><i class="fa-solid fa-xmark"></i> Rejeter</button>
       </ng-container>
       <button class="btn-err btn-sm" *ngIf="product.status === 'ACTIVE'">Désactiver</button>
       <button class="btn-ok  btn-sm" *ngIf="product.status === 'INACTIVE'">Réactiver</button>
@@ -22,7 +22,10 @@
   <!-- Carte identité produit -->
   <div class="glass mb-20" style="padding:24px">
     <div class="flex gap-20" style="align-items:flex-start">
-      <div style="font-size:56px;line-height:1">{{ product.emoji }}</div>
+      <div class="apd-prod-img">
+        <img [src]="product.images[0] || 'https://picsum.photos/seed/' + product.id + '/100/100'"
+             [alt]="product.name" loading="lazy">
+      </div>
       <div style="flex:1">
         <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
           <span style="font-size:20px;font-weight:700">{{ product.name }}</span>
@@ -172,6 +175,6 @@
     <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-box" style="color:var(--primary)"></i></div>
     <h3 style="font-weight:600;margin-bottom:8px">Produit introuvable</h3>
     <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun produit.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()">← Retour à la liste</button>
+    <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</button>
   </div>
 </ng-template>

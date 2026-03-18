@@ -1,0 +1,14 @@
+.agd-prod-img {
+  width: 80px; height: 80px; border-radius: 12px;
+  overflow: hidden; flex-shrink: 0; border: 1px solid var(--border);
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+@media (max-width: 768px) {
+  .flex-between { flex-wrap: wrap; gap: 12px; }
+  .glass { overflow-x: auto; }
+  .tbl { min-width: 500px; }
+}
+@media (max-width: 480px) {
+  .agd-prod-img { width: 60px; height: 60px; }
+}

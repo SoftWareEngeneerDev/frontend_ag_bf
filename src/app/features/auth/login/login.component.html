@@ -32,7 +32,7 @@
   <div class="auth-right">
     <div class="auth-form-wrap">
       <div class="auth-header">
-        <div style="font-size:36px;margin-bottom:12px">👋</div>
+        <div class="auth-wave"><i class="fa-solid fa-hand-wave"></i></div>
         <h2 class="auth-title">Content de vous revoir !</h2>
         <p class="auth-sub">Connectez-vous pour accéder à vos groupes d'achat</p>
       </div>
@@ -50,7 +50,15 @@
           <label>Mot de passe</label>
           <div class="inp-icon-wrap">
             <i class="fa-solid fa-key inp-icon"></i>
-            <input class="inp" type="password" formControlName="password" placeholder="••••••••">
+            <input class="inp" [type]="showPassword ? 'text' : 'password'"
+                   formControlName="password" placeholder="••••••••">
+            <button type="button" class="inp-eye" (click)="showPassword = !showPassword">
+              <i [class]="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+            </button>
+          </div>
+          <div class="error-msg" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ form.get('password')?.errors?.['required'] ? 'Le mot de passe est requis.' : 'Champ invalide.' }}
           </div>
         </div>
 
@@ -58,11 +66,13 @@
           <a routerLink="/auth/forgot-password">Mot de passe oublié ?</a>
         </div>
 
-        <div class="alert-red alert" *ngIf="error">⚠️ {{ error }}</div>
+        <div class="alert-red alert" *ngIf="error">
+          <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+        </div>
 
-        <button class="btn-primary btn-blk btn-lg btn-round" type="submit" [disabled]="loading">
-          <span *ngIf="!loading">Se connecter →</span>
-          <app-loading-spinner *ngIf="loading" [size]="20"></app-loading-spinner>
+        <button class="btn-primary btn-blk btn-lg btn-round" type="submit" [disabled]="loading || form.invalid">
+          <i *ngIf="loading" class="fa-solid fa-spinner fa-spin"></i>
+          <span>{{ loading ? 'Connexion...' : 'Se connecter →' }}</span>
         </button>
 
         <div class="auth-switch">
@@ -73,11 +83,17 @@
 
       <!-- Demo box -->
       <div class="demo-box">
-        <div class="demo-title">🧪 Accès démo rapide</div>
+        <div class="demo-title"><i class="fa-solid fa-flask"></i> Accès démo rapide</div>
         <div class="demo-btns">
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('MEMBER')">👤 Membre</button>
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')"><i class="fa-solid fa-store"></i> Fournisseur</button>
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('ADMIN')">🛡 Admin</button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('MEMBER')">
+            <i class="fa-solid fa-user"></i> Membre
+          </button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')">
+            <i class="fa-solid fa-store"></i> Fournisseur
+          </button>
+          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('ADMIN')">
+            <i class="fa-solid fa-shield-halved"></i> Admin
+          </button>
         </div>
       </div>
     </div>

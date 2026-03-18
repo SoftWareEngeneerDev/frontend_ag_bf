@@ -13,9 +13,32 @@ import { Group, PricingTier } from '../../../core/models';
 export class GroupDetailComponent implements OnInit {
   group?: Group;
   loading = true;
+  activeImg = 0;
+  qty = 1;
+  descExpanded = false;
 
   memberAvatars = ['KT','MO','FD','AB','SC','ST','YT','BK'];
   avatarBgs     = ['#F5A623','#00D4FF','#10D98B','#7B2FBE','#FF4D6A','#FFB347','#F5A623','#00D4FF'];
+
+  get productImages(): string[] {
+    if (!this.group) return [];
+    const imgs = this.group.product.images;
+    return imgs.length >= 2 ? imgs : [
+      ...imgs,
+      `https://picsum.photos/seed/${this.group.product.id}-b/600/600`,
+      `https://picsum.photos/seed/${this.group.product.id}-c/600/600`,
+      `https://picsum.photos/seed/${this.group.product.id}-d/600/600`,
+    ];
+  }
+
+  get descShort(): string {
+    const d = this.group?.product.description || '';
+    return d.length > 120 ? d.slice(0, 120) + '...' : d;
+  }
+
+  stars(rating: number): boolean[] {
+    return [1,2,3,4,5].map(i => i <= Math.round(rating));
+  }
 
   constructor(
     private route: ActivatedRoute,

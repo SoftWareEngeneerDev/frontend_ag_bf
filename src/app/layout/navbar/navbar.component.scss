@@ -1,5 +1,14 @@
 :host { display:block; position:sticky; top:0; z-index:200; }
 
+/* ─── Announce bar ───────────────────────────────────────── */
+.announce-bar {
+  background: var(--primary); color: #fff;
+  font-size: 13px; font-weight: 500; text-align: center;
+  padding: 8px 16px;
+  @media (max-width: 480px) { font-size: 11px; padding: 6px 12px; }
+}
+
+/* ─── Navbar shell ───────────────────────────────────────── */
 .navbar {
   background: var(--bg-white);
   border-bottom: 1px solid var(--border);
@@ -14,20 +23,29 @@
   display: flex;
   align-items: center;
   gap: 32px;
+  @media (max-width: 768px) { padding: 0 16px; gap: 16px; }
 }
 
+/* ─── Desktop nav links ──────────────────────────────────── */
 .nb-links {
   display: flex; gap: 4px; flex: 1; justify-content: center;
   a {
     padding: 8px 14px; border-radius: var(--r);
     font-size: 14px; font-weight: 500; color: var(--txt2);
     text-decoration: none; transition: all var(--t);
+    white-space: nowrap;
     &:hover  { background: var(--primary-l); color: var(--primary); }
     &.active { background: var(--primary-l); color: var(--primary); font-weight: 700; }
   }
+  @media (max-width: 900px) { display: none; }
 }
 
-.nb-actions { display:flex; align-items:center; gap:10px; }
+/* ─── Actions ────────────────────────────────────────────── */
+.nb-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+.nb-desktop-only {
+  @media (max-width: 900px) { display: none !important; }
+}
 
 .nb-notif {
   position: relative; font-size: 20px; padding: 6px;
@@ -42,4 +60,66 @@
   font-size: 9px; font-weight: 700; border-radius: 99px;
   min-width: 16px; height: 16px;
   display: flex; align-items: center; justify-content: center; padding: 0 4px;
+}
+
+/* ─── Hamburger ──────────────────────────────────────────── */
+.nb-hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 38px; height: 38px; padding: 8px;
+  background: var(--bg2); border: none; border-radius: var(--r-sm);
+  cursor: pointer; flex-shrink: 0;
+  span {
+    display: block; height: 2px; background: var(--txt);
+    border-radius: 2px; transition: all .25s ease;
+    transform-origin: center;
+  }
+  &.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  &.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  &.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  &:hover { background: var(--bg3); }
+  @media (max-width: 900px) { display: flex; }
+}
+
+/* ─── Mobile drawer ──────────────────────────────────────── */
+.nb-drawer {
+  position: fixed; inset: 0; z-index: 199;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
+  &.open { opacity: 1; pointer-events: all; }
+}
+
+.nb-drawer-inner {
+  position: absolute; top: 0; right: 0;
+  width: min(320px, 88vw); height: 100%;
+  background: var(--bg-white);
+  box-shadow: -4px 0 32px rgba(0,0,0,.15);
+  padding: 80px 24px 32px;
+  display: flex; flex-direction: column; gap: 32px;
+  transform: translateX(100%);
+  transition: transform .28s ease;
+  .nb-drawer.open & { transform: translateX(0); }
+}
+
+.nb-drawer-links {
+  display: flex; flex-direction: column; gap: 4px;
+  a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px; border-radius: var(--r-lg);
+    font-size: 15px; font-weight: 500; color: var(--txt);
+    text-decoration: none; transition: all var(--t);
+    i { font-size: 16px; color: var(--muted); width: 20px; text-align: center; }
+    &:hover  { background: var(--bg2); }
+    &.active { background: var(--primary-l); color: var(--primary); font-weight: 700;
+      i { color: var(--primary); }
+    }
+  }
+}
+
+.nb-drawer-actions {
+  display: flex; flex-direction: column; gap: 10px;
+  a { display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px; border-radius: var(--r-lg); font-size: 14px; font-weight: 700;
+      text-decoration: none; }
 }

@@ -1,10 +1,21 @@
-.mg-list  { display: flex; flex-direction: column; gap: 14px; }
-.mg-card  { padding: 20px; }
-.mg-emoji { font-size: 44px; flex-shrink: 0; }
-.mg-body  { flex: 1; min-width: 0; }
-.mg-head  { margin-bottom: 10px; gap: 8px; align-items: flex-start; }
-.mg-name  { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
-.mg-meta  { font-size: 12px; }
-.mg-progress { margin-bottom: 12px; }
-.mg-price { font-size: 18px; font-weight: 700; color: var(--gold); }
-.mg-footer { align-items: center; gap: 12px; flex-wrap: wrap; }
+.mg-page { display: flex; flex-direction: column; gap: 16px; }
+
+.tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-full); font-size: 10px; font-weight: 700;
+}
+
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; gap: 12px; }
+}
+
+@media (max-width: 600px) {
+  .tab-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab-nav::-webkit-scrollbar { height: 0; }
+  .tab-count { display: none; }
+}

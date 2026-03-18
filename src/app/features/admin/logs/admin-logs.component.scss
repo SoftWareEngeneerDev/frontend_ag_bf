@@ -1,0 +1,11 @@
+// Table scroll handled globally via .glass + .tbl in main.scss
+// Tab nav scroll handled globally
+
+@media (max-width: 600px) {
+  // Toolbar: input + export button → column
+  .flex-between > .flex.gap-10 {
+    flex-direction: column;
+    width: 100%;
+    .btn-ghost { width: 100%; justify-content: center; }
+  }
+}

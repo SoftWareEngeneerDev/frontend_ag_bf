@@ -1,4 +1,6 @@
-.pay-page { max-width: 540px; margin: 0 auto; }
+.pay-page { max-width: 540px; margin: 0 auto;
+  @media (max-width: 600px) { padding: 0 4px; }
+}
 
 .pay-steps {
   display: flex; justify-content: center; align-items: center;
@@ -7,24 +9,30 @@
 .ps-item   { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .ps-circle {
   width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.08);
+  background: var(--bg3); border: 2px solid var(--border);
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700; color: var(--muted); transition: all var(--t);
-  &.active { background: linear-gradient(135deg,var(--gold),#E8920A); color:#0A0E1A; }
-  &.done   { background: linear-gradient(135deg,var(--ok),#0AB572); color:#0A0E1A; }
+  &.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px var(--primary-l); }
+  &.done   { background: var(--ok, #10D98B); border-color: var(--ok, #10D98B); color: #fff; }
 }
-.ps-label  { font-size: 11px; }
-.ps-line   { width: 60px; height: 1px; background: rgba(255,255,255,.1); margin: 0 4px; margin-bottom: 22px; &.done { background:var(--gold); } }
+.ps-label  { font-size: 11px; color: var(--muted); }
+.ps-line   { width: 60px; height: 2px; background: var(--border); margin: 0 4px; margin-bottom: 22px; transition: background var(--t); &.done { background: var(--primary); } }
 
 .pay-body    { display: flex; flex-direction: column; gap: 16px; }
 .pay-card    { padding: 20px; }
 .pay-product { align-items: center; }
 
+.pay-prod-img {
+  width: 64px; height: 64px; border-radius: 10px;
+  overflow: hidden; flex-shrink: 0; border: 1px solid var(--border);
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
 .pay-amount {
   padding: 28px; text-align: center;
-  background: linear-gradient(135deg, rgba(245,166,35,.04), rgba(0,212,255,.02));
+  background: linear-gradient(135deg, var(--primary-l), var(--bg));
 }
-.pay-total { font-size: 52px; font-weight: 800; color: var(--gold); line-height: 1; }
+.pay-total { font-size: 52px; font-weight: 800; color: var(--primary); line-height: 1; }
 
 .methods-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 
@@ -34,14 +42,23 @@
 .pay-success { padding: 12px 0; }
 .suc-circle {
   width: 90px; height: 90px;
-  background: rgba(16,217,139,.1); border: 3px solid var(--ok); border-radius: 50%;
+  background: #E8FDF2; border: 3px solid #10D98B; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 38px; margin: 0 auto 24px; color: var(--ok);
+  font-size: 38px; margin: 0 auto 24px; color: #10D98B;
 }
 .suc-details { padding: 18px; margin-bottom: 24px; text-align: left; }
 .suc-row {
   display: flex; justify-content: space-between;
-  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+  padding: 8px 0; border-bottom: 1px solid var(--border);
   font-size: 13px;
   &:last-child { border-bottom: none; }
+}
+
+@media (max-width: 480px) {
+  .pay-steps { gap: 0; }
+  .ps-label  { font-size: 9px; }
+  .ps-line   { width: 32px; }
+  .pay-total { font-size: 38px; }
+  .pay-card  { padding: 14px; }
+  .methods-list .btn { font-size: 13px; padding: 11px 14px; }
 }

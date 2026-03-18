@@ -25,13 +25,18 @@ import { NavItem } from '../../../layout/sidebar/sidebar.component';
   `,
   styles: [`
     .shell-wrap    { display:flex; }
-    .shell-main    { margin-left:var(--sidebar-w); flex:1; min-height:100vh; background:var(--bg); }
+    .shell-main    { margin-left:var(--sidebar-w); flex:1; min-height:100vh; background:var(--bg); overflow-x:hidden; }
     .shell-content { padding:24px; }
     .admin-alert   { background:#FEF2F2; border-bottom:2px solid var(--red); padding:10px 28px; display:flex; align-items:center; gap:12px; font-size:13px; color:var(--red); flex-wrap:wrap; }
     @media (max-width:768px) {
       .shell-main    { margin-left:0; }
+      .shell-content { padding:16px; }
+      .admin-alert   { padding:10px 16px; font-size:12px; }
+    }
+    @media (max-width:480px) {
       .shell-content { padding:12px; }
-      .admin-alert   { padding:10px 16px; }
+      .admin-alert   { flex-direction:column; align-items:flex-start; gap:8px; }
+      .admin-alert a { width:100%; text-align:center; }
     }
   `]
 })

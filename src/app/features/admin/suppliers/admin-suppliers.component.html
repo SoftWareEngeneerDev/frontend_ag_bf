@@ -41,7 +41,9 @@
       <div class="sup-actions">
         <ng-container *ngIf="s.status === 'PENDING'">
           <button class="btn-gold btn-sm" style="flex:1;justify-content:center"><i class="fa-solid fa-circle-check"></i> Approuver</button>
-          <button class="btn-err  btn-sm" style="flex:1;justify-content:center">✗ Rejeter</button>
+          <button class="btn-err  btn-sm" style="flex:1;justify-content:center">
+            <i class="fa-solid fa-xmark"></i> Rejeter
+          </button>
         </ng-container>
         <ng-container *ngIf="s.status === 'APPROVED'">
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">Voir profil</button>

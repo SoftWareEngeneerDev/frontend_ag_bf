@@ -1,7 +1,15 @@
 .dis-list { display:flex; flex-direction:column; gap:14px; }
 .dis-card { padding:18px; }
 .dis-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; gap:12px; flex-wrap:wrap; }
-.dis-left { flex:1; }
-.dis-right{ text-align:right; }
-.dis-amount{ font-size:16px; font-weight:700; color:var(--gold); margin:4px 0; }
+.dis-left { flex:1; min-width: 0; }
+.dis-right{ text-align:right; flex-shrink: 0; }
+.dis-amount{ font-size:16px; font-weight:700; color:var(--primary); margin:4px 0; }
 .dis-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+@media (max-width: 600px) {
+  .dis-card   { padding: 14px; }
+  .dis-head   { flex-direction: column; }
+  .dis-right  { text-align: left; }
+  .dis-actions{ flex-direction: column; }
+  .dis-actions .btn { width: 100%; justify-content: center; }
+}
