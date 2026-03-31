@@ -41,8 +41,8 @@
     </div>
 
     <div class="ph-score">
-      <app-circle-progress [size]="76" [sw]="7" [pct]="95" color="#0DA487">
-        <span class="font-mono" style="font-size:16px;font-weight:800;color:var(--primary)">95</span>
+      <app-circle-progress [size]="76" [sw]="7" [pct]="user?.trustScore || 100" color="#0DA487">
+        <span class="font-mono" style="font-size:16px;font-weight:800;color:var(--primary)">{{ user?.trustScore || 100 }}</span>
       </app-circle-progress>
       <div class="ph-score-label">Score<br>confiance</div>
     </div>
@@ -81,7 +81,7 @@
         <label>Téléphone</label>
         <div class="inp-icon-wrap">
           <i class="fa-solid fa-phone inp-icon"></i>
-          <input class="inp" formControlName="phone" placeholder="+226 76 00 00 00">
+          <input class="inp" formControlName="phone" placeholder="+226 76 00 00 00" [attr.disabled]="true">
         </div>
       </div>
       <div class="inp-group">
@@ -92,6 +92,15 @@
         </div>
       </div>
     </form>
+
+    <!-- Messages succès / erreur -->
+    <div class="alert-ok alert" *ngIf="successMessage" style="margin-bottom:12px">
+      <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
+    </div>
+    <div class="alert-red alert" *ngIf="errorMessage" style="margin-bottom:12px">
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+    </div>
+
     <button class="btn-primary btn-round" type="button" (click)="save()" [disabled]="saving">
       <i *ngIf="saving" class="fa-solid fa-spinner anim-spin"></i>
       <i *ngIf="!saving" class="fa-solid fa-floppy-disk"></i>
@@ -167,7 +176,6 @@
   <!-- ── Parrainage ─────────────────────────────────────────────── -->
   <div class="anim-fade" *ngIf="activeTab === 'parrainage'">
 
-    <!-- Hero parrainage -->
     <div class="card ref-hero">
       <div class="ref-hero-icon">
         <i class="fa-solid fa-gift"></i>
@@ -179,7 +187,6 @@
         Pour chaque ami inscrit et ayant fait un premier achat avec votre code, vous recevez <strong>500 XOF</strong> de crédit.
       </p>
 
-      <!-- Code -->
       <div class="ref-code-box">
         <div class="ref-code-label">Votre code de parrainage</div>
         <div class="ref-code-val font-mono">{{ user?.referralCode }}</div>
@@ -198,12 +205,11 @@
       </div>
     </div>
 
-    <!-- Stats parrainage -->
     <div class="ref-stats-grid">
       <div class="card ref-stat-card" *ngFor="let s of [
         {icon:'fa-solid fa-users', color:'#0DA487', bg:'#E6FAF5', v:'3',        l:'Amis parrainés'},
         {icon:'fa-solid fa-sack-dollar', color:'#F4A902', bg:'#FFF8E6', v:'1 500 XOF', l:'Crédits gagnés'},
-        {icon:'fa-solid fa-cart-shopping', color:'#7B2FBE', bg:'#F3EAFF', v:'2',  l:'Achats parrainage'}
+        {icon:'fa-solid fa-cart-shopping', color:'#7B2FBE', bg:'#F3EAFF', v:'2', l:'Achats parrainage'}
       ]">
         <div class="ref-stat-icon" [style.background]="s.bg" [style.color]="s.color">
           <i [class]="s.icon"></i>
