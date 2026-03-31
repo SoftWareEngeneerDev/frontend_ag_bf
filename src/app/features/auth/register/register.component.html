@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <p class="al-footer">© 2024 AchatGroupéBF</p>
+    <p class="al-footer">© 2026 AchatGroupéBF</p>
   </div>
 
   <div class="auth-right">
@@ -90,6 +90,11 @@
               <a href="#" class="text-primary">Politique de confidentialité</a>
             </span>
           </label>
+
+          <!-- ── Erreur backend ── -->
+          <div class="alert-red alert" *ngIf="errorMessage">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+          </div>
 
           <button class="btn-primary btn-blk btn-lg btn-round" type="submit"
                   [disabled]="loading || form.get('fullName')?.invalid || form.get('phone')?.invalid || !form.get('acceptTerms')?.value">
