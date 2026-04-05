@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MockDataService } from '../../../../core/services/mock-data.service';
+import { AdminService }   from '../../../../core/services/admin.service';
+import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../core/models';
 
 @Component({
@@ -10,34 +11,64 @@ import { Product } from '../../../../core/models';
 })
 export class AdminProductDetailComponent implements OnInit {
   product: Product | null = null;
+  loading = true;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    public mock: MockDataService
+    private route:          ActivatedRoute,
+    private router:         Router,
+    private adminService:   AdminService,
+    private productService: ProductService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.product = this.mock.products.find(p => p.id === id) ?? null;
+    if (!id) { this.router.navigate(['/admin/products']); return; }
+
+    // ── Charger le produit depuis le backend ───────────────────
+    this.productService.getById(id).subscribe({
+      next: (p) => {
+        this.product = p;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.product = null;
+      }
+    });
   }
 
-  goBack(): void {
-    this.router.navigate(['/admin/products']);
+  // ── Approuver le produit ──────────────────────────────────────
+  approve(): void {
+    if (!this.product) return;
+    this.adminService.validateProduct(this.product.id, true).subscribe({
+      next: () => { if (this.product) this.product.status = 'ACTIVE' as any; },
+      error: () => {}
+    });
   }
+
+  // ── Rejeter le produit ────────────────────────────────────────
+  reject(): void {
+    if (!this.product) return;
+    this.adminService.validateProduct(this.product.id, false, 'Non conforme aux standards').subscribe({
+      next: () => { if (this.product) this.product.status = 'REJECTED' as any; },
+      error: () => {}
+    });
+  }
+
+  goBack(): void { this.router.navigate(['/admin/products']); }
 
   get statusClass(): string {
     if (!this.product) return '';
-    if (this.product.status === 'ACTIVE')   return 'badge-ok';
-    if (this.product.status === 'PENDING')  return 'badge-warn';
+    if (this.product.status === 'ACTIVE'   || this.product.status === ('APPROVED' as any)) return 'badge-ok';
+    if (this.product.status === 'PENDING'  || this.product.status === ('PENDING_APPROVAL' as any)) return 'badge-warn';
     if (this.product.status === 'REJECTED') return 'badge-err';
     return 'badge-grey';
   }
 
   get statusLabel(): string {
     if (!this.product) return '';
-    if (this.product.status === 'ACTIVE')   return 'Actif';
-    if (this.product.status === 'PENDING')  return 'En attente';
+    if (this.product.status === 'ACTIVE'   || this.product.status === ('APPROVED' as any))        return 'Actif';
+    if (this.product.status === 'PENDING'  || this.product.status === ('PENDING_APPROVAL' as any)) return 'En attente';
     if (this.product.status === 'REJECTED') return 'Rejeté';
     return 'Inactif';
   }

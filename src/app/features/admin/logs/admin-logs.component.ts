@@ -1,37 +1,101 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
   selector: 'app-admin-logs',
   templateUrl: './admin-logs.component.html',
   styleUrls:  ['./admin-logs.component.scss']
 })
-export class AdminLogsComponent {
+export class AdminLogsComponent implements OnInit {
   search    = '';
   activeTab = 'Tous';
-  tabs      = ['Tous','Authentification','Paiements','Groupes','Système'];
+  loading   = true;
+  tabs      = ['Tous', 'Authentification', 'Paiements', 'Groupes', 'Système'];
+  logs: any[] = [];
 
-  logs = [
-    { time:'2024-03-15 14:32:18', user:'Aminata Admin',  action:'VALIDATION_FOURNISSEUR', entity:'Tech Ouaga SARL',     ip:'196.14.22.xx', level:'INFO',    module:'Fournisseur' },
-    { time:'2024-03-15 14:18:05', user:'Aminata Admin',  action:'APPROBATION_PRODUIT',    entity:'Samsung Galaxy A55',  ip:'196.14.22.xx', level:'INFO',    module:'Produit' },
-    { time:'2024-03-15 13:55:42', user:'System',         action:'REMBOURSEMENT_AUTO',     entity:'TXN-8847 · 8 500 XOF',ip:'—',           level:'INFO',    module:'Paiement' },
-    { time:'2024-03-15 13:12:19', user:'Aminata Admin',  action:'SUSPENSION_UTILISATEUR', entity:'USR-0248',            ip:'196.14.22.xx', level:'WARN',    module:'Authentification' },
-    { time:'2024-03-15 12:44:38', user:'System',         action:'FERMETURE_GROUPE',       entity:'GRP-0152 · Expiré',   ip:'—',           level:'INFO',    module:'Groupe' },
-    { time:'2024-03-15 11:30:10', user:'Kofi Traoré',    action:'LOGIN',                  entity:'+22676528609',         ip:'41.207.xx.xx', level:'INFO',    module:'Authentification' },
-    { time:'2024-03-15 10:55:07', user:'System',         action:'EXPIRATION_OTP',         entity:'OTP-8821',            ip:'—',           level:'WARN',    module:'Authentification' },
-    { time:'2024-03-15 09:20:44', user:'Ibrahim Ouédr.', action:'CREATION_GROUPE',        entity:'GRP-0201 · Samsung',  ip:'41.207.xx.xx', level:'INFO',    module:'Groupe' },
-    { time:'2024-03-15 08:01:33', user:'System',         action:'CRON_EXPIRATION',        entity:'3 groupes expirés',   ip:'—',           level:'INFO',    module:'Système' },
-    { time:'2024-03-14 23:45:12', user:'System',         action:'BACKUP_DB',              entity:'achatgrouper_db',     ip:'—',           level:'INFO',    module:'Système' },
-  ];
+  constructor(private adminService: AdminService) {}
 
-  get filtered() {
+  ngOnInit(): void {
+    this.loadLogs();
+  }
+
+  // ── GET /admin/audit-logs ─────────────────────────────────────
+  private loadLogs(): void {
+    this.loading = true;
+    this.adminService.getAuditLogs({ limit: 100 }).subscribe({
+      next: (res) => {
+        const data    = res.data?.logs ?? res.data ?? [];
+        this.logs     = data.map((l: any) => this.mapLog(l));
+        this.loading  = false;
+      },
+      error: () => { this.loading = false; }
+    });
+  }
+
+  get filtered(): any[] {
     return this.logs.filter(l => {
-      const matchSearch = !this.search || l.action.includes(this.search.toUpperCase()) || l.user.toLowerCase().includes(this.search.toLowerCase()) || l.entity.toLowerCase().includes(this.search.toLowerCase());
-      const matchTab = this.activeTab === 'Tous' || l.module === this.activeTab;
+      const matchSearch = !this.search ||
+        l.action.toLowerCase().includes(this.search.toLowerCase()) ||
+        l.user.toLowerCase().includes(this.search.toLowerCase()) ||
+        l.entity.toLowerCase().includes(this.search.toLowerCase());
+
+      const moduleMap: Record<string, string[]> = {
+        'Authentification': ['auth', 'login', 'otp', 'register', 'session'],
+        'Paiements':        ['payment', 'refund', 'escrow'],
+        'Groupes':          ['group'],
+        'Système':          ['system', 'cron', 'backup'],
+      };
+
+      const matchTab = this.activeTab === 'Tous' ||
+        (moduleMap[this.activeTab] ?? []).some(k =>
+          l.module.toLowerCase().includes(k) ||
+          l.action.toLowerCase().includes(k)
+        );
+
       return matchSearch && matchTab;
     });
   }
 
   levelClass(l: string): string {
     return l === 'INFO' ? 'badge-ok' : l === 'WARN' ? 'badge-warn' : 'badge-err';
+  }
+
+  // ── Helper mapper ─────────────────────────────────────────────
+  private mapLog(l: any): any {
+    const action = (l.action ?? '').toUpperCase();
+
+    // Déduire le module depuis l'action ou l'entité
+    const module = this.inferModule(action, l.entity ?? '');
+
+    // Déduire le niveau depuis l'action
+    const level = ['DELETE', 'SUSPEND', 'BAN', 'REJECT', 'FAIL', 'ERROR'].some(k => action.includes(k))
+      ? 'WARN'
+      : 'INFO';
+
+    return {
+      time:   new Date(l.createdAt).toLocaleString('fr-FR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      }),
+      user:   l.user?.name ?? 'System',
+      action,
+      entity: `${l.entity ?? ''}${l.entityId ? ' · ' + l.entityId.slice(0, 8) : ''}`,
+      ip:     l.ipAddress ?? '—',
+      module,
+      level,
+    };
+  }
+
+  private inferModule(action: string, entity: string): string {
+    const a = action.toLowerCase();
+    const e = entity.toLowerCase();
+    if (a.includes('auth') || a.includes('login') || a.includes('otp') || a.includes('session')) return 'Authentification';
+    if (a.includes('payment') || a.includes('refund') || e.includes('payment')) return 'Paiement';
+    if (a.includes('group') || e.includes('group')) return 'Groupe';
+    if (a.includes('product') || e.includes('product')) return 'Produit';
+    if (a.includes('supplier') || e.includes('supplier')) return 'Fournisseur';
+    if (a.includes('user') || e.includes('user')) return 'Utilisateur';
+    if (a.includes('cron') || a.includes('backup') || a.includes('system')) return 'Système';
+    return 'Autre';
   }
 }

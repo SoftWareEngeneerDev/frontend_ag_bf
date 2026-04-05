@@ -16,6 +16,7 @@ export class OtpComponent implements OnInit, OnDestroy {
   countdown     = 120;
   canResend     = false;
   resendLoading = false;
+  emitted       = false;
 
   private timer?: ReturnType<typeof setInterval>;
 
@@ -25,6 +26,7 @@ export class OtpComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void { if (this.timer) clearInterval(this.timer); }
 
   startTimer(): void {
+    if (this.timer) clearInterval(this.timer);
     this.countdown = 120;
     this.canResend  = false;
     this.timer = setInterval(() => {
@@ -35,40 +37,97 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   onInput(event: Event, idx: number): void {
     const input = event.target as HTMLInputElement;
-    const val   = input.value.replace(/\D/g, '').slice(-1);
+    // Garder seulement le dernier chiffre saisi
+    const val = input.value.replace(/\D/g, '').slice(-1);
 
-    // ── CORRECTION : créer un nouveau tableau pour déclencher la détection ──
-    const newDigits  = [...this.digits];
-    newDigits[idx]   = val;
-    this.digits      = newDigits;
+    // Forcer la valeur de l'input
+    input.value = val;
 
-    // Focus sur le champ suivant
+    // Mettre à jour le tableau
+    const newDigits = [...this.digits];
+    newDigits[idx]  = val;
+    this.digits     = newDigits;
+
+    // Focus suivant
     if (val && idx < 5) {
-      const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
-      boxes[idx + 1]?.focus();
+      setTimeout(() => {
+        const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
+        boxes[idx + 1]?.focus();
+      }, 10);
     }
 
-    // ── CORRECTION : vérifier après le changement du tableau ──
-    const code = this.digits.join('');
-    if (code.length === 6 && this.digits.every(d => d !== '')) {
-      // Petit délai pour laisser Angular mettre à jour la vue
-      setTimeout(() => this.verified.emit(code), 100);
-    }
+    this.checkComplete();
   }
 
   onKeydown(event: KeyboardEvent, idx: number): void {
-    if (event.key === 'Backspace' && !this.digits[idx] && idx > 0) {
+    if (event.key === 'Backspace') {
+      if (!this.digits[idx] && idx > 0) {
+        const newDigits    = [...this.digits];
+        newDigits[idx - 1] = '';
+        this.digits        = newDigits;
+        // Forcer le vidage de l'input précédent
+        setTimeout(() => {
+          const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
+          if (boxes[idx - 1]) boxes[idx - 1].value = '';
+          boxes[idx - 1]?.focus();
+        }, 10);
+      } else {
+        const newDigits = [...this.digits];
+        newDigits[idx]  = '';
+        this.digits     = newDigits;
+        const input     = event.target as HTMLInputElement;
+        input.value     = '';
+      }
+      event.preventDefault();
+    }
+
+    if (event.key === 'ArrowRight' && idx < 5) {
+      const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
+      boxes[idx + 1]?.focus();
+    }
+    if (event.key === 'ArrowLeft' && idx > 0) {
       const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
       boxes[idx - 1]?.focus();
     }
   }
 
-  // ── Renvoyer OTP → POST /auth/resend-otp ─────────────────────
+  onPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const text   = event.clipboardData?.getData('text') ?? '';
+    const nums   = text.replace(/\D/g, '').slice(0, 6).split('');
+    if (nums.length !== 6) return;
+
+    this.digits = nums;
+
+    // Mettre à jour les inputs DOM
+    setTimeout(() => {
+      const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
+      nums.forEach((n, i) => { if (boxes[i]) boxes[i].value = n; });
+      boxes[5]?.focus();
+      this.checkComplete();
+    }, 50);
+  }
+
+  private checkComplete(): void {
+    const code = this.digits.join('');
+    if (code.length === 6 && this.digits.every(d => d !== '') && !this.emitted) {
+      this.emitted = true;
+      setTimeout(() => {
+        this.verified.emit(code);
+        setTimeout(() => { this.emitted = false; }, 3000);
+      }, 150);
+    }
+  }
+
   resend(): void {
     if (!this.canResend || this.resendLoading) return;
-
     this.resendLoading = true;
-    this.digits        = ['', '', '', '', '', ''];
+    this.emitted       = false;
+
+    // Vider les inputs DOM
+    const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
+    boxes.forEach(b => b.value = '');
+    this.digits = ['', '', '', '', '', ''];
 
     this.auth.resendOtp(this.phone, this.type).subscribe({
       next:  () => { this.resendLoading = false; this.startTimer(); },

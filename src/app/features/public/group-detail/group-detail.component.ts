@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GroupService } from '../../../core/services/group.service';
-import { AuthService }  from '../../../core/services/auth.service';
+import { GroupService, JoinGroupResult } from '../../../core/services/group.service';
+import { AuthService }   from '../../../core/services/auth.service';
 import { FormatService } from '../../../core/services/format.service';
 import { Group, PricingTier } from '../../../core/models';
 
@@ -11,10 +11,12 @@ import { Group, PricingTier } from '../../../core/models';
   styleUrls: ['./group-detail.component.scss']
 })
 export class GroupDetailComponent implements OnInit {
-  group?: Group;
-  loading = true;
-  activeImg = 0;
-  qty = 1;
+  group?:      Group;
+  loading    = true;
+  joining    = false;
+  errorMsg   = '';
+  activeImg  = 0;
+  qty        = 1;
   descExpanded = false;
 
   memberAvatars = ['KT','MO','FD','AB','SC','ST','YT','BK'];
@@ -37,22 +39,30 @@ export class GroupDetailComponent implements OnInit {
   }
 
   stars(rating: number): boolean[] {
-    return [1,2,3,4,5].map(i => i <= Math.round(rating));
+    return [1, 2, 3, 4, 5].map(i => i <= Math.round(rating));
   }
 
   constructor(
-    private route: ActivatedRoute,
+    private route:        ActivatedRoute,
     private groupService: GroupService,
-    public  auth: AuthService,
-    public  fmt: FormatService,
-    private router: Router,
+    public  auth:         AuthService,
+    public  fmt:          FormatService,
+    private router:       Router,
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id') || 'grp-001';
-    this.groupService.getById(id).subscribe(g => {
-      this.group  = g || undefined;
-      this.loading = false;
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) { this.router.navigate(['/groups']); return; }
+
+    this.groupService.getById(id).subscribe({
+      next: (g) => {
+        this.group   = g;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.router.navigate(['/groups']);
+      }
     });
   }
 
@@ -61,7 +71,9 @@ export class GroupDetailComponent implements OnInit {
     return this.fmt.progressPercent(this.group.currentCount, this.group.minParticipants);
   }
 
-  get isThreshold(): boolean { return this.group?.status === 'THRESHOLD_REACHED'; }
+  get isThreshold(): boolean {
+    return this.group?.status === 'THRESHOLD_REACHED';
+  }
 
   currentTierIndex(tiers: PricingTier[]): number {
     if (!this.group) return 0;
@@ -72,12 +84,37 @@ export class GroupDetailComponent implements OnInit {
     return idx;
   }
 
+  // ── Rejoindre le groupe → POST /groups/:id/join ───────────────
   joinGroup(): void {
     if (!this.auth.isLoggedIn()) {
-      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: this.router.url } });
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
       return;
     }
-    this.router.navigate(['/member/payment']);
+
+    if (!this.group) return;
+
+    this.joining  = true;
+    this.errorMsg = '';
+
+    this.groupService.joinGroup(this.group.id).subscribe({
+      next: (result: JoinGroupResult) => {  // CORRECTION : type explicite
+        this.joining = false;
+        this.router.navigate(['/member/payment'], {
+          queryParams: {
+            groupId:       result.groupId,
+            depositAmount: result.depositAmount,  // CORRECTION : propriétés correctes
+            currentPrice:  result.currentPrice,
+          }
+        });
+      },
+      error: (err) => {
+        this.joining  = false;
+        const msg     = err?.error?.error?.message;
+        this.errorMsg = msg || 'Impossible de rejoindre ce groupe. Réessayez.';
+      }
+    });
   }
 
   goBack(): void { this.router.navigate(['/groups']); }

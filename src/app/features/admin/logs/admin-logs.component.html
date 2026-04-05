@@ -7,7 +7,9 @@
     <div class="flex gap-10">
       <input class="inp" style="width:260px" placeholder="Rechercher action, entité, utilisateur..."
              [(ngModel)]="search">
-      <button class="btn-ghost btn-sm"><i class="fa-solid fa-download"></i> Exporter</button>
+      <button class="btn-ghost btn-sm">
+        <i class="fa-solid fa-download"></i> Exporter
+      </button>
     </div>
   </div>
 
@@ -17,10 +19,21 @@
             (click)="activeTab = t">{{ t }}</button>
   </div>
 
-  <div class="glass">
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <div class="glass" *ngIf="!loading">
     <table class="tbl">
       <thead>
-        <tr><th>Horodatage</th><th>Utilisateur</th><th>Action</th><th>Entité</th><th>IP</th><th>Module</th><th>Niveau</th></tr>
+        <tr>
+          <th>Horodatage</th>
+          <th>Utilisateur</th>
+          <th>Action</th>
+          <th>Entité</th>
+          <th>IP</th>
+          <th>Module</th>
+          <th>Niveau</th>
+        </tr>
       </thead>
       <tbody>
         <tr *ngFor="let l of filtered">
@@ -34,5 +47,13 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Empty -->
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <div style="font-size:36px;margin-bottom:12px">
+        <i class="fa-solid fa-scroll" style="color:var(--primary)"></i>
+      </div>
+      <p class="text-muted">Aucun log trouvé pour cette recherche.</p>
+    </div>
   </div>
 </div>

@@ -15,7 +15,7 @@
   <div class="pay-body">
 
     <!-- ── Étape 1 : Résumé ── -->
-    <ng-container *ngIf="step === 1">
+    <ng-container *ngIf="step === 1 && group">
       <div class="glass pay-card anim-fade">
         <div class="flex gap-14 pay-product">
           <div class="pay-prod-img">
@@ -24,25 +24,36 @@
           </div>
           <div>
             <div class="font-display" style="font-weight:700;font-size:15px">{{ group.product.name }}</div>
-            <div class="text-muted" style="font-size:12px">{{ group.currentCount }}/{{ group.minParticipants }} participants · {{ group.status | groupStatusLabel }}</div>
+            <div class="text-muted" style="font-size:12px">
+              {{ group.currentCount }}/{{ group.minParticipants }} participants · {{ group.status | groupStatusLabel }}
+            </div>
           </div>
         </div>
       </div>
 
       <div class="glass pay-amount anim-fade-1">
-        <div class="text-muted" style="font-size:13px; margin-bottom:6px">Solde final à payer</div>
+        <div class="text-muted" style="font-size:13px;margin-bottom:6px">
+          {{ paymentType === 'DEPOSIT' ? 'Dépôt à payer' : 'Solde final à payer' }}
+        </div>
         <div class="font-display font-mono pay-total">{{ finalAmount | currencyXof }}</div>
-        <div class="text-muted" style="font-size:12px; margin-top:4px">
-          Prix total: {{ group.currentPrice | currencyXof }} − Dépôt déjà payé: {{ group.depositAmount | currencyXof }}
+        <div class="text-muted" style="font-size:12px;margin-top:4px">
+          Prix total : {{ group.currentPrice | currencyXof }}
+          <ng-container *ngIf="paymentType === 'FINAL'">
+            − Dépôt déjà payé : {{ group.depositAmount | currencyXof }}
+          </ng-container>
         </div>
       </div>
 
       <div class="alert-cyan alert anim-fade-2">
-        <i class="fa-solid fa-shield-halved"></i> Votre paiement est sécurisé. Le fournisseur ne sera payé qu'après confirmation de livraison.
+        <i class="fa-solid fa-shield-halved"></i>
+        Votre paiement est sécurisé. Le fournisseur ne sera payé qu'après confirmation de livraison.
       </div>
 
       <button class="btn-gold btn-blk btn-lg" (click)="step = 2">Continuer →</button>
     </ng-container>
+
+    <!-- Loader si groupe pas encore chargé -->
+    <app-loading-spinner *ngIf="step === 1 && !group" [full]="true"></app-loading-spinner>
 
     <!-- ── Étape 2 : Méthode ── -->
     <ng-container *ngIf="step === 2">
@@ -71,6 +82,11 @@
         </div>
       </div>
 
+      <!-- Erreur backend -->
+      <div class="alert-red alert" *ngIf="errorMsg" style="margin-bottom:12px">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+      </div>
+
       <button class="btn-gold btn-blk btn-lg"
               [disabled]="!selMethod || (needsPhone && !phone)"
               (click)="pay()">
@@ -86,7 +102,9 @@
     <ng-container *ngIf="step === 3">
       <div class="pay-processing text-center">
         <div class="proc-icon anim-pulse"><i class="fa-solid fa-credit-card"></i></div>
-        <h3 class="font-display" style="font-size:22px;font-weight:800;margin-bottom:8px">Traitement en cours...</h3>
+        <h3 class="font-display" style="font-size:22px;font-weight:800;margin-bottom:8px">
+          Traitement en cours...
+        </h3>
         <p class="text-muted">Connexion sécurisée avec {{ methodLabel }}...</p>
         <div class="alert-cyan alert" style="margin-top:20px;text-align:left">
           <i class="fa-solid fa-lock"></i> Connexion chiffrée SSL · Paiement sécurisé par CinetPay

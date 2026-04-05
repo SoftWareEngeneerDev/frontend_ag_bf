@@ -5,22 +5,24 @@
   <p class="font-mono otp-phone">{{ phone }}</p>
 
   <div class="otp-inputs">
-    <input class="otp-box"
-           *ngFor="let d of digits; let i = index"
-           [value]="digits[i]"
-           maxlength="1"
-           inputmode="numeric"
-           (input)="onInput($event, i)"
-           (keydown)="onKeydown($event, i)">
+    <input
+      class="otp-box"
+      *ngFor="let d of digits; let i = index"
+      type="text"
+      inputmode="numeric"
+      maxlength="1"
+      [value]="digits[i]"
+      (input)="onInput($event, i)"
+      (keydown)="onKeydown($event, i)"
+      (paste)="i === 0 ? onPaste($event) : null"
+      autocomplete="one-time-code">
   </div>
 
-  <div class="otp-timer text-muted">
+  <div class="otp-timer text-muted" style="margin-top:16px">
     <span *ngIf="!canResend">
       Renvoyer le code dans
       <span class="font-mono" style="color:var(--err)">{{ timerLabel }}</span>
     </span>
-
-    <!-- Bouton renvoyer avec spinner ─────────────────────────── -->
     <button *ngIf="canResend" class="btn-ghost btn-sm"
             (click)="resend()" [disabled]="resendLoading">
       <i *ngIf="resendLoading" class="fa-solid fa-spinner fa-spin"></i>

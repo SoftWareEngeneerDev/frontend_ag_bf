@@ -5,13 +5,10 @@ import { Observable, tap, map, throwError, catchError } from 'rxjs';
 import { User, LoginDto, RegisterDto, AuthResponse, OtpDto } from '../models';
 import { MockDataService } from './mock-data.service';
 
-// ── URL de base de l'API backend ─────────────────────────────────
-const API = 'http://localhost:3000/api/v1';
-
-// ── Clés localStorage ────────────────────────────────────────────
-const KEY_USER         = 'agbf_user';
-const KEY_TOKEN        = 'agbf_token';
-const KEY_REFRESH      = 'agbf_refresh';
+const API          = 'http://localhost:3000/api/v1';
+const KEY_USER     = 'agbf_user';
+const KEY_TOKEN    = 'agbf_token';
+const KEY_REFRESH  = 'agbf_refresh';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,15 +24,14 @@ export class AuthService {
   readonly isAdmin     = computed(() => this._user()?.role === 'ADMIN');
 
   constructor(
-    private http: HttpClient,
+    private http:   HttpClient,
     private router: Router,
-    private mock: MockDataService,
+    private mock:   MockDataService,
   ) {
     this.restoreSession();
   }
 
   // ── Session ────────────────────────────────────────────────────
-
   private restoreSession(): void {
     const stored = localStorage.getItem(KEY_USER);
     const token  = localStorage.getItem(KEY_TOKEN);
@@ -52,20 +48,18 @@ export class AuthService {
     this._user.set(user);
   }
 
-  private clearSession(): void {
+  clearSession(): void {
     localStorage.removeItem(KEY_USER);
     localStorage.removeItem(KEY_TOKEN);
     localStorage.removeItem(KEY_REFRESH);
     this._user.set(null);
   }
 
-  // ── Helper : mapper la réponse backend vers le modèle User ─────
-  // Le backend retourne { name, phone, role, status, trustScore, referralCode... }
-  // On mappe vers notre interface User du front
+  // ── Mapper backend → front ─────────────────────────────────────
   private mapBackendUser(backendUser: any): User {
     return {
       id:            backendUser.id,
-      fullName:      backendUser.name,           // backend: name → front: fullName
+      fullName:      backendUser.name,
       phone:         backendUser.phone,
       email:         backendUser.email,
       role:          backendUser.role,
@@ -80,13 +74,12 @@ export class AuthService {
     };
   }
 
-  // ── Helper : formater le numéro de téléphone ───────────────────
-  // Le front stocke "76528609" ou "+22676528609"
-  // Le backend attend "+22676528609"
-  private formatPhone(phone: string): string {
-    const cleaned = phone.replace(/\s/g, '');
+  // ── Formater le téléphone ──────────────────────────────────────
+  formatPhone(phone: string): string {
+    const cleaned = phone.replace(/[\s\-\.]/g, '');
     if (cleaned.startsWith('+226')) return cleaned;
     if (cleaned.startsWith('226'))  return '+' + cleaned;
+    if (cleaned.startsWith('0'))    return '+226' + cleaned.slice(1);
     return '+226' + cleaned;
   }
 
@@ -96,13 +89,15 @@ export class AuthService {
   register(dto: RegisterDto): Observable<{ phone: string }> {
     this._loading.set(true);
 
-    const payload = {
-      phone:       this.formatPhone(dto.phone),
-      name:        dto.fullName,               // front: fullName → backend: name
-      email:       dto.email || undefined,
-      password:    dto.password,
-      referralCode: dto.referralCode || undefined,
+    const payload: any = {
+      phone:    this.formatPhone(dto.phone),
+      name:     dto.fullName,
+      password: dto.password,
     };
+
+    if (dto.email)        payload.email        = dto.email;
+    if (dto.referralCode) payload.referralCode = dto.referralCode;
+    if (dto.role)         payload.role         = dto.role;
 
     return this.http.post<any>(`${API}/auth/register`, payload).pipe(
       map(res => ({ phone: res.data?.phone ?? payload.phone })),
@@ -116,30 +111,48 @@ export class AuthService {
 
   // ══════════════════════════════════════════════════════════════
   // VERIFY OTP — POST /auth/verify-otp
+  // CORRECTION : gère le cas fournisseur (supplierPending: true)
   // ══════════════════════════════════════════════════════════════
   verifyOtp(dto: OtpDto): Observable<AuthResponse> {
     this._loading.set(true);
 
     const payload = {
       phone: this.formatPhone(dto.phone),
-      code:  dto.otp,          // front: otp → backend: code
+      code:  dto.otp,
       type:  'REGISTER',
     };
 
     return this.http.post<any>(`${API}/auth/verify-otp`, payload).pipe(
       map(res => {
         const data = res.data;
+
+        // ── Cas fournisseur : compte SUSPENDED, pas de tokens ──
+        // Le backend retourne { supplierPending: true }
+        if (data?.supplierPending) {
+          // Retourner une AuthResponse vide pour ne pas bloquer le front
+          return {
+            token:        '',
+            refreshToken: '',
+            user:         null as any,
+            expiresIn:    0,
+            supplierPending: true,
+          } as any;
+        }
+
+        // ── Cas normal : membre avec tokens ────────────────────
         const user = this.mapBackendUser(data.user);
-        const authResp: AuthResponse = {
+        return {
           token:        data.accessToken,
           refreshToken: data.refreshToken,
           user,
-          expiresIn:    900, // 15 minutes
-        };
-        return authResp;
+          expiresIn:    900,
+        } as AuthResponse;
       }),
       tap(r => {
-        this.saveSession(r.user, r.token, r.refreshToken);
+        // Sauvegarder la session uniquement si on a des tokens
+        if (r.token && r.user) {
+          this.saveSession(r.user, r.token, r.refreshToken);
+        }
         this._loading.set(false);
       }),
       catchError(err => {
@@ -153,72 +166,55 @@ export class AuthService {
   // LOGIN — POST /auth/login
   // ══════════════════════════════════════════════════════════════
   login(dto: LoginDto): Observable<AuthResponse> {
-  this._loading.set(true);
- 
-  // ── Détecter si c'est un email ou un téléphone ─────────────
-  const isEmail = dto.phone.includes('@');
- 
-  const payload = isEmail
-    ? { email: dto.phone, password: dto.password }           // connexion par email
-    : { phone: this.formatPhone(dto.phone), password: dto.password }; // connexion par téléphone
- 
-  return this.http.post<any>(`${API}/auth/login`, payload).pipe(
-    map(res => {
-      const data = res.data;
- 
-      // Cas 2FA : le backend retourne twoFactorRequired: true
-      if (data?.twoFactorRequired) {
-        throw { twoFactorRequired: true };
-      }
- 
-      const user = this.mapBackendUser(data.user);
-      const authResp: AuthResponse = {
-        token:        data.accessToken,
-        refreshToken: data.refreshToken,
-        user,
-        expiresIn:    900,
-      };
-      return authResp;
-    }),
-    tap(r => {
-      this.saveSession(r.user, r.token, r.refreshToken);
-      this._loading.set(false);
-    }),
-    catchError(err => {
-      this._loading.set(false);
-      return throwError(() => err);
-    })
-  );
-}
+    this._loading.set(true);
+
+    const isEmail = dto.phone.includes('@');
+    const payload = isEmail
+      ? { email: dto.phone, password: dto.password }
+      : { phone: this.formatPhone(dto.phone), password: dto.password };
+
+    return this.http.post<any>(`${API}/auth/login`, payload).pipe(
+      map(res => {
+        const data = res.data;
+        if (data?.twoFactorRequired) throw { twoFactorRequired: true };
+        const user = this.mapBackendUser(data.user);
+        return {
+          token:        data.accessToken,
+          refreshToken: data.refreshToken,
+          user,
+          expiresIn:    900,
+        } as AuthResponse;
+      }),
+      tap(r => {
+        this.saveSession(r.user, r.token, r.refreshToken);
+        this._loading.set(false);
+      }),
+      catchError(err => {
+        this._loading.set(false);
+        return throwError(() => err);
+      })
+    );
+  }
 
   // ══════════════════════════════════════════════════════════════
-  // LOGOUT — POST /auth/logout
+  // LOGOUT
   // ══════════════════════════════════════════════════════════════
   logout(): void {
     const refreshToken = localStorage.getItem(KEY_REFRESH);
-
-    // Appel backend pour révoquer le token (best effort)
-    this.http.post(`${API}/auth/logout`, { refreshToken }).subscribe({
-      error: () => {} // On déconnecte même si ça échoue
-    });
-
+    this.http.post(`${API}/auth/logout`, { refreshToken }).subscribe({ error: () => {} });
     this.clearSession();
     this.router.navigate(['/']);
   }
 
   // ══════════════════════════════════════════════════════════════
-  // REFRESH TOKEN — POST /auth/refresh
+  // REFRESH TOKEN
   // ══════════════════════════════════════════════════════════════
   refreshToken(): Observable<{ token: string }> {
     const refreshToken = localStorage.getItem(KEY_REFRESH);
-
     return this.http.post<any>(`${API}/auth/refresh`, { refreshToken }).pipe(
       map(res => ({ token: res.data.accessToken })),
-      tap(r => {
-        localStorage.setItem(KEY_TOKEN, r.token);
-      }),
+      tap(r => localStorage.setItem(KEY_TOKEN, r.token)),
       catchError(err => {
-        // Refresh échoué → déconnexion
         this.clearSession();
         this.router.navigate(['/auth/login']);
         return throwError(() => err);
@@ -227,7 +223,7 @@ export class AuthService {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // FORGOT PASSWORD — POST /auth/forgot-password
+  // FORGOT PASSWORD
   // ══════════════════════════════════════════════════════════════
   forgotPassword(phone: string): Observable<void> {
     this._loading.set(true);
@@ -236,34 +232,28 @@ export class AuthService {
     }).pipe(
       map(() => void 0),
       tap(() => this._loading.set(false)),
-      catchError(err => {
-        this._loading.set(false);
-        return throwError(() => err);
-      })
+      catchError(err => { this._loading.set(false); return throwError(() => err); })
     );
   }
 
   // ══════════════════════════════════════════════════════════════
-  // RESET PASSWORD — POST /auth/reset-password
+  // RESET PASSWORD
   // ══════════════════════════════════════════════════════════════
   resetPassword(phone: string, code: string, newPassword: string): Observable<void> {
     this._loading.set(true);
     return this.http.post<any>(`${API}/auth/reset-password`, {
-      phone:       this.formatPhone(phone),
+      phone: this.formatPhone(phone),
       code,
       newPassword,
     }).pipe(
       map(() => void 0),
       tap(() => this._loading.set(false)),
-      catchError(err => {
-        this._loading.set(false);
-        return throwError(() => err);
-      })
+      catchError(err => { this._loading.set(false); return throwError(() => err); })
     );
   }
 
   // ══════════════════════════════════════════════════════════════
-  // RESEND OTP — POST /auth/resend-otp
+  // RESEND OTP
   // ══════════════════════════════════════════════════════════════
   resendOtp(phone: string, type: 'REGISTER' | 'RESET_PASSWORD' = 'REGISTER'): Observable<void> {
     return this.http.post<any>(`${API}/auth/resend-otp`, {
@@ -276,21 +266,14 @@ export class AuthService {
   }
 
   // ── Utilitaires ────────────────────────────────────────────────
-
   getToken(): string | null { return localStorage.getItem(KEY_TOKEN); }
-
   isRole(role: string): boolean { return this._user()?.role === role; }
 
-  // Demo login (garde les mocks pour le développement)
+  // Demo login
   loginDemo(role: 'MEMBER' | 'SUPPLIER' | 'ADMIN'): void {
-    const users = {
-      MEMBER:   this.mock.memberUser,
-      SUPPLIER: this.mock.supplierUser,
-      ADMIN:    this.mock.adminUser,
-    };
-    const user = users[role];
-    this.saveSession(user, 'mock-demo-' + Date.now(), 'mock-refresh-' + Date.now());
+    const users  = { MEMBER: this.mock.memberUser, SUPPLIER: this.mock.supplierUser, ADMIN: this.mock.adminUser };
     const routes = { MEMBER: '/member', SUPPLIER: '/supplier', ADMIN: '/admin' };
+    this.saveSession(users[role], 'mock-demo-' + Date.now(), 'mock-refresh-' + Date.now());
     this.router.navigate([routes[role]]);
   }
 }

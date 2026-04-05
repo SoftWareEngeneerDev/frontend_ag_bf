@@ -68,6 +68,7 @@ export interface RegisterDto {
   confirmPassword: string;
   referralCode?: string;
   acceptTerms: boolean;
+  role?: 'MEMBER' | 'SUPPLIER';
 }
 
 export interface OtpDto {

@@ -33,8 +33,6 @@
   <!-- Grille produits -->
   <div class="sp-grid" *ngIf="!loading && filtered.length > 0">
     <div class="glass sp-card" *ngFor="let p of filtered">
-
-      <!-- Image zone -->
       <div class="sp-img">
         <img [src]="p.images[0] || 'https://picsum.photos/seed/' + p.id + '/200/200'"
              [alt]="p.name" loading="lazy" class="sp-prod-img">
@@ -43,14 +41,10 @@
           <i class="fa-solid fa-fire"></i> {{ p.activeGroupCount }} groupe{{ p.activeGroupCount > 1 ? 's' : '' }}
         </span>
       </div>
-
-      <!-- Body -->
       <div class="sp-body">
         <div class="text-muted sp-cat">{{ p.category.name }}</div>
         <h3 class="font-display sp-name">{{ p.name | truncate:40 }}</h3>
         <p class="text-muted sp-desc">{{ p.description | truncate:80 }}</p>
-
-        <!-- Stats row -->
         <div class="sp-stats">
           <div class="sp-stat">
             <span class="sp-stat-v font-mono">{{ p.soloPrice | currencyXof }}</span>
@@ -65,8 +59,6 @@
             <span class="text-muted sp-stat-l">En stock</span>
           </div>
         </div>
-
-        <!-- Rating -->
         <div class="sp-rating">
           <i *ngFor="let i of stars()" class="fa-solid fa-star"
              [style.color]="i < p.rating ? '#F5A623' : 'var(--border2)'"></i>
@@ -74,19 +66,21 @@
             {{ p.rating }}/5 ({{ p.reviewCount }} avis)
           </span>
         </div>
-
-        <!-- Actions -->
         <div class="sp-actions">
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
-                  (click)="openEdit(p)"><i class="fa-solid fa-pen"></i> Modifier</button>
-          <button class="btn-cyan  btn-sm" style="flex:1;justify-content:center"
-                  (click)="openCreateGroup(p)"><i class="fa-solid fa-users-plus"></i> Créer un groupe</button>
+                  (click)="openEdit(p)">
+            <i class="fa-solid fa-pen"></i> Modifier
+          </button>
+          <button class="btn-cyan btn-sm" style="flex:1;justify-content:center"
+                  (click)="openCreateGroup(p)">
+            <i class="fa-solid fa-users-plus"></i> Créer un groupe
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal Modifier produit -->
+  <!-- ── Modal Modifier produit ─────────────────────────────────── -->
   <div class="modal-backdrop" *ngIf="showEditModal && selectedProduct" (click)="showEditModal = false">
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
@@ -133,19 +127,23 @@
           </div>
         </div>
         <div class="alert-cyan alert" style="font-size:12px">
-          <i class="fa-solid fa-circle-info"></i> Les modifications seront soumises à validation avant publication.
+          <i class="fa-solid fa-circle-info"></i>
+          Les modifications seront soumises à validation avant publication.
         </div>
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center"
                   (click)="showEditModal = false">Annuler</button>
-          <button class="btn-gold"  style="flex:1;justify-content:center"
-                  (click)="showEditModal = false">Enregistrer →</button>
+          <button class="btn-gold" style="flex:1;justify-content:center"
+                  (click)="saveEdit()" [disabled]="saving">
+            <i *ngIf="saving" class="fa-solid fa-spinner fa-spin"></i>
+            {{ saving ? 'Enregistrement...' : 'Enregistrer →' }}
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal Créer un groupe -->
+  <!-- ── Modal Créer un groupe ──────────────────────────────────── -->
   <div class="modal-backdrop" *ngIf="showGroupModal && selectedProduct" (click)="showGroupModal = false">
     <div class="modal-box glass" style="max-width:540px" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
@@ -155,7 +153,9 @@
                  [alt]="selectedProduct!.name" loading="lazy">
           </div>
           <div>
-            <h3 class="font-display" style="font-size:17px;font-weight:700"><i class="fa-solid fa-users-plus"></i> Créer un groupe</h3>
+            <h3 class="font-display" style="font-size:17px;font-weight:700">
+              <i class="fa-solid fa-users-plus"></i> Créer un groupe
+            </h3>
             <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.name | truncate:38 }}</p>
           </div>
         </div>
@@ -164,8 +164,6 @@
         </button>
       </div>
       <div class="modal-body">
-
-        <!-- Paramètres principaux -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
           <div class="inp-group">
             <label>Membres min.</label>
@@ -183,11 +181,9 @@
 
         <!-- Paliers de réduction -->
         <div>
-          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:10px">
-            Paliers de réduction
-          </label>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:10px">Paliers de réduction</label>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div *ngFor="let tier of groupForm.tiers; let i = index"
+            <div *ngFor="let tier of groupForm.tiers"
                  class="glass" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;padding:10px 14px">
               <div class="inp-group" style="margin:0">
                 <label style="font-size:10px">Membres min.</label>
@@ -198,9 +194,7 @@
                 <input class="inp" type="number" [(ngModel)]="tier.discountPercent" min="1" max="70">
               </div>
               <div style="text-align:center">
-                <div class="font-mono" style="font-size:11px;color:#10D98B;font-weight:700">
-                  -{{ tier.discountPercent }}%
-                </div>
+                <div class="font-mono" style="font-size:11px;color:#10D98B;font-weight:700">-{{ tier.discountPercent }}%</div>
                 <div class="text-muted" style="font-size:10px">
                   {{ selectedProduct!.soloPrice * (1 - tier.discountPercent / 100) | number:'1.0-0' }} XOF
                 </div>
@@ -226,16 +220,18 @@
         </div>
 
         <div class="flex gap-10">
-          <button class="btn-ghost" style="flex:1;justify-content:center"
-                  (click)="showGroupModal = false">Annuler</button>
-          <button class="btn-cyan"  style="flex:1;justify-content:center"
-                  (click)="showGroupModal = false">Créer le groupe →</button>
+          <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showGroupModal = false">Annuler</button>
+          <button class="btn-cyan" style="flex:1;justify-content:center"
+                  (click)="createGroupFromProduct()" [disabled]="creatingGroup">
+            <i *ngIf="creatingGroup" class="fa-solid fa-spinner fa-spin"></i>
+            {{ creatingGroup ? 'Création...' : 'Créer le groupe →' }}
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal ajout produit -->
+  <!-- ── Modal Ajouter produit ──────────────────────────────────── -->
   <div class="modal-backdrop" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
@@ -247,30 +243,50 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="inp-group" *ngFor="let f of [
-          {l:'Nom du produit',     ph:'Ex: Smartphone Samsung Galaxy A55'},
-          {l:'Description',        ph:'Décrivez votre produit...'},
-          {l:'Prix solo (XOF)',    ph:'Ex: 285000'},
-          {l:'Stock disponible',   ph:'Ex: 100'},
-        ]">
-          <label>{{ f.l }}</label>
-          <input class="inp" [placeholder]="f.ph">
+        <div class="inp-group">
+          <label>Nom du produit</label>
+          <input class="inp" [(ngModel)]="addForm.name" placeholder="Ex: Smartphone Samsung Galaxy A55">
         </div>
         <div class="inp-group">
-          <label>Catégorie</label>
-          <select class="inp">
-            <option>Électronique</option>
-            <option>Alimentaire</option>
-            <option>Textile & Mode</option>
-            <option>Maison & Jardin</option>
-          </select>
+          <label>Description</label>
+          <textarea class="inp" rows="3" [(ngModel)]="addForm.description"
+                    placeholder="Décrivez votre produit..." style="resize:vertical"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Prix solo (XOF)</label>
+            <input class="inp" type="number" [(ngModel)]="addForm.soloPrice" placeholder="Ex: 285000">
+          </div>
+          <div class="inp-group">
+            <label>Prix groupe min. (XOF)</label>
+            <input class="inp" type="number" [(ngModel)]="addForm.baseGroupPrice" placeholder="Ex: 220000">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Stock disponible</label>
+            <input class="inp" type="number" [(ngModel)]="addForm.stock" placeholder="Ex: 100">
+          </div>
+          <div class="inp-group">
+            <label>Catégorie</label>
+            <select class="inp" [(ngModel)]="addForm.categoryId">
+              <option value="">-- Choisir --</option>
+              <option *ngFor="let c of allCategories" [value]="c.id">{{ c.name }}</option>
+            </select>
+          </div>
         </div>
         <div class="alert-cyan alert">
-          <i class="fa-solid fa-circle-info"></i> Votre produit sera examiné par un admin avant d'être visible.
+          <i class="fa-solid fa-circle-info"></i>
+          Votre produit sera examiné par un admin avant d'être visible.
         </div>
         <div class="flex gap-10">
-          <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showAddModal = false">Annuler</button>
-          <button class="btn-gold"  style="flex:1;justify-content:center" (click)="showAddModal = false">Soumettre →</button>
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showAddModal = false">Annuler</button>
+          <button class="btn-gold" style="flex:1;justify-content:center"
+                  (click)="submitProduct()" [disabled]="!addForm.name || saving">
+            <i *ngIf="saving" class="fa-solid fa-spinner fa-spin"></i>
+            {{ saving ? 'Soumission...' : 'Soumettre →' }}
+          </button>
         </div>
       </div>
     </div>

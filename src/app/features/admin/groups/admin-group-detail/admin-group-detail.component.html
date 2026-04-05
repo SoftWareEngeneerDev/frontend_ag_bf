@@ -1,9 +1,11 @@
-<div *ngIf="group; else notFound">
+<div *ngIf="!loading && group; else notFound">
 
   <!-- En-tête -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour</button>
+      <button class="btn-ghost btn-sm" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left"></i> Retour
+      </button>
       <div>
         <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail groupe</h2>
         <p class="text-muted font-mono" style="font-size:12px">{{ group.id }}</p>
@@ -11,7 +13,8 @@
     </div>
     <div class="flex gap-8">
       <button class="btn-err btn-sm"
-              *ngIf="group.status === 'OPEN' || group.status === 'THRESHOLD_REACHED'">
+              *ngIf="group.status === 'OPEN' || group.status === 'THRESHOLD_REACHED'"
+              (click)="closeGroup()">
         Fermer le groupe
       </button>
     </div>
@@ -66,12 +69,14 @@
       <div class="text-muted" style="font-size:12px;margin-top:4px">Acompte requis</div>
     </div>
     <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ formatXOF(group.depositAmount * group.currentCount) }}</div>
+      <div style="font-size:22px;font-weight:700;color:#F5A623">
+        {{ formatXOF(group.depositAmount * group.currentCount) }}
+      </div>
       <div class="text-muted" style="font-size:12px;margin-top:4px">Acomptes collectés</div>
     </div>
   </div>
 
-  <!-- Détails et paliers de prix -->
+  <!-- Détails et paliers -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
     <!-- Informations groupe -->
@@ -119,10 +124,6 @@
             <td class="text-muted" style="font-size:12px">Seuil atteint le</td>
             <td style="font-size:12px;color:#10D98B">{{ formatDate(group.thresholdReachedAt!) }}</td>
           </tr>
-          <tr *ngIf="group.paymentDeadline">
-            <td class="text-muted" style="font-size:12px">Délai paiement</td>
-            <td style="font-size:12px;color:#F5A623">{{ formatDate(group.paymentDeadline!) }}</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -157,13 +158,11 @@
 
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
         <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Fournisseur</h3>
-        <div class="text-muted" style="font-size:13px;margin-bottom:4px;font-weight:500;color:inherit">
-          {{ group.supplier.companyName }}
-        </div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">{{ group.supplier.companyName }}</div>
         <div class="text-muted" style="font-size:12px">{{ group.supplier.contactName }}</div>
         <div class="text-muted" style="font-size:12px">{{ group.supplier.phone }}</div>
         <div class="text-muted" style="font-size:12px">{{ group.supplier.city }}</div>
-        <div class="flex gap-6 mt-8" style="align-items:center">
+        <div class="flex gap-6" style="align-items:center;margin-top:8px">
           <i class="fa-solid fa-star" style="color:#F5A623;font-size:13px"></i>
           <span class="font-mono" style="font-size:13px">{{ group.supplier.rating }}/5</span>
           <span class="text-muted" style="font-size:11px">({{ group.supplier.reviewCount }} avis)</span>
@@ -177,10 +176,15 @@
 </div>
 
 <ng-template #notFound>
-  <div style="text-align:center;padding:60px 0">
-    <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-fire" style="color:var(--orange)"></i></div>
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+  <div *ngIf="!loading" style="text-align:center;padding:60px 0">
+    <div style="font-size:48px;margin-bottom:16px">
+      <i class="fa-solid fa-fire" style="color:var(--orange)"></i>
+    </div>
     <h3 style="font-weight:600;margin-bottom:8px">Groupe introuvable</h3>
     <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun groupe.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</button>
+    <button class="btn-ghost btn-sm" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+    </button>
   </div>
 </ng-template>

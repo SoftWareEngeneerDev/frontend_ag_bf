@@ -36,8 +36,11 @@
             (click)="activeTab = t">{{ t }}</button>
   </div>
 
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
   <!-- Tableau -->
-  <div class="glass">
+  <div class="glass" *ngIf="!loading">
     <table class="tbl">
       <thead>
         <tr>
@@ -53,7 +56,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let g of filtered">
-          <!-- Groupe / Produit -->
           <td>
             <div class="flex gap-10" style="align-items:center">
               <div class="ag-prod-icon">
@@ -67,11 +69,8 @@
               </div>
             </div>
           </td>
-          <!-- Fournisseur -->
           <td class="text-muted" style="font-size:12px">{{ g.supplier.companyName }}</td>
-          <!-- Statut -->
           <td><span [class]="statusClass(g.status)">{{ statusLabel(g.status) }}</span></td>
-          <!-- Membres -->
           <td>
             <div>
               <div class="flex gap-6 mb-4" style="align-items:center">
@@ -85,27 +84,24 @@
               </div>
             </div>
           </td>
-          <!-- Réduction -->
           <td>
             <span class="font-mono" style="font-size:13px;font-weight:600;color:#10D98B">
               -{{ g.discountPercent }}%
             </span>
           </td>
-          <!-- Prix actuel -->
           <td class="font-mono" style="font-size:12px">{{ formatXOF(g.currentPrice) }}</td>
-          <!-- Expiration -->
           <td>
             <span class="font-mono" style="font-size:12px"
                   [style.color]="isExpiringSoon(g.expiresAt) ? '#FF4D6A' : 'inherit'">
               {{ formatExpiry(g.expiresAt) }}
             </span>
           </td>
-          <!-- Actions -->
           <td>
             <div class="flex gap-6">
               <button class="btn-ghost btn-sm" [routerLink]="['/admin/groups', g.id]">Voir</button>
               <button class="btn-err btn-sm"
-                      *ngIf="g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED'">
+                      *ngIf="g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED'"
+                      (click)="closeGroup(g)">
                 Fermer
               </button>
             </div>
@@ -115,7 +111,9 @@
     </table>
 
     <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px"><i class="fa-solid fa-fire" style="color:var(--orange)"></i></div>
+      <div style="font-size:36px;margin-bottom:12px">
+        <i class="fa-solid fa-fire" style="color:var(--orange)"></i>
+      </div>
       <p class="text-muted">Aucun groupe trouvé pour cette recherche.</p>
     </div>
   </div>
