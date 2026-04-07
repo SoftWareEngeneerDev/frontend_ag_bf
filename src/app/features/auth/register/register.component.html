@@ -223,7 +223,7 @@
 
       <!-- ══ Step 3 Membre / Step 4 Fournisseur : OTP ══════════ -->
       <ng-container *ngIf="(step === 3 && profileType === 'MEMBER') || (step === 4 && profileType === 'SUPPLIER')">
-        <app-otp [phone]="form.value.phone"
+        <app-otp [phone]="otpPhone || form.value.phone"
                  (verified)="onOtpComplete($event)"
                  (back)="step = profileType === 'SUPPLIER' ? 3 : 2">
         </app-otp>

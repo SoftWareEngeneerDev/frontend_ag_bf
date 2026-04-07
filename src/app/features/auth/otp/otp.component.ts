@@ -109,6 +109,7 @@ export class OtpComponent implements OnInit, OnDestroy {
   }
 
   private checkComplete(): void {
+    console.log('digits:', this.digits);
     const code = this.digits.join('');
     if (code.length === 6 && this.digits.every(d => d !== '') && !this.emitted) {
       this.emitted = true;

@@ -4,11 +4,46 @@
   <div class="prof-header card">
     <div class="ph-left">
       <div class="ph-av-wrap">
-        <app-avatar [name]="user?.fullName || 'U'" [size]="72" bg="linear-gradient(135deg,#F5A623,#E67E00)"></app-avatar>
-        <button class="ph-av-edit" title="Modifier la photo">
-          <i class="fa-solid fa-camera"></i>
+
+        <!-- Input file caché -->
+        <input #fileInput type="file" accept="image/*"
+               style="display:none"
+               (change)="onFileSelected($event)">
+
+        <!-- Avatar avec preview -->
+        <div class="ph-avatar-container" (click)="openFilePicker()" style="cursor:pointer;position:relative">
+          <!-- Si photo uploadée → afficher l'image -->
+          <img *ngIf="avatarPreview"
+               [src]="avatarPreview"
+               style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--primary)"
+               alt="Photo de profil">
+          <!-- Sinon → afficher l'avatar initiales -->
+          <app-avatar *ngIf="!avatarPreview"
+                      [name]="user?.fullName || 'U'"
+                      [size]="72"
+                      bg="linear-gradient(135deg,#F5A623,#E67E00)">
+          </app-avatar>
+
+          <!-- Overlay caméra au hover -->
+          <div class="ph-av-overlay"
+               style="position:absolute;inset:0;border-radius:50%;
+                      background:rgba(0,0,0,0.45);
+                      display:flex;align-items:center;justify-content:center;
+                      opacity:0;transition:opacity 0.2s;cursor:pointer"
+               onmouseenter="this.style.opacity='1'"
+               onmouseleave="this.style.opacity='0'">
+            <i *ngIf="!uploadingPhoto" class="fa-solid fa-camera" style="color:#fff;font-size:20px"></i>
+            <i *ngIf="uploadingPhoto"  class="fa-solid fa-spinner fa-spin" style="color:#fff;font-size:20px"></i>
+          </div>
+        </div>
+
+        <!-- Bouton caméra visible -->
+        <button class="ph-av-edit" title="Modifier la photo" (click)="openFilePicker()">
+          <i *ngIf="!uploadingPhoto" class="fa-solid fa-camera"></i>
+          <i *ngIf="uploadingPhoto"  class="fa-solid fa-spinner fa-spin"></i>
         </button>
       </div>
+
       <div>
         <div class="font-display ph-name">{{ user?.fullName }}</div>
         <div class="ph-meta">
@@ -42,10 +77,20 @@
 
     <div class="ph-score">
       <app-circle-progress [size]="76" [sw]="7" [pct]="user?.trustScore || 100" color="#0DA487">
-        <span class="font-mono" style="font-size:16px;font-weight:800;color:var(--primary)">{{ user?.trustScore || 100 }}</span>
+        <span class="font-mono" style="font-size:16px;font-weight:800;color:var(--primary)">
+          {{ user?.trustScore || 100 }}
+        </span>
       </app-circle-progress>
       <div class="ph-score-label">Score<br>confiance</div>
     </div>
+  </div>
+
+  <!-- Messages globaux -->
+  <div class="alert-ok alert" *ngIf="successMessage" style="margin-bottom:12px">
+    <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMessage" style="margin-bottom:12px">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
   </div>
 
   <!-- ══ TABS ══════════════════════════════════════════════════════ -->
@@ -81,7 +126,7 @@
         <label>Téléphone</label>
         <div class="inp-icon-wrap">
           <i class="fa-solid fa-phone inp-icon"></i>
-          <input class="inp" formControlName="phone" placeholder="+226 76 00 00 00" [attr.disabled]="true">
+          <input class="inp" formControlName="phone" [attr.disabled]="true">
         </div>
       </div>
       <div class="inp-group">
@@ -93,16 +138,8 @@
       </div>
     </form>
 
-    <!-- Messages succès / erreur -->
-    <div class="alert-ok alert" *ngIf="successMessage" style="margin-bottom:12px">
-      <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
-    </div>
-    <div class="alert-red alert" *ngIf="errorMessage" style="margin-bottom:12px">
-      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
-    </div>
-
     <button class="btn-primary btn-round" type="button" (click)="save()" [disabled]="saving">
-      <i *ngIf="saving" class="fa-solid fa-spinner anim-spin"></i>
+      <i *ngIf="saving"  class="fa-solid fa-spinner anim-spin"></i>
       <i *ngIf="!saving" class="fa-solid fa-floppy-disk"></i>
       {{ saving ? 'Sauvegarde...' : 'Sauvegarder les modifications' }}
     </button>
@@ -113,7 +150,6 @@
     <div class="prof-section-title">
       <i class="fa-solid fa-shield-halved"></i> Sécurité du compte
     </div>
-
     <div class="prof-form" style="margin-bottom:24px">
       <div class="inp-group">
         <label>Mot de passe actuel</label>
@@ -137,9 +173,7 @@
         </div>
       </div>
     </div>
-
     <div class="divider" style="margin-bottom:20px"></div>
-
     <div class="sec-2fa">
       <div class="sec-2fa-info">
         <div class="sec-2fa-title">
@@ -152,13 +186,12 @@
       </div>
       <div class="toggle toggle-on" title="Activé"></div>
     </div>
-
     <button class="btn-primary btn-round" style="margin-top:20px">
       <i class="fa-solid fa-check"></i> Mettre à jour la sécurité
     </button>
   </div>
 
-  <!-- ── Préférences notifications ────────────────────────────────── -->
+  <!-- ── Notifications ────────────────────────────────────────────── -->
   <div class="card p-24 anim-fade" *ngIf="activeTab === 'notifications'">
     <div class="prof-section-title">
       <i class="fa-solid fa-bell"></i> Préférences de notifications
@@ -175,18 +208,14 @@
 
   <!-- ── Parrainage ─────────────────────────────────────────────── -->
   <div class="anim-fade" *ngIf="activeTab === 'parrainage'">
-
     <div class="card ref-hero">
-      <div class="ref-hero-icon">
-        <i class="fa-solid fa-gift"></i>
-      </div>
+      <div class="ref-hero-icon"><i class="fa-solid fa-gift"></i></div>
       <h3 class="font-display" style="font-size:20px;font-weight:800;margin-bottom:8px">
         Invitez vos amis, gagnez ensemble !
       </h3>
       <p class="text-muted" style="font-size:14px;max-width:420px;margin:0 auto 24px">
-        Pour chaque ami inscrit et ayant fait un premier achat avec votre code, vous recevez <strong>500 XOF</strong> de crédit.
+        Pour chaque ami inscrit avec votre code, vous recevez <strong>500 XOF</strong> de crédit.
       </p>
-
       <div class="ref-code-box">
         <div class="ref-code-label">Votre code de parrainage</div>
         <div class="ref-code-val font-mono">{{ user?.referralCode }}</div>
@@ -194,7 +223,6 @@
           <i class="fa-solid fa-copy"></i> Copier
         </button>
       </div>
-
       <div class="ref-actions">
         <button class="btn-primary btn-round">
           <i class="fa-solid fa-share-nodes"></i> Partager le lien
@@ -204,12 +232,11 @@
         </button>
       </div>
     </div>
-
     <div class="ref-stats-grid">
       <div class="card ref-stat-card" *ngFor="let s of [
-        {icon:'fa-solid fa-users', color:'#0DA487', bg:'#E6FAF5', v:'3',        l:'Amis parrainés'},
-        {icon:'fa-solid fa-sack-dollar', color:'#F4A902', bg:'#FFF8E6', v:'1 500 XOF', l:'Crédits gagnés'},
-        {icon:'fa-solid fa-cart-shopping', color:'#7B2FBE', bg:'#F3EAFF', v:'2', l:'Achats parrainage'}
+        {icon:'fa-solid fa-users',        color:'#0DA487', bg:'#E6FAF5', v:'3',         l:'Amis parrainés'},
+        {icon:'fa-solid fa-sack-dollar',  color:'#F4A902', bg:'#FFF8E6', v:'1 500 XOF', l:'Crédits gagnés'},
+        {icon:'fa-solid fa-cart-shopping',color:'#7B2FBE', bg:'#F3EAFF', v:'2',         l:'Achats parrainage'}
       ]">
         <div class="ref-stat-icon" [style.background]="s.bg" [style.color]="s.color">
           <i [class]="s.icon"></i>

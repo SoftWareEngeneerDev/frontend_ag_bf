@@ -1,8 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
-    "baseUrl": "./",
+    "rootDir": "./src",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -20,14 +19,7 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": ["ES2022", "dom"],
-    "paths": {
-      "@core/*": ["src/app/core/*"],
-      "@shared/*": ["src/app/shared/*"],
-      "@features/*": ["src/app/features/*"],
-      "@layout/*": ["src/app/layout/*"],
-      "@env/*": ["src/environments/*"]
-    }
+    "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
