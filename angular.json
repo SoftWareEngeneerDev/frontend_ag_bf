@@ -73,6 +73,10 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+            "options": {
+                      "buildTarget": "achatgroupe-bf:build",
+                      "port": 4300
+                    },
           "configurations": {
             "production": {
               "browserTarget": "achatgroupe-bf:build:production"
