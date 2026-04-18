@@ -1,125 +1,321 @@
-:host { display:block; position:sticky; top:0; z-index:200; }
+:host { display: block; position: sticky; top: 0; z-index: 200; }
 
-/* ─── Announce bar ───────────────────────────────────────── */
+/* ── Announce bar ────────────────────────────────────────────── */
 .announce-bar {
-  background: var(--primary); color: #fff;
-  font-size: 13px; font-weight: 500; text-align: center;
-  padding: 8px 16px;
-  @media (max-width: 480px) { font-size: 11px; padding: 6px 12px; }
+  background: linear-gradient(135deg, #0B8F75, #0DA487);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  padding: 9px 16px;
+  letter-spacing: .1px;
+
+  a { font-weight: 800; }
+
+  @media (max-width: 480px) { font-size: 11px; padding: 7px 12px; }
 }
 
-/* ─── Navbar shell ───────────────────────────────────────── */
+/* ── Navbar shell ────────────────────────────────────────────── */
 .navbar {
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-xs);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+
+  // État scrollé — fond blanc comme Apple/Back Market
+  &.scrolled {
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,0,0,.07);
+    box-shadow: 0 2px 20px rgba(0,0,0,.07);
+  }
 }
 
 .nb-inner {
   max-width: var(--max-w);
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 68px;
   display: flex;
   align-items: center;
   gap: 32px;
   @media (max-width: 768px) { padding: 0 16px; gap: 16px; }
 }
 
-/* ─── Desktop nav links ──────────────────────────────────── */
+/* ── Nav links desktop ───────────────────────────────────────── */
 .nb-links {
-  display: flex; gap: 4px; flex: 1; justify-content: center;
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  justify-content: center;
+
   a {
-    padding: 8px 14px; border-radius: var(--r);
-    font-size: 14px; font-weight: 500; color: var(--txt2);
-    text-decoration: none; transition: all var(--t);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,.9);      // blanc sur fond transparent
+    text-decoration: none;
+    transition: all .18s ease;
     white-space: nowrap;
-    &:hover  { background: var(--primary-l); color: var(--primary); }
-    &.active { background: var(--primary-l); color: var(--primary); font-weight: 700; }
+    position: relative;
+
+    &:hover  { background: rgba(255,255,255,.15); color: #fff; }
+    &.active { background: rgba(255,255,255,.2); color: #fff; font-weight: 700; }
+
+    &.active::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 16px; right: 16px;
+      height: 2px;
+      background: rgba(255,255,255,.8);
+      border-radius: 2px;
+    }
   }
+
+  // Quand scrollé : liens foncés
+  .navbar.scrolled & a {
+    color: #4B5563;
+    &:hover  { background: #F0FDF9; color: var(--primary); }
+    &.active {
+      background: var(--primary-l);
+      color: var(--primary);
+      &::after { background: var(--primary); }
+    }
+  }
+
   @media (max-width: 900px) { display: none; }
 }
 
-/* ─── Actions ────────────────────────────────────────────── */
-.nb-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+/* ── Actions ─────────────────────────────────────────────────── */
+.nb-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
 
 .nb-desktop-only {
   @media (max-width: 900px) { display: none !important; }
 }
 
+// Bouton outline custom
+.btn-outline {
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1.5px solid #E2E8F0;
+  background: transparent;
+  color: #4B5563;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all .18s ease;
+
+  &:hover {
+    border-color: var(--primary, #0DA487);
+    color: var(--primary, #0DA487);
+    background: var(--primary-l, #E6F7F4);
+  }
+}
+
+// Bouton connexion
+.nb-actions .btn-outline.btn-sm {
+  padding: 8px 18px;
+  font-size: 13px;
+  border-radius: 9px;
+}
+
+// Bouton "S'inscrire" / Mon espace
+.nb-actions .btn-primary.btn-sm {
+  padding: 9px 20px;
+  font-size: 13px;
+  border-radius: 9px;
+  font-weight: 700;
+  box-shadow: 0 3px 12px rgba(13,164,135,.25);
+
+  &:hover { box-shadow: 0 5px 20px rgba(13,164,135,.35); }
+}
+
+/* ── Notification bell ───────────────────────────────────────── */
 .nb-notif {
-  position: relative; font-size: 20px; padding: 6px;
-  cursor: pointer; text-decoration: none; border-radius: var(--r);
-  transition: background var(--t);
-  &:hover { background: var(--bg2); }
+  position: relative;
+  font-size: 20px;
+  padding: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 10px;
+  color: rgba(255,255,255,.9);   // blanc sur fond transparent
+  transition: background .18s, color .18s;
+
+  &:hover { background: rgba(255,255,255,.15); }
+
+  .navbar.scrolled & {
+    color: #4B5563;
+    &:hover { background: #f5f5f5; color: var(--primary); }
+  }
 }
 
 .nb-dot {
-  position: absolute; top: 2px; right: 2px;
-  background: var(--red); color: #fff;
-  font-size: 9px; font-weight: 700; border-radius: 99px;
-  min-width: 16px; height: 16px;
-  display: flex; align-items: center; justify-content: center; padding: 0 4px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #E63946;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  border-radius: 99px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 1.5px solid #fff;
 }
 
-/* ─── Hamburger ──────────────────────────────────────────── */
+/* ── Hamburger ───────────────────────────────────────────────── */
 .nb-hamburger {
   display: none;
-  flex-direction: column; justify-content: center; gap: 5px;
-  width: 38px; height: 38px; padding: 8px;
-  background: var(--bg2); border: none; border-radius: var(--r-sm);
-  cursor: pointer; flex-shrink: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .18s;
+
   span {
-    display: block; height: 2px; background: var(--txt);
-    border-radius: 2px; transition: all .25s ease;
+    display: block;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: all .25s ease;
     transform-origin: center;
   }
+
+  .navbar.scrolled & {
+    background: #f4f4f4;
+    border-color: transparent;
+    span { background: #2B3445; }
+  }
+
   &.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   &.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
   &.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  &:hover { background: var(--bg3); }
+
+  &:hover { background: #e8e8e8; }
   @media (max-width: 900px) { display: flex; }
 }
 
-/* ─── Mobile drawer ──────────────────────────────────────── */
+/* ── Mobile drawer ───────────────────────────────────────────── */
 .nb-drawer {
-  position: fixed; inset: 0; z-index: 199;
-  background: rgba(0,0,0,.4); backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
   transition: opacity .25s ease;
+
   &.open { opacity: 1; pointer-events: all; }
 }
 
 .nb-drawer-inner {
-  position: absolute; top: 0; right: 0;
-  width: min(320px, 88vw); height: 100%;
-  background: var(--bg-white);
-  box-shadow: -4px 0 32px rgba(0,0,0,.15);
-  padding: 80px 24px 32px;
-  display: flex; flex-direction: column; gap: 32px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(320px, 88vw);
+  height: 100%;
+  background: #fff;
+  box-shadow: -8px 0 48px rgba(0,0,0,.18);
+  padding: 88px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   transform: translateX(100%);
-  transition: transform .28s ease;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+
   .nb-drawer.open & { transform: translateX(0); }
 }
 
 .nb-drawer-links {
-  display: flex; flex-direction: column; gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
   a {
-    display: flex; align-items: center; gap: 12px;
-    padding: 13px 16px; border-radius: var(--r-lg);
-    font-size: 15px; font-weight: 500; color: var(--txt);
-    text-decoration: none; transition: all var(--t);
-    i { font-size: 16px; color: var(--muted); width: 20px; text-align: center; }
-    &:hover  { background: var(--bg2); }
-    &.active { background: var(--primary-l); color: var(--primary); font-weight: 700;
-      i { color: var(--primary); }
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2B3445;
+    text-decoration: none;
+    transition: all .18s ease;
+
+    i {
+      font-size: 16px;
+      color: #9CA3AF;
+      width: 20px;
+      text-align: center;
+      transition: color .18s;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      i { color: var(--primary, #0DA487); }
+    }
+
+    &.active {
+      background: var(--primary-l, #E6F7F4);
+      color: var(--primary, #0DA487);
+      font-weight: 700;
+      i { color: var(--primary, #0DA487); }
     }
   }
 }
 
 .nb-drawer-actions {
-  display: flex; flex-direction: column; gap: 10px;
-  a { display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 13px; border-radius: var(--r-lg); font-size: 14px; font-weight: 700;
-      text-decoration: none; }
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .18s ease;
+  }
+
+  // Bouton connexion dans drawer
+  .btn-outline {
+    border: 1.5px solid #E2E8F0;
+    color: #4B5563;
+    background: transparent;
+
+    &:hover {
+      border-color: var(--primary, #0DA487);
+      color: var(--primary, #0DA487);
+      background: var(--primary-l, #E6F7F4);
+    }
+  }
 }

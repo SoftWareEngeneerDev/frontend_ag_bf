@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 
@@ -8,7 +8,13 @@ import { NotificationService } from '../../core/services/notification.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  auth    = inject(AuthService);
-  notifs  = inject(NotificationService);
+  auth     = inject(AuthService);
+  notifs   = inject(NotificationService);
   menuOpen = false;
+  scrolled = false;
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.scrolled = window.scrollY > 40;
+  }
 }

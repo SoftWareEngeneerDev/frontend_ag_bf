@@ -1,0 +1,143 @@
+<app-navbar></app-navbar>
+
+<div class="contact-page">
+
+  <!-- Hero -->
+  <div class="ct-hero">
+    <div class="container text-center">
+      <div class="ct-hero-icon"><i class="fa-solid fa-headset"></i></div>
+      <h1 class="font-display ct-hero-title">Nous <span class="text-primary">contacter</span></h1>
+      <p class="ct-hero-sub text-muted">Notre équipe vous répond en moins de 2h · Lun–Sam 8h–18h</p>
+    </div>
+  </div>
+
+  <div class="container ct-body">
+    <div class="ct-grid">
+
+      <!-- Formulaire -->
+      <div class="glass ct-form-card" *ngIf="!sent">
+        <h2 class="font-display ct-form-title">
+          <i class="fa-solid fa-paper-plane"></i> Envoyer un message
+        </h2>
+
+        <div class="ct-field-row">
+          <div class="ct-field">
+            <label class="ct-label">Nom complet *</label>
+            <input class="inp" placeholder="Ex : Aminata Traoré" [(ngModel)]="form.name">
+          </div>
+          <div class="ct-field">
+            <label class="ct-label">Téléphone *</label>
+            <input class="inp" placeholder="Ex : 07 00 00 00 00" [(ngModel)]="form.phone" type="tel">
+          </div>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Email (optionnel)</label>
+          <input class="inp" placeholder="vous@exemple.com" [(ngModel)]="form.email" type="email">
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Sujet *</label>
+          <select class="inp ct-select" [(ngModel)]="form.subject">
+            <option value="" disabled selected>Choisir un sujet</option>
+            <option *ngFor="let s of subjects" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label">Message *</label>
+          <textarea class="inp ct-textarea" rows="5"
+                    placeholder="Décrivez votre demande en détail..."
+                    [(ngModel)]="form.message"></textarea>
+        </div>
+
+        <button class="ct-submit"
+                [disabled]="loading || !form.name || !form.phone || !form.message"
+                (click)="send()">
+          <i class="fa-solid fa-paper-plane" *ngIf="!loading"></i>
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="loading"></i>
+          {{ loading ? 'Envoi en cours...' : 'Envoyer le message' }}
+        </button>
+      </div>
+
+      <!-- Confirmation envoi -->
+      <div class="glass ct-form-card ct-sent" *ngIf="sent">
+        <div class="ct-sent-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3 class="font-display ct-sent-title">Message envoyé !</h3>
+        <p class="text-muted ct-sent-desc">
+          Merci <strong>{{ form.name }}</strong>, nous avons bien reçu votre message.<br>
+          Notre équipe vous répondra dans les prochaines <strong>2 heures</strong>.
+        </p>
+        <button class="btn-outline btn-round" (click)="sent = false; form = {name:'',phone:'',email:'',subject:'',message:''}">
+          Envoyer un autre message
+        </button>
+      </div>
+
+      <!-- Infos contact -->
+      <div class="ct-info">
+
+        <div class="ct-info-card glass">
+          <div class="ct-info-icon" style="background:#E6F7F4;color:var(--primary)">
+            <i class="fa-solid fa-phone"></i>
+          </div>
+          <div>
+            <div class="ct-info-label">Téléphone / WhatsApp</div>
+            <div class="ct-info-val">+226 70 00 00 00</div>
+            <div class="ct-info-sub">Lun–Sam · 8h–18h</div>
+          </div>
+        </div>
+
+        <div class="ct-info-card glass">
+          <div class="ct-info-icon" style="background:#FFF3E0;color:var(--orange)">
+            <i class="fa-solid fa-envelope"></i>
+          </div>
+          <div>
+            <div class="ct-info-label">Email</div>
+            <div class="ct-info-val">support&#64;achatgroupebf.com</div>
+            <div class="ct-info-sub">Réponse sous 2h en semaine</div>
+          </div>
+        </div>
+
+        <div class="ct-info-card glass">
+          <div class="ct-info-icon" style="background:#F3EAFF;color:var(--purple)">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <div>
+            <div class="ct-info-label">Adresse</div>
+            <div class="ct-info-val">Ouagadougou, Burkina Faso 🇧🇫</div>
+            <div class="ct-info-sub">Secteur 15, non loin du marché central</div>
+          </div>
+        </div>
+
+        <div class="ct-info-card glass">
+          <div class="ct-info-icon" style="background:#FFF8E6;color:var(--gold)">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div>
+            <div class="ct-info-label">WhatsApp</div>
+            <div class="ct-info-val">+226 70 00 00 00</div>
+            <div class="ct-info-sub">Réponse rapide garantie</div>
+          </div>
+        </div>
+
+        <!-- Horaires -->
+        <div class="ct-hours glass">
+          <div class="ct-hours-title font-display">
+            <i class="fa-solid fa-clock"></i> Horaires d'ouverture
+          </div>
+          <div class="ct-hours-row" *ngFor="let h of [
+            {day:'Lundi – Vendredi', time:'8h00 – 18h00', open:true},
+            {day:'Samedi',           time:'9h00 – 14h00', open:true},
+            {day:'Dimanche',         time:'Fermé',         open:false}
+          ]">
+            <span>{{ h.day }}</span>
+            <span [style.color]="h.open ? 'var(--ok)' : 'var(--muted)'">{{ h.time }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

@@ -1,29 +1,141 @@
-.footer {}
+.footer { background: #0F1923; }
 
-.ft-top { padding: 28px 0; }
-.ft-top-inner { display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
-.ft-promo { display:flex; align-items:center; gap:16px; }
-.ft-promo-icon { font-size:36px; }
-.ft-promo-title { font-size:18px; font-weight:800; color:#fff; margin-bottom:3px; }
-.ft-promo-sub   { font-size:13px; color:rgba(255,255,255,.8); }
+/* ── Top band CTA ──────────────────────────────────────────── */
+.ft-top {
+  padding: 32px 0;
+  background: linear-gradient(135deg, #0DA487, #07836C);
+  position: relative;
+  overflow: hidden;
 
-.ft-main { padding: 48px 0; }
+  &::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    pointer-events: none;
+  }
+}
+
+.ft-top-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.ft-promo { display: flex; align-items: center; gap: 16px; }
+
+.ft-promo-icon {
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,.15);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff;
+  flex-shrink: 0;
+}
+
+.ft-promo-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 3px; }
+.ft-promo-sub   { font-size: 13px; color: rgba(255,255,255,.82); font-weight: 500; }
+
+/* ── Main footer ───────────────────────────────────────────── */
+.ft-main { padding: 52px 0 40px; }
+
 .ft-grid {
   display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr 1fr;
-  gap: 40px;
-  @media (max-width:900px) { grid-template-columns:1fr 1fr; }
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 480px) { grid-template-columns: 1fr; gap: 28px; }
 }
 
 .ft-brand {}
-.ft-desc  { font-size:13.5px; line-height:1.7; margin:14px 0 16px; max-width:280px; }
-.ft-payments { display:flex; flex-wrap:wrap; gap:6px; }
-.ft-pay { font-size:11px; background:var(--bg2); padding:4px 10px; border-radius:var(--r-full); color:var(--txt2); }
 
-.ft-col {}
-.ft-col-title { font-size:14px; font-weight:800; color:var(--txt); margin-bottom:14px; }
-.ft-link { display:block; font-size:13px; color:var(--muted); margin-bottom:9px; transition:color var(--t); &:hover { color:var(--primary); } }
+.ft-desc {
+  font-size: 13.5px;
+  line-height: 1.75;
+  margin: 16px 0 18px;
+  max-width: 290px;
+  color: #8899AA;
+}
 
-.ft-bottom { border-top:1px solid var(--border); padding:16px 0; background:var(--bg-white); }
-.ft-bottom-inner { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-.ft-legal { display:flex; gap:20px; a { font-size:13px; color:var(--muted); transition:color var(--t); &:hover{color:var(--primary);} } }
+.ft-payments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.ft-pay {
+  font-size: 11px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  padding: 5px 12px;
+  border-radius: 99px;
+  color: #8899AA;
+  font-weight: 600;
+  transition: all .18s;
+
+  &:hover {
+    background: rgba(13,164,135,.2);
+    border-color: rgba(13,164,135,.4);
+    color: #6EE7B7;
+  }
+}
+
+/* ── Link columns ──────────────────────────────────────────── */
+.ft-col-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+.ft-link {
+  display: block;
+  font-size: 13.5px;
+  color: #7888A0;
+  margin-bottom: 11px;
+  transition: color .18s, padding-left .18s;
+  font-weight: 500;
+
+  &:hover {
+    color: #6EE7B7;
+    padding-left: 4px;
+  }
+}
+
+/* ── Bottom bar ────────────────────────────────────────────── */
+.ft-bottom {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding: 18px 0;
+}
+
+.ft-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  span { font-size: 13px; color: #5a6a7a; }
+}
+
+.ft-legal {
+  display: flex;
+  gap: 22px;
+
+  a {
+    font-size: 13px;
+    color: #5a6a7a;
+    transition: color .18s;
+    font-weight: 500;
+    &:hover { color: #6EE7B7; }
+  }
+}

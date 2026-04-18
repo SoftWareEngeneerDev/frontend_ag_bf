@@ -1,0 +1,199 @@
+.ret-page { background: var(--bg); min-height: 100vh; }
+
+// ── HERO ──────────────────────────────────────────────────────────
+.ret-hero {
+  background: linear-gradient(140deg, #4C1D95 0%, #7B2FBE 50%, #FF8C00 100%);
+  padding: 80px 0 64px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) { padding: 52px 0 40px; }
+}
+
+.ret-hero-icon {
+  width: 72px; height: 72px;
+  background: rgba(255,255,255,.15);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: #fff;
+  margin: 0 auto 20px;
+
+  @media (max-width: 480px) { width: 56px; height: 56px; font-size: 24px; }
+}
+
+.ret-hero-title {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900; color: #fff; margin-bottom: 12px;
+  letter-spacing: -.5px;
+}
+
+.ret-hero-sub { font-size: 15px; color: rgba(255,255,255,.78); font-weight: 500; }
+
+// ── BODY ──────────────────────────────────────────────────────────
+.ret-body { padding: 52px 24px 72px; max-width: 880px; margin: 0 auto; }
+
+// ── BANDEAU CONFIANCE ─────────────────────────────────────────────
+.ret-trust-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.ret-trust-item {
+  flex: 1; min-width: 180px;
+  display: flex; align-items: center; gap: 12px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  border: 1.5px solid #f0f0f0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  transition: all .2s;
+
+  &:hover {
+    border-color: #d4f0e8;
+    box-shadow: 0 6px 20px rgba(13,164,135,.08);
+    transform: translateY(-2px);
+  }
+
+  i { font-size: 20px; color: var(--primary); }
+
+  @media (max-width: 480px) { min-width: 100%; }
+}
+
+// ── SECTIONS ──────────────────────────────────────────────────────
+.ret-section {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  border: 1.5px solid #f0f0f0;
+  box-shadow: 0 2px 14px rgba(0,0,0,.05);
+
+  @media (max-width: 480px) { padding: 20px 16px; border-radius: 16px; }
+}
+
+.ret-section-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+
+.ret-section-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+
+.ret-section-title { font-size: 18px; font-weight: 900; color: #1a1a2e; }
+.ret-intro { font-size: 13.5px; color: #6B7280; margin-bottom: 18px; line-height: 1.7; }
+
+// ── LISTES ────────────────────────────────────────────────────────
+.ret-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #4B5563;
+    line-height: 1.55;
+    font-weight: 500;
+    padding: 12px 14px;
+    background: #F8FAFB;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+
+    i {
+      font-size: 14px;
+      color: var(--ok);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+  }
+
+  &.ret-list-err li i { color: var(--err); }
+}
+
+// ── TABLEAU ───────────────────────────────────────────────────────
+.ret-table-wrap { overflow-x: auto; border-radius: 12px; }
+
+.ret-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+
+  th {
+    background: #F8FAFB;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 800; color: #374151;
+    white-space: nowrap;
+    border-bottom: 2px solid #F0F0F0;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #F5F5F5;
+    color: #4B5563;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+  td.badge-ok { font-size: 12px; font-weight: 700; }
+}
+
+// ── ÉTAPES ────────────────────────────────────────────────────────
+.ret-steps { display: flex; flex-direction: column; gap: 0; }
+
+.ret-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #F5F5F5;
+  &:last-child { border-bottom: none; }
+}
+
+.ret-step-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--primary-l);
+  color: var(--primary);
+  font-size: 14px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid rgba(13,164,135,.2);
+}
+
+.ret-step-icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #9CA3AF; font-size: 16px;
+}
+
+.ret-step-title { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 3px; }
+.ret-step-desc  { font-size: 12px; color: #6B7280; line-height: 1.6; }
+
+// ── CTA ───────────────────────────────────────────────────────────
+.ret-cta {
+  padding: 40px 36px;
+  border-radius: 22px;
+  text-align: center;
+  @media (max-width: 480px) { padding: 28px 20px; }
+}
+
+.ret-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }

@@ -1,31 +1,35 @@
 :host { display: block; }
 
-// ── Carte principale ────────────────────────────────────────────────
+// ── Carte principale ─────────────────────────────────────────────────
 .gc-card {
-  background: var(--bg-white, #fff);
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+  box-shadow: 0 2px 16px rgba(0,0,0,.08);
   cursor: pointer;
   transition: box-shadow .28s ease, transform .28s ease;
   display: flex;
   flex-direction: column;
+  border: 1px solid #f0f0f0;
 
   &:hover {
-    box-shadow: 0 10px 32px rgba(0, 0, 0, .14);
-    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.14);
+    transform: translateY(-4px);
 
-    .gc-img      { transform: scale(1.06); }
+    .gc-img      { transform: scale(1.04); }
     .gc-actions  { opacity: 1; pointer-events: all; }
   }
 }
 
-// ── Zone image ──────────────────────────────────────────────────────
+// ── Zone image ───────────────────────────────────────────────────────
 .gc-img-wrap {
   position: relative;
-  height: 230px;
+  height: 220px;
   overflow: hidden;
-  background: #f3f4f6;
+  background: linear-gradient(145deg, #f5f6fa 0%, #eef0f5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gc-img {
@@ -35,7 +39,7 @@
   transition: transform .45s ease;
 }
 
-// Badges (coin haut-gauche)
+// Badge statut (coin haut-gauche)
 .gc-badge {
   position: absolute;
   top: 12px;
@@ -49,26 +53,35 @@
   display: flex;
   align-items: center;
   gap: 5px;
-
+  backdrop-filter: blur(4px);
   i { font-size: 10px; }
 }
-.gc-badge-hot  { background: var(--gold, #F4A902); color: #fff; }
-.gc-badge-open { background: var(--primary, #0DA487); color: #fff; }
+.gc-badge-hot  {
+  background: rgba(244, 169, 2, .95);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(244,169,2,.4);
+}
+.gc-badge-open {
+  background: rgba(13, 164, 135, .92);
+  color: #fff;
+}
 
-// Remise (coin haut-droit)
+// Remise (coin haut-droit) — style référence africaine
 .gc-discount {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: var(--orange, #FF8C00);
+  background: #E63946;
   color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  border-radius: 6px;
-  padding: 5px 11px;
+  font-size: 14px;
+  font-weight: 900;
+  border-radius: 8px;
+  padding: 6px 12px;
+  box-shadow: 0 3px 10px rgba(230,57,70,.35);
+  letter-spacing: .3px;
 }
 
-// Boutons d'action au survol (colonne côté droit, centrée verticalement)
+// Boutons survol (colonne droite)
 .gc-actions {
   position: absolute;
   right: 12px;
@@ -92,7 +105,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+  box-shadow: 0 2px 10px rgba(0,0,0,.15);
   color: var(--txt, #111);
   font-size: 14px;
   transition: background .18s, color .18s, transform .18s;
@@ -104,66 +117,116 @@
   }
 }
 
-.gc-act-fav:hover {
-  background: #E63946;
-}
+.gc-act-fav:hover { background: #E63946; }
 
-// ── Corps ───────────────────────────────────────────────────────────
+// ── Corps ────────────────────────────────────────────────────────────
 .gc-body {
-  padding: 16px 18px 18px;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  gap: 0;
 }
 
+// Catégorie
 .gc-cat {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  color: var(--muted, #888);
+  color: var(--primary, #0DA487);
   text-transform: uppercase;
-  letter-spacing: .7px;
+  letter-spacing: .8px;
   margin-bottom: 6px;
   display: block;
 }
 
+// Nom du produit
 .gc-name {
   font-size: 14px;
-  font-weight: 700;
-  color: var(--txt, #111);
-  line-height: 1.4;
-  margin: 0 0 10px;
-  min-height: 40px;
+  font-weight: 800;
+  color: #1a1a2e;
+  line-height: 1.35;
+  margin: 0 0 8px;
+  min-height: 38px;
+  text-transform: uppercase;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  letter-spacing: .2px;
 }
 
-// ── Étoiles ─────────────────────────────────────────────────────────
+// ── Étoiles ──────────────────────────────────────────────────────────
 .gc-rating {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .gc-stars {
   display: flex;
   gap: 2px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .gc-star-on  { color: #F4A902; }
 .gc-star-off { color: #dde0e4; }
 
 .gc-review-count {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted, #888);
 }
 
-// ── Progression ─────────────────────────────────────────────────────
+// ── Status + temps restant (style référence) ──────────────────────────
+.gc-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.gc-status-dot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0DA487;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #0DA487;
+    display: inline-block;
+    box-shadow: 0 0 0 2px rgba(13,164,135,.25);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  &.hot {
+    color: #F4A902;
+    &::before {
+      background: #F4A902;
+      box-shadow: 0 0 0 2px rgba(244,169,2,.25);
+    }
+  }
+}
+
+.gc-countdown-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted, #888);
+  font-weight: 500;
+}
+
+.gc-cd-icon { font-size: 12px; color: var(--orange, #FF8C00); }
+
+// ── Progression participants ──────────────────────────────────────────
 .gc-progress {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .gc-prog-header {
@@ -173,6 +236,7 @@
   font-size: 12px;
   color: var(--muted, #888);
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .gc-prog-icon { font-size: 11px; margin-right: 4px; color: var(--primary, #0DA487); }
@@ -180,81 +244,106 @@
 .gc-pct {
   font-weight: 700;
   color: var(--primary, #0DA487);
-  &.gc-pct-full { color: var(--gold, #F4A902); }
+  &.gc-pct-full { color: #F4A902; }
 }
 
 .gc-prog-track {
-  height: 7px;
+  height: 6px;
   background: #eef0f3;
-  border-radius: 4px;
+  border-radius: 99px;
   overflow: hidden;
 }
 
 .gc-prog-fill {
   height: 100%;
-  background: var(--primary, #0DA487);
-  border-radius: 4px;
-  transition: width .4s ease;
+  background: linear-gradient(90deg, #0DA487, #05C99E);
+  border-radius: 99px;
+  transition: width .45s cubic-bezier(.4,0,.2,1);
 
-  &.full { background: var(--gold, #F4A902); }
+  &.full { background: linear-gradient(90deg, #F4A902, #FF8C00); }
 }
 
-// ── Prix + countdown ────────────────────────────────────────────────
+// ── Prix ─────────────────────────────────────────────────────────────
 .gc-price-row {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 14px;
   flex-wrap: wrap;
-  gap: 8px;
 }
 
-.gc-prices { display: flex; flex-direction: column; gap: 2px; }
+.gc-prices { display: flex; align-items: baseline; gap: 8px; }
 
 .gc-old-price {
   font-size: 12px;
-  color: var(--light, #b0b5be);
+  color: #b0b5be;
   text-decoration: line-through;
+  font-weight: 500;
 }
 
 .gc-price {
   font-size: 20px;
-  font-weight: 800;
-  color: var(--primary, #0DA487);
+  font-weight: 900;
+  color: #E63946;
   font-family: var(--font-mono, 'Roboto', monospace);
+  letter-spacing: -.3px;
 }
 
-.gc-countdown-wrap {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: var(--muted, #888);
-}
-
-.gc-cd-icon { font-size: 13px; color: var(--orange, #FF8C00); }
-
-// ── CTA ─────────────────────────────────────────────────────────────
+// ── CTA — style pleine largeur avec flèche ────────────────────────────
 .gc-cta {
   width: 100%;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  border-radius: var(--r, 8px);
-  padding: 12px;
+  border-radius: 10px;
+  padding: 13px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
+  background: linear-gradient(135deg, #FF6B35, #FF8C00);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all .2s ease;
+  letter-spacing: .2px;
+  box-shadow: 0 4px 16px rgba(255,140,0,.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #E55A24, #E67E00);
+    box-shadow: 0 6px 20px rgba(255,140,0,.45);
+    transform: translateY(-1px);
+  }
+
+  &:active { transform: translateY(0); }
 
   i { font-size: 13px; }
+
+  // Override pour les variantes btn-gold et btn-outline-primary
+  &.btn-gold {
+    background: linear-gradient(135deg, #F4A902, #E09600);
+    box-shadow: 0 4px 16px rgba(244,169,2,.35);
+    &:hover { background: linear-gradient(135deg, #E09600, #C88500); }
+  }
+
+  &.btn-outline-primary {
+    background: transparent;
+    border: 2px solid var(--primary, #0DA487);
+    color: var(--primary, #0DA487);
+    box-shadow: none;
+    &:hover {
+      background: var(--primary-l, #E6F7F4);
+      box-shadow: none;
+      transform: none;
+    }
+  }
 }
 
-// ── Alerte seuil atteint ─────────────────────────────────────────────
+// ── Alerte seuil atteint ──────────────────────────────────────────────
 .gc-hot-alert {
   margin-top: 10px;
   background: #FFF8E1;
   border: 1px solid #F4A902;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -263,20 +352,26 @@
   align-items: center;
   gap: 7px;
 
-  i { color: var(--gold, #F4A902); }
+  i { color: #F4A902; }
 }
 
-// ── Responsive ──────────────────────────────────────────────────────
+// ── Animation ─────────────────────────────────────────────────────────
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(13,164,135,.25); }
+  50%       { box-shadow: 0 0 0 5px rgba(13,164,135,.1); }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────
 @media (max-width: 480px) {
-  .gc-img-wrap { height: 180px; }
-  .gc-price    { font-size: 17px; }
-  .gc-cta      { font-size: 12px; padding: 10px; }
+  .gc-img-wrap { height: 185px; }
+  .gc-price    { font-size: 18px; }
+  .gc-cta      { font-size: 13px; padding: 12px; }
   .gc-body     { padding: 12px 14px 14px; }
-  .gc-name     { font-size: 13px; min-height: 36px; }
-  .gc-actions  { display: none; }   // hover actions inutiles sur touch
+  .gc-name     { font-size: 13px; min-height: 35px; }
+  .gc-actions  { display: none; }
 }
 
 @media (max-width: 360px) {
   .gc-img-wrap { height: 160px; }
-  .gc-price    { font-size: 15px; }
+  .gc-price    { font-size: 16px; }
 }
