@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MockDataService } from '../../../../core/services/mock-data.service';
+import { HttpClient } from '@angular/common/http';
+import { GroupService } from '../../../../core/services/group.service';
 import { Group } from '../../../../core/models';
+
+const API = 'http://localhost:3000/api/v1';
 
 @Component({
   selector: 'app-admin-group-detail',
@@ -9,22 +12,45 @@ import { Group } from '../../../../core/models';
   styleUrls: ['./admin-group-detail.component.scss']
 })
 export class AdminGroupDetailComponent implements OnInit {
-  group: Group | null = null;
+  group:   Group | null = null;
+  loading = true;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    public mock: MockDataService
+    private route:        ActivatedRoute,
+    private router:       Router,
+    private http:         HttpClient,
+    private groupService: GroupService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.group = this.mock.groups.find(g => g.id === id) ?? null;
+    if (!id) { this.router.navigate(['/admin/groups']); return; }
+
+    // ── GET /groups/:id ────────────────────────────────────────
+    this.groupService.getById(id).subscribe({
+      next: (g) => {
+        this.group   = g;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.group   = null;
+      }
+    });
   }
 
-  goBack(): void {
-    this.router.navigate(['/admin/groups']);
+  // ── PATCH /admin/groups/:id/close ────────────────────────────
+  closeGroup(): void {
+    if (!this.group) return;
+    this.http.patch(`${API}/admin/groups/${this.group.id}/close`, {
+      reason: 'Fermé manuellement par admin'
+    }).subscribe({
+      next: () => { if (this.group) this.group.status = 'CANCELLED' as any; },
+      error: () => {}
+    });
   }
+
+  goBack(): void { this.router.navigate(['/admin/groups']); }
 
   get statusClass(): string {
     if (!this.group) return '';
@@ -62,7 +88,7 @@ export class AdminGroupDetailComponent implements OnInit {
 
   get isExpiringSoon(): boolean {
     if (!this.group) return false;
-    return (this.group.expiresAt.getTime() - Date.now()) < 24 * 3600000;
+    return (new Date(this.group.expiresAt).getTime() - Date.now()) < 24 * 3600000;
   }
 
   formatXOF(val: number): string {
@@ -70,13 +96,15 @@ export class AdminGroupDetailComponent implements OnInit {
   }
 
   formatDate(date: Date): string {
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
   }
 
   formatExpiry(date: Date): string {
-    const diff = date.getTime() - Date.now();
-    const h = Math.floor(diff / 3600000);
-    const d = Math.floor(h / 24);
+    const diff = new Date(date).getTime() - Date.now();
+    const h    = Math.floor(diff / 3600000);
+    const d    = Math.floor(h / 24);
     if (d > 0) return `${d}j ${h % 24}h`;
     if (h > 0) return `${h}h`;
     return 'Expiré';

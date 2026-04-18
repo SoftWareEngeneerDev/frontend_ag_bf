@@ -4,7 +4,7 @@
     <div class="al-logo"><app-logo [size]="20"></app-logo></div>
     <div class="al-body">
       <div class="al-icon"><i class="fa-solid fa-gift"></i></div>
-      <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté</span> AchatGroupéBF</h2>
+      <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté</span> Djula Market</h2>
       <div class="al-features">
         <div class="al-feature" *ngFor="let f of ['Inscription gratuite et rapide','Première économie dès votre 1er groupe','Support client disponible 7j/7','Paiement sécurisé via mobile money']">
           <span class="af-icon"><i class="fa-solid fa-circle-check"></i></span>
@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <p class="al-footer">© 2024 AchatGroupéBF</p>
+    <p class="al-footer">© 2026 Djula Market</p>
   </div>
 
   <div class="auth-right">
@@ -30,14 +30,63 @@
         </div>
       </div>
 
-      <!-- Step 1 -->
+      <!-- ══ Step 1 : Choisir son profil ══════════════════════════ -->
       <ng-container *ngIf="step === 1">
         <div class="auth-header">
-          <h2 class="auth-title">Créez votre compte</h2>
+          <h2 class="auth-title">Vous êtes ?</h2>
+          <p class="auth-sub">Choisissez votre profil pour commencer</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+
+          <!-- Membre -->
+          <div class="profile-choice" (click)="selectProfile('MEMBER')"
+               style="cursor:pointer;padding:28px 20px;border-radius:var(--r-lg);border:2px solid var(--border);
+                      text-align:center;transition:all 0.2s;background:var(--bg2)">
+            <div style="font-size:40px;margin-bottom:12px">🛒</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:6px">Acheteur</div>
+            <div class="text-muted" style="font-size:12px;line-height:1.5">
+              Je veux rejoindre des groupes et économiser sur mes achats
+            </div>
+            <div class="btn-primary btn-round" style="margin-top:16px;padding:8px 16px;font-size:13px;display:inline-flex">
+              Choisir →
+            </div>
+          </div>
+
+          <!-- Fournisseur -->
+          <div class="profile-choice" (click)="selectProfile('SUPPLIER')"
+               style="cursor:pointer;padding:28px 20px;border-radius:var(--r-lg);border:2px solid var(--border);
+                      text-align:center;transition:all 0.2s;background:var(--bg2)">
+            <div style="font-size:40px;margin-bottom:12px">🏪</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:6px">Fournisseur</div>
+            <div class="text-muted" style="font-size:12px;line-height:1.5">
+              Je veux vendre mes produits en volume à des groupes d'acheteurs
+            </div>
+            <div style="margin-top:16px;padding:8px 16px;font-size:13px;display:inline-flex;
+                        background:linear-gradient(135deg,#00D4FF,#7B2FBE);color:#fff;
+                        border-radius:99px;font-weight:600">
+              Choisir →
+            </div>
+          </div>
+
+        </div>
+
+        <div class="auth-switch">
+          Déjà inscrit ? <a routerLink="/auth/login">Se connecter</a>
+        </div>
+      </ng-container>
+
+      <!-- ══ Step 2 : Infos personnelles ══════════════════════════ -->
+      <ng-container *ngIf="step === 2">
+        <div class="auth-header">
+          <h2 class="auth-title">
+            <span *ngIf="profileType === 'MEMBER'">Créez votre compte</span>
+            <span *ngIf="profileType === 'SUPPLIER'">Informations personnelles</span>
+          </h2>
           <p class="auth-sub">Gratuit · Rapide · Sans engagement</p>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="nextStep()" class="auth-form">
+        <form [formGroup]="form" (ngSubmit)="submitAccount()" class="auth-form">
           <div class="inp-group">
             <label>Nom complet</label>
             <input class="inp" formControlName="fullName" placeholder="Ex: Kofi Traoré">
@@ -52,7 +101,12 @@
           </div>
 
           <div class="inp-group">
-            <label>Email <span class="text-muted" style="font-weight:400">(optionnel)</span></label>
+            <label>
+              Email
+              <span class="text-muted" style="font-weight:400">
+                {{ profileType === 'SUPPLIER' ? '(professionnel recommandé)' : '(optionnel)' }}
+              </span>
+            </label>
             <input class="inp" formControlName="email" placeholder="votre@email.com" type="email">
           </div>
 
@@ -70,12 +124,11 @@
               <div class="pw-seg" *ngFor="let s of [1,2,3,4]"
                    [style.background]="s <= pwStrength ? pwColor : 'var(--bg3)'"></div>
             </div>
-            <div class="pw-label" [style.color]="pwColor" *ngIf="pwStrength > 0">
-              {{ pwLabel }}
-            </div>
+            <div class="pw-label" [style.color]="pwColor" *ngIf="pwStrength > 0">{{ pwLabel }}</div>
           </div>
 
-          <div class="inp-group">
+          <!-- Code parrainage (membres seulement) -->
+          <div class="inp-group" *ngIf="profileType === 'MEMBER'">
             <label>Code de parrainage <span class="text-muted" style="font-weight:400">(optionnel)</span></label>
             <div class="inp-icon-wrap">
               <i class="fa-solid fa-gift inp-icon"></i>
@@ -84,12 +137,18 @@
           </div>
 
           <label class="terms-label">
-            <input type="checkbox" formControlName="acceptTerms" style="accent-color:var(--primary);width:16px;height:16px">
+            <input type="checkbox" formControlName="acceptTerms"
+                   style="accent-color:var(--primary);width:16px;height:16px">
             <span class="text-muted" style="font-size:13px;line-height:1.5">
               J'accepte les <a href="#" class="text-primary">CGU</a> et la
               <a href="#" class="text-primary">Politique de confidentialité</a>
             </span>
           </label>
+
+          <!-- Erreur -->
+          <div class="alert-red alert" *ngIf="errorMessage">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+          </div>
 
           <button class="btn-primary btn-blk btn-lg btn-round" type="submit"
                   [disabled]="loading || form.get('fullName')?.invalid || form.get('phone')?.invalid || !form.get('acceptTerms')?.value">
@@ -97,25 +156,93 @@
             <span>{{ loading ? 'Chargement...' : 'Continuer →' }}</span>
           </button>
 
-          <div class="auth-switch">
-            Déjà membre ? <a routerLink="/auth/login">Se connecter</a>
-          </div>
+          <button type="button" class="btn-ghost btn-blk" style="margin-top:10px" (click)="step = 1">
+            <i class="fa-solid fa-arrow-left"></i> Retour
+          </button>
         </form>
       </ng-container>
 
-      <!-- Step 2: OTP -->
-      <ng-container *ngIf="step === 2">
-        <app-otp [phone]="form.value.phone" (verified)="onOtpComplete($event)" (back)="step = 1"></app-otp>
+      <!-- ══ Step 3 Fournisseur : Infos entreprise ══════════════ -->
+      <ng-container *ngIf="step === 3 && profileType === 'SUPPLIER'">
+        <div class="auth-header">
+          <h2 class="auth-title">Votre entreprise</h2>
+          <p class="auth-sub">Ces informations seront vérifiées par notre équipe</p>
+        </div>
+
+        <form [formGroup]="companyForm" (ngSubmit)="submitCompany()" class="auth-form">
+          <div class="inp-group">
+            <label>Nom de l'entreprise <span style="color:var(--err)">*</span></label>
+            <div class="inp-icon-wrap">
+              <i class="fa-solid fa-store inp-icon"></i>
+              <input class="inp" formControlName="companyName" placeholder="Ex: Tech Ouaga SARL">
+            </div>
+          </div>
+
+          <div class="inp-group">
+            <label>IFU (Identifiant Fiscal Unique)</label>
+            <input class="inp" formControlName="taxId" placeholder="Ex: 00012345A">
+          </div>
+
+          <div class="inp-group">
+            <label>RCCM (Registre du Commerce)</label>
+            <input class="inp" formControlName="siret" placeholder="Ex: RCCM/BF/OUA/2023">
+          </div>
+
+          <div class="inp-group">
+            <label>Ville <span style="color:var(--err)">*</span></label>
+            <select class="inp" formControlName="city">
+              <option>Ouagadougou</option>
+              <option>Bobo-Dioulasso</option>
+              <option>Koudougou</option>
+              <option>Ouahigouya</option>
+              <option>Banfora</option>
+              <option>Autre</option>
+            </select>
+          </div>
+
+          <div class="inp-group">
+            <label>Adresse</label>
+            <input class="inp" formControlName="address" placeholder="Ex: Secteur 15, Rue 10.35">
+          </div>
+
+          <div class="alert-cyan alert" style="font-size:12px">
+            <i class="fa-solid fa-circle-info"></i>
+            Votre dossier sera examiné dans les 24-48h. Vous recevrez un SMS de confirmation.
+          </div>
+
+          <button class="btn-primary btn-blk btn-lg btn-round" type="submit"
+                  [disabled]="companyForm.invalid">
+            Continuer →
+          </button>
+
+          <button type="button" class="btn-ghost btn-blk" style="margin-top:10px" (click)="step = 2">
+            <i class="fa-solid fa-arrow-left"></i> Retour
+          </button>
+        </form>
       </ng-container>
 
-      <!-- Step 3: Welcome -->
-      <ng-container *ngIf="step === 3">
-        <div class="welcome-wrap text-center">
+      <!-- ══ Step 3 Membre / Step 4 Fournisseur : OTP ══════════ -->
+      <ng-container *ngIf="(step === 3 && profileType === 'MEMBER') || (step === 4 && profileType === 'SUPPLIER')">
+        <app-otp [phone]="otpPhone || form.value.phone"
+                 (verified)="onOtpComplete($event)"
+                 (back)="step = profileType === 'SUPPLIER' ? 3 : 2">
+        </app-otp>
+
+        <div class="alert-red alert" *ngIf="errorMessage" style="margin-top:12px">
+          <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+        </div>
+      </ng-container>
+
+      <!-- ══ Step 4 Membre / Step 5 Fournisseur : Bienvenue ════ -->
+      <ng-container *ngIf="(step === 4 && profileType === 'MEMBER') || (step === 5 && profileType === 'SUPPLIER')">
+
+        <!-- Bienvenue Membre -->
+        <div class="welcome-wrap text-center" *ngIf="profileType === 'MEMBER'">
           <div class="wc-success"><i class="fa-solid fa-check"></i></div>
           <h2 class="font-display" style="font-size:28px;font-weight:800;margin-bottom:8px">
             Bienvenue <span class="text-primary">{{ user?.fullName?.split(' ')?.[0] }} !</span>
           </h2>
-          <p class="text-muted" style="margin-bottom:28px">Compte activé avec succès <i class="fa-solid fa-check"></i></p>
+          <p class="text-muted" style="margin-bottom:28px">Compte activé avec succès ✓</p>
 
           <div class="wc-card card-flat p-20">
             <div class="flex gap-14" style="align-items:center;text-align:left;margin-bottom:16px">
@@ -143,6 +270,36 @@
             <i class="fa-solid fa-rocket"></i> Explorer les groupes
           </button>
         </div>
+
+        <!-- Bienvenue Fournisseur -->
+        <div class="welcome-wrap text-center" *ngIf="profileType === 'SUPPLIER'">
+          <div class="wc-success" style="background:linear-gradient(135deg,#00D4FF,#7B2FBE)">
+            <i class="fa-solid fa-store"></i>
+          </div>
+          <h2 class="font-display" style="font-size:26px;font-weight:800;margin-bottom:8px">
+            Dossier soumis <span class="text-primary">!</span>
+          </h2>
+          <p class="text-muted" style="margin-bottom:24px;font-size:14px;line-height:1.6">
+            Notre équipe examinera votre dossier dans les <strong>24-48h</strong>.<br>
+            Vous recevrez un <strong>SMS</strong> dès validation.
+          </p>
+
+          <div class="wc-card card-flat p-20" style="text-align:left;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+              <span class="text-muted">Entreprise</span>
+              <strong>{{ companyForm.value.companyName }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px">
+              <span class="text-muted">Statut</span>
+              <span class="badge-warn">⏳ En attente de validation</span>
+            </div>
+          </div>
+
+          <button class="btn-primary btn-blk btn-xl btn-round" (click)="goToDashboard()">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter
+          </button>
+        </div>
+
       </ng-container>
 
     </div>

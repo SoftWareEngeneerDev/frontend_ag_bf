@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
-import { MockDataService } from '../../../core/services/mock-data.service';
 import { Product, Category } from '../../../core/models';
 
 @Component({
@@ -10,53 +9,111 @@ import { Product, Category } from '../../../core/models';
   styleUrls: ['./catalog.component.scss']
 })
 export class CatalogComponent implements OnInit {
-  products: Product[] = [];
-  filtered: Product[] = [];
+  products:   Product[]  = [];
+  filtered:   Product[]  = [];
   categories: Category[] = [];
   loading = true;
-
-  search   = '';
-  selCat   = '';
-  sortBy   = 'popular';
+  search  = '';
+  selCat  = '';
+  sortBy  = 'popular';
 
   sorts = [
-    { val:'popular',  label:'Popularité' },
-    { val:'price-asc',label:'Prix croissant' },
-    { val:'price-desc',label:'Prix décroissant' },
-    { val:'newest',   label:'Nouveauté' },
+    { val: 'popular',    label: 'Popularité' },
+    { val: 'price_asc',  label: 'Prix croissant' },
+    { val: 'price_desc', label: 'Prix décroissant' },
+    { val: 'newest',     label: 'Nouveauté' },
   ];
 
   constructor(
     private productService: ProductService,
-    private mock: MockDataService,
     private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.categories = this.mock.categories;
-    this.productService.getAll().subscribe(p => {
-      this.products = p;
-      this.apply();
-      this.loading = false;
+    // ── Charger les catégories depuis le backend ───────────────
+    this.productService.getCategories().subscribe({
+      next: (cats) => { this.categories = cats; },
+      error: () => {}
+    });
+
+    // ── Charger les produits depuis le backend ─────────────────
+    this.loadProducts();
+  }
+
+  // ── Charger les produits avec les filtres actuels ─────────────
+  loadProducts(): void {
+    this.loading = true;
+
+    // Mapping sort front → backend
+    const sortMap: Record<string, string> = {
+      'popular':    'popular',
+      'price_asc':  'price_asc',
+      'price_desc': 'price_desc',
+      'newest':     'price_asc', // pas de sort newest côté backend, on trie côté front
+    };
+
+    this.productService.getAll({
+      categoryId: this.selCat   || undefined,
+      search:     this.search   || undefined,
+      sort:       sortMap[this.sortBy],
+    }).subscribe({
+      next: (products) => {
+        this.products = products;
+        this.apply();
+        this.loading  = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
     });
   }
 
+  // ── Filtrage et tri côté front (après chargement) ─────────────
   apply(): void {
     let data = [...this.products];
-    if (this.selCat)  data = data.filter(p => p.category.id === this.selCat);
-    if (this.search)  data = data.filter(p => p.name.toLowerCase().includes(this.search.toLowerCase()));
-    if (this.sortBy === 'price-asc')  data.sort((a,b) => a.soloPrice - b.soloPrice);
-    if (this.sortBy === 'price-desc') data.sort((a,b) => b.soloPrice - a.soloPrice);
-    if (this.sortBy === 'newest')     data.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Filtre catégorie (déjà fait côté backend mais on garde pour la réactivité)
+    if (this.selCat) data = data.filter(p => p.category.id === this.selCat);
+
+    // Filtre search (déjà fait côté backend mais on garde pour la réactivité)
+    if (this.search) data = data.filter(p =>
+      p.name.toLowerCase().includes(this.search.toLowerCase())
+    );
+
+    // Tri côté front
+    if (this.sortBy === 'price_asc')  data.sort((a, b) => a.soloPrice - b.soloPrice);
+    if (this.sortBy === 'price_desc') data.sort((a, b) => b.soloPrice - a.soloPrice);
+    if (this.sortBy === 'newest')     data.sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
     this.filtered = data;
   }
 
-  onSearch(v: string): void  { this.search = v; this.apply(); }
-  onCat(id: string): void    { this.selCat = id; this.apply(); }
-  onSort(v: string): void    { this.sortBy = v; this.apply(); }
+  onSearch(v: string): void {
+    this.search = v;
+    // Recherche locale immédiate + rechargement backend
+    this.apply();
+    if (v.length === 0 || v.length >= 3) this.loadProducts();
+  }
 
-  goDetail(_p: Product): void { this.router.navigate(['/catalog']); }
-  goGroups(_p: Product): void { this.router.navigate(['/groups']); }
+  onCat(id: string): void {
+    this.selCat = id;
+    this.loadProducts();
+  }
+
+  onSort(v: string): void {
+    this.sortBy = v;
+    this.apply(); // tri local uniquement
+  }
+
+  goDetail(p: Product): void {
+    this.router.navigate(['/catalog', p.id]);
+  }
+
+  goGroups(p: Product): void {
+    this.router.navigate(['/groups'], { queryParams: { productId: p.id } });
+  }
 
   discount(p: Product): number {
     if (!p.minGroupPrice) return 0;
@@ -69,8 +126,8 @@ export class CatalogComponent implements OnInit {
 
   stars(n: number): ('full' | 'half' | 'empty')[] {
     return [1, 2, 3, 4, 5].map(i => {
-      if (n >= i)       return 'full';
-      if (n >= i - 0.5) return 'half';
+      if (n >= i)        return 'full';
+      if (n >= i - 0.5)  return 'half';
       return 'empty';
     });
   }

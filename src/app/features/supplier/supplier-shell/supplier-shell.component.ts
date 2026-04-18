@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { NavItem } from '../../../layout/sidebar/sidebar.component';
+
+const API = 'http://localhost:3000/api/v1';
 
 @Component({
   selector: 'app-supplier-shell',
@@ -29,13 +32,46 @@ import { NavItem } from '../../../layout/sidebar/sidebar.component';
     }
   `]
 })
-export class SupplierShellComponent {
+export class SupplierShellComponent implements OnInit {
   sidebarOpen = false;
+
   navItems: NavItem[] = [
-    { route:'/supplier',          icon:'fa-solid fa-gauge-high',    label:'Tableau de bord', exact:true },
-    { route:'/supplier/products', icon:'fa-solid fa-box-open',      label:'Mes Produits' },
-    { route:'/supplier/groups',   icon:'fa-solid fa-layer-group',   label:'Mes Groupes',     badge:5 },
-    { route:'/supplier/orders',   icon:'fa-solid fa-cart-shopping', label:'Commandes',       badge:3, badgeColor:'#FF4D6A' },
-    { route:'/supplier/revenue',  icon:'fa-solid fa-sack-dollar',   label:'Revenus' },
+    { route: '/supplier',          icon: 'fa-solid fa-gauge-high',    label: 'Tableau de bord', exact: true },
+    { route: '/supplier/products', icon: 'fa-solid fa-box-open',      label: 'Mes Produits' },
+    { route: '/supplier/groups',   icon: 'fa-solid fa-layer-group',   label: 'Mes Groupes',   badge: 0 },
+    { route: '/supplier/orders',   icon: 'fa-solid fa-cart-shopping', label: 'Commandes',     badge: 0, badgeColor: '#FF4D6A' },
+    { route: '/supplier/revenue',  icon: 'fa-solid fa-sack-dollar',   label: 'Revenus' },
   ];
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadBadges();
+  }
+
+  private loadBadges(): void {
+    // ── Groupes actifs → badge Mes Groupes ───────────────────
+    this.http.get<any>(`${API}/supplier/groups`, { params: { limit: 100 } }).subscribe({
+      next: (res) => {
+        const groups = res.data?.groups ?? res.data ?? [];
+        const active = groups.filter((g: any) =>
+          g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED'
+        ).length;
+        this.navItems[2].badge = active;
+      },
+      error: () => {}
+    });
+
+    // ── Commandes urgentes → badge Commandes ─────────────────
+    this.http.get<any>(`${API}/supplier/orders`, { params: { limit: 100 } }).subscribe({
+      next: (res) => {
+        const orders  = res.data?.orders ?? res.data ?? [];
+        const urgent  = orders.filter((o: any) =>
+          o.status === 'CREATED' || o.status === 'CONFIRMED'
+        ).length;
+        this.navItems[3].badge = urgent;
+      },
+      error: () => {}
+    });
+  }
 }

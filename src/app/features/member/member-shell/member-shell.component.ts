@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { NavItem } from '../../../layout/sidebar/sidebar.component';
 import { NotificationService } from '../../../core/services/notification.service';
+
+const API = 'http://localhost:3000/api/v1';
 
 @Component({
   selector: 'app-member-shell',
@@ -32,20 +35,51 @@ import { NotificationService } from '../../../core/services/notification.service
     }
   `]
 })
-export class MemberShellComponent {
-  title = 'Mon Espace';
+export class MemberShellComponent implements OnInit {
+  title       = 'Mon Espace';
   sidebarOpen = false;
 
   navItems: NavItem[] = [
-    { route:'/member',               icon:'fa-solid fa-house',        label:'Tableau de bord', exact:true },
-    { route:'/member/groups',        icon:'fa-solid fa-layer-group',  label:'Mes Groupes',     badge:3 },
-    { route:'/member/payment',       icon:'fa-solid fa-credit-card',  label:'Paiement' },
-    { route:'/member/orders',        icon:'fa-solid fa-box',          label:'Mes Commandes' },
-    { route:'/member/notifications', icon:'fa-solid fa-bell',         label:'Notifications',   badge:3, badgeColor:'#FF4D6A' },
-    { route:'/member/profile',       icon:'fa-solid fa-gear',         label:'Profil' },
+    { route: '/member',               icon: 'fa-solid fa-house',       label: 'Tableau de bord', exact: true },
+    { route: '/member/groups',        icon: 'fa-solid fa-layer-group', label: 'Mes Groupes',     badge: 0 },
+    { route: '/member/payment',       icon: 'fa-solid fa-credit-card', label: 'Paiement' },
+    { route: '/member/orders',        icon: 'fa-solid fa-box',         label: 'Mes Commandes' },
+    { route: '/member/notifications', icon: 'fa-solid fa-bell',        label: 'Notifications',   badge: 0, badgeColor: '#FF4D6A' },
+    { route: '/member/profile',       icon: 'fa-solid fa-gear',        label: 'Profil' },
   ];
 
-  constructor(public notifs: NotificationService) {
+  constructor(
+    public  notifs: NotificationService,
+    private http:   HttpClient,
+  ) {}
+
+  ngOnInit(): void {
+    // ── Badge notifications (non lues) ─────────────────────────
+    // Déjà géré via le signal du NotificationService
     this.navItems[4].badge = this.notifs.unreadCount();
+
+    // ── Badge groupes actifs ───────────────────────────────────
+    this.http.get<any>(`${API}/users/me/groups`).subscribe({
+      next: (res) => {
+        const active = res.data?.active ?? [];
+        this.navItems[1].badge = active.length;
+      },
+      error: () => {}
+    });
+
+    // ── Badge commandes en cours ───────────────────────────────
+    this.http.get<any>(`${API}/orders/me`).subscribe({
+      next: (res) => {
+        const orders  = res.data ?? [];
+        const pending = orders.filter((o: any) =>
+          ['CREATED', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(o.status)
+        ).length;
+        if (pending > 0) {
+          this.navItems[3].badge      = pending;
+          this.navItems[3].badgeColor = '#00D4FF';
+        }
+      },
+      error: () => {}
+    });
   }
 }

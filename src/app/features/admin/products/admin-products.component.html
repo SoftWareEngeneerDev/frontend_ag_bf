@@ -36,8 +36,11 @@
             (click)="activeTab = t">{{ t }}</button>
   </div>
 
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
   <!-- Tableau -->
-  <div class="glass">
+  <div class="glass" *ngIf="!loading">
     <table class="tbl">
       <thead>
         <tr>
@@ -112,11 +115,11 @@
             <div class="flex gap-6">
               <button class="btn-ghost btn-sm" [routerLink]="['/admin/products', p.id]">Voir</button>
               <ng-container *ngIf="p.status === 'PENDING'">
-                <button class="btn-ok  btn-sm">Approuver</button>
-                <button class="btn-err btn-sm">Rejeter</button>
+                <button class="btn-ok  btn-sm" (click)="approve(p)">Approuver</button>
+                <button class="btn-err btn-sm" (click)="reject(p)">Rejeter</button>
               </ng-container>
-              <button class="btn-err btn-sm" *ngIf="p.status === 'ACTIVE'">Désactiver</button>
-              <button class="btn-ok  btn-sm" *ngIf="p.status === 'INACTIVE'">Réactiver</button>
+              <button class="btn-err btn-sm" *ngIf="p.status === 'ACTIVE'" (click)="reject(p)">Désactiver</button>
+              <button class="btn-ok  btn-sm" *ngIf="p.status === 'INACTIVE'" (click)="approve(p)">Réactiver</button>
             </div>
           </td>
         </tr>

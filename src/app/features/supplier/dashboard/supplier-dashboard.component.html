@@ -7,40 +7,40 @@
         <i class="fa-solid fa-store"></i>
       </div>
       <div class="suph-info">
-        <div class="suph-name">Tech Ouaga SARL</div>
+        <div class="suph-name">{{ supplierName }}</div>
         <div class="suph-meta">
           <span class="suph-badge">
             <i class="fa-solid fa-circle-check"></i> Vérifié
           </span>
           <span class="suph-meta-item">
-            <i class="fa-solid fa-location-dot"></i> Ouagadougou
+            <i class="fa-solid fa-location-dot"></i> {{ supplierCity }}
           </span>
           <span class="suph-meta-item">
-            <i class="fa-solid fa-calendar"></i> Depuis juin 2023
+            <i class="fa-solid fa-calendar"></i> Depuis {{ supplierSince }}
           </span>
         </div>
-        <div class="suph-stars">
-          <i *ngFor="let s of stars(4.8)"
+        <div class="suph-stars" *ngIf="supplierRating > 0">
+          <i *ngFor="let s of stars(supplierRating)"
              [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-          <span class="suph-rating-val">4.8</span>
-          <span class="suph-rating-sub">(142 avis)</span>
+          <span class="suph-rating-val">{{ supplierRating }}</span>
+          <span class="suph-rating-sub">({{ supplierReviews }} avis)</span>
         </div>
       </div>
     </div>
 
     <div class="suph-stats">
       <div class="suph-stat">
-        <div class="suph-stat-val">47</div>
+        <div class="suph-stat-val">{{ totalGroups }}</div>
         <div class="suph-stat-label">Groupes totaux</div>
       </div>
       <div class="suph-stat-div"></div>
       <div class="suph-stat">
-        <div class="suph-stat-val">96%</div>
+        <div class="suph-stat-val">{{ successRate }}%</div>
         <div class="suph-stat-label">Taux de succès</div>
       </div>
       <div class="suph-stat-div"></div>
       <div class="suph-stat">
-        <div class="suph-stat-val">12.4M</div>
+        <div class="suph-stat-val">{{ totalRevenue }}</div>
         <div class="suph-stat-label">XOF générés</div>
       </div>
     </div>
@@ -82,7 +82,6 @@
         <div class="sup-panel-title">
           <i class="fa-solid fa-chart-column"></i> Revenus — 6 derniers mois
         </div>
-        <span class="sup-panel-sub">Total : <strong style="color:var(--gold)">9.62M XOF</strong></span>
       </div>
       <div class="sup-bar-chart">
         <div class="sbc-col" *ngFor="let v of chartData; let i = index">
@@ -108,7 +107,7 @@
       <div class="sup-donut-wrap">
         <div class="sup-donut"></div>
         <div class="sup-donut-center">
-          <div class="sdc-total">18</div>
+          <div class="sdc-total">{{ totalGroups }}</div>
           <div class="sdc-label">groupes</div>
         </div>
       </div>
@@ -131,12 +130,21 @@
       <div class="sup-panel-title">
         <i class="fa-solid fa-triangle-exclamation" style="color:#FF4D6A"></i>
         Commandes urgentes
-        <span class="sup-badge-err">3 en attente</span>
+        <span class="sup-badge-err" *ngIf="urgentOrders.length > 0">
+          {{ urgentOrders.length }} en attente
+        </span>
       </div>
-      <button class="sup-see-all" (click)="goOrders()">Voir tout <i class="fa-solid fa-arrow-right"></i></button>
+      <button class="sup-see-all" (click)="goOrders()">
+        Voir tout <i class="fa-solid fa-arrow-right"></i>
+      </button>
     </div>
 
-    <div class="sup-orders-table">
+    <app-empty-state *ngIf="urgentOrders.length === 0"
+      icon="fa-solid fa-check-circle" title="Aucune commande urgente"
+      description="Toutes vos commandes sont à jour.">
+    </app-empty-state>
+
+    <div class="sup-orders-table" *ngIf="urgentOrders.length > 0">
       <table class="tbl">
         <thead>
           <tr>
@@ -167,7 +175,7 @@
               </span>
             </td>
             <td>
-              <button class="btn-gold btn-sm btn-round">
+              <button class="btn-gold btn-sm btn-round" (click)="goOrders()">
                 <i class="fa-solid fa-truck-fast"></i> Traiter
               </button>
             </td>
@@ -183,10 +191,17 @@
       <div class="sup-panel-title">
         <i class="fa-solid fa-trophy"></i> Top produits
       </div>
-      <button class="sup-see-all" (click)="goProducts()">Gérer <i class="fa-solid fa-arrow-right"></i></button>
+      <button class="sup-see-all" (click)="goProducts()">
+        Gérer <i class="fa-solid fa-arrow-right"></i>
+      </button>
     </div>
 
-    <div class="sup-top-products">
+    <app-empty-state *ngIf="topProducts.length === 0"
+      icon="fa-solid fa-box" title="Aucun produit approuvé"
+      description="Soumettez vos premiers produits pour commencer.">
+    </app-empty-state>
+
+    <div class="sup-top-products" *ngIf="topProducts.length > 0">
       <div class="stp-item" *ngFor="let p of topProducts; let i = index">
         <div class="stp-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
           #{{ i + 1 }}

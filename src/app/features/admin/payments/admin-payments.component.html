@@ -36,8 +36,11 @@
             (click)="activeTab = t">{{ t }}</button>
   </div>
 
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
   <!-- Tableau -->
-  <div class="glass">
+  <div class="glass" *ngIf="!loading">
     <table class="tbl">
       <thead>
         <tr>
@@ -92,18 +95,26 @@
           <td>
             <div class="flex gap-6">
               <button class="btn-ghost btn-sm">Voir</button>
-              <button class="btn-ok btn-sm"
-                      *ngIf="p.status === 'FAILED'">Relancer</button>
               <button class="btn-err btn-sm"
-                      *ngIf="p.status === 'PENDING'">Annuler</button>
+                      *ngIf="p.status === 'PENDING'"
+                      (click)="refund(p)">
+                Annuler
+              </button>
+              <button class="btn-ok btn-sm"
+                      *ngIf="p.status === 'FAILED'">
+                Relancer
+              </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
 
+    <!-- Empty -->
     <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px"><i class="fa-solid fa-credit-card" style="color:var(--primary)"></i></div>
+      <div style="font-size:36px;margin-bottom:12px">
+        <i class="fa-solid fa-credit-card" style="color:var(--primary)"></i>
+      </div>
       <p class="text-muted">Aucune transaction trouvée pour cette recherche.</p>
     </div>
   </div>

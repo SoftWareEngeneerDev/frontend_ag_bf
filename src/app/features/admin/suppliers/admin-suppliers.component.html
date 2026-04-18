@@ -10,7 +10,16 @@
             (click)="activeTab = t">{{ t }}</button>
   </div>
 
-  <div class="sup-grid">
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- Empty -->
+  <app-empty-state *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-store" title="Aucun fournisseur"
+    description="Aucun fournisseur dans cette catégorie.">
+  </app-empty-state>
+
+  <div class="sup-grid" *ngIf="!loading">
     <div class="glass sup-card" *ngFor="let s of filtered">
       <div class="sup-head">
         <div class="sup-icon"><i class="fa-solid fa-store"></i></div>
@@ -39,15 +48,34 @@
       </div>
 
       <div class="sup-actions">
+        <!-- ── En attente → Approuver / Rejeter ── -->
         <ng-container *ngIf="s.status === 'PENDING'">
-          <button class="btn-gold btn-sm" style="flex:1;justify-content:center"><i class="fa-solid fa-circle-check"></i> Approuver</button>
-          <button class="btn-err  btn-sm" style="flex:1;justify-content:center">
+          <button class="btn-gold btn-sm" style="flex:1;justify-content:center"
+                  (click)="approve(s)">
+            <i class="fa-solid fa-circle-check"></i> Approuver
+          </button>
+          <button class="btn-err btn-sm" style="flex:1;justify-content:center"
+                  (click)="reject(s)">
             <i class="fa-solid fa-xmark"></i> Rejeter
           </button>
         </ng-container>
+
+        <!-- ── Approuvé → Voir profil / Suspendre ── -->
         <ng-container *ngIf="s.status === 'APPROVED'">
-          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">Voir profil</button>
-          <button class="btn-err   btn-sm">Suspendre</button>
+          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">
+            Voir profil
+          </button>
+          <button class="btn-err btn-sm" (click)="suspend(s)">
+            Suspendre
+          </button>
+        </ng-container>
+
+        <!-- ── Suspendu ── -->
+        <ng-container *ngIf="s.status === 'SUSPENDED'">
+          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
+                  (click)="approve(s)">
+            <i class="fa-solid fa-rotate-left"></i> Réactiver
+          </button>
         </ng-container>
       </div>
     </div>
