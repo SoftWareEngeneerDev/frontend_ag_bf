@@ -30,6 +30,48 @@ export class LandingComponent implements OnInit, OnDestroy {
   groups:  Group[] = [];
   loading  = true;
 
+  // Slider
+  currentSlide = 0;
+  private slideTimer?: ReturnType<typeof setInterval>;
+
+  slides: Slide[] = [
+    {
+      badge: 'Achat groupé · Burkina Faso', title: 'Achetez ensemble,', highlight: 'économisez plus',
+      sub: 'Rejoignez des groupes d\'achat et profitez de prix réduits sur des centaines de produits.',
+      cta: 'Voir les groupes', ctaSec: 'Comment ça marche ?',
+      tag: 'Dès 10% de dépôt', tagIcon: 'fa-solid fa-bolt', discount: '-40%',
+      bg: 'linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)', accent: '#f97316',
+      emoji: '🛍️', stat1Val: '5 247+', stat1Lbl: 'Membres actifs', stat2Val: '320+', stat2Lbl: 'Groupes réussis',
+    },
+    {
+      badge: 'Orange Money · Moov Money', title: 'Payez facilement', highlight: 'en mobile money',
+      sub: 'Orange Money, Moov Money, Ligdicash — payez votre dépôt en quelques secondes.',
+      cta: 'Rejoindre un groupe', ctaSec: 'Voir le catalogue',
+      tag: 'Paiement sécurisé', tagIcon: 'fa-solid fa-shield-halved', discount: '-35%',
+      bg: 'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)', accent: '#22d3ee',
+      emoji: '📱', stat1Val: '48.5M', stat1Lbl: 'XOF économisés', stat2Val: '89%', stat2Lbl: 'Taux de succès',
+    },
+    {
+      badge: 'Livraison · Ouagadougou', title: 'Recevez votre commande', highlight: 'à domicile',
+      sub: 'Livraison rapide à Ouagadougou et dans les grandes villes du Burkina Faso.',
+      cta: 'Découvrir les offres', ctaSec: 'S\'inscrire gratuitement',
+      tag: 'Livraison incluse', tagIcon: 'fa-solid fa-truck', discount: '-50%',
+      bg: 'linear-gradient(135deg,#1f1c2c 0%,#928dab 100%)', accent: '#a78bfa',
+      emoji: '📦', stat1Val: '72h', stat1Lbl: 'Délai moyen', stat2Val: '4.8★', stat2Lbl: 'Note fournisseurs',
+    },
+  ];
+
+  promosBanners = [
+    { label: 'Électronique', sub: 'Jusqu\'à -45%', icon: 'fa-solid fa-laptop', bg: 'linear-gradient(135deg,#1e3a5f,#2563eb)' },
+    { label: 'Alimentation', sub: 'Groupes actifs', icon: 'fa-solid fa-basket-shopping', bg: 'linear-gradient(135deg,#14532d,#16a34a)' },
+    { label: 'Mobilier',     sub: 'Nouveaux groupes', icon: 'fa-solid fa-couch',           bg: 'linear-gradient(135deg,#7c2d12,#ea580c)' },
+    { label: 'Mode & Textile', sub: 'Flash sale',    icon: 'fa-solid fa-shirt',            bg: 'linear-gradient(135deg,#4a044e,#a21caf)' },
+  ];
+
+  categoryFilters = ['Tous', 'Électronique', 'Alimentation', 'Mobilier', 'Mode'];
+  activeCategory  = 'Tous';
+  private allGroups: Group[] = [];
+
   // Animated counters
   membersCount = 0;
   groupsCount  = 0;
@@ -60,8 +102,6 @@ export class LandingComponent implements OnInit, OnDestroy {
     { label: 'Carte',        icon: 'fa-solid fa-credit-card',          color: '#6B7280' },
   ];
 
-  private animTimer?: ReturnType<typeof setInterval>;
-
   constructor(
     private groupService: GroupService,
     public  mock: MockDataService,
@@ -69,16 +109,17 @@ export class LandingComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // CORRECTION : getActiveGroups n'existe plus → utiliser getAll avec status OPEN
     this.groupService.getAll({ status: 'OPEN' }).subscribe({
       next: (g: Group[]) => {
-        this.groups  = g.slice(0, 3); // Seulement 3 groupes sur la landing
-        this.loading = false;
+        this.allGroups = g;
+        this.groups    = g.slice(0, 3);
+        this.loading   = false;
       },
       error: () => { this.loading = false; }
     });
 
     this.startCounters();
+    this.startSlider();
   }
 
   ngOnDestroy(): void {
@@ -86,6 +127,55 @@ export class LandingComponent implements OnInit, OnDestroy {
     if (this.animTimer) clearInterval(this.animTimer);
   }
 
+  // ── Slider ────────────────────────────────────────────────────
+  private startSlider(): void {
+    this.slideTimer = setInterval(() => this.nextSlide(), 5000);
+  }
+
+  stopSlider(): void {
+    if (this.slideTimer) { clearInterval(this.slideTimer); this.slideTimer = undefined; }
+  }
+
+  prevSlide(): void {
+    this.stopSlider();
+    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+    this.startSlider();
+  }
+
+  nextSlide(): void {
+    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+  }
+
+  goToSlide(i: number): void {
+    this.stopSlider();
+    this.currentSlide = i;
+    this.startSlider();
+  }
+
+  onSlideAction(slide: Slide): void {
+    if (slide.cta.toLowerCase().includes('groupe')) this.router.navigate(['/groups']);
+    else this.router.navigate(['/catalog']);
+  }
+
+  onSlideSecAction(slide: Slide): void {
+    if (slide.ctaSec.toLowerCase().includes('inscri')) this.router.navigate(['/auth/register']);
+    else if (slide.ctaSec.toLowerCase().includes('catalogue')) this.router.navigate(['/catalog']);
+    else this.router.navigate(['/how-it-works']);
+  }
+
+  // ── Filtres catégories ─────────────────────────────────────────
+  filterByCategory(cat: string): void {
+    this.activeCategory = cat;
+    if (cat === 'Tous') {
+      this.groups = this.allGroups.slice(0, 3);
+    } else {
+      this.groups = this.allGroups
+        .filter(g => g.product?.category?.name?.toLowerCase().includes(cat.toLowerCase()))
+        .slice(0, 3);
+    }
+  }
+
+  // ── Compteurs animés ───────────────────────────────────────────
   private startCounters(): void {
     let progress = 0;
     this.animTimer = setInterval(() => {
