@@ -1,26 +1,66 @@
 <div class="mg-page">
 
-  <!-- Onglets filtres -->
+  <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
+  <div class="mg-header mb-24">
+    <div>
+      <h2 class="mg-title">
+        <i class="fa-solid fa-layer-group"></i> Mes Groupes
+      </h2>
+      <p class="mg-sub text-muted">
+        {{ groups.length }} groupe{{ groups.length !== 1 ? 's' : '' }} au total
+      </p>
+    </div>
+    <a routerLink="/groups" class="btn-primary btn-round">
+      <i class="fa-solid fa-plus"></i> Rejoindre un groupe
+    </a>
+  </div>
+
+  <!-- ══ ONGLETS FILTRES ════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabList"
-            [class.active]="activeTab === t.key"
-            (click)="setTab(t.key)">
-      <i [class]="t.icon"></i> {{ t.label }}
-      <span *ngIf="t.count > 0" class="tab-count">{{ t.count }}</span>
+    <button
+      class="tab-btn"
+      *ngFor="let t of tabList"
+      [class.active]="activeTab === t.key"
+      (click)="setTab(t.key)">
+      <i [class]="t.icon"></i>
+      {{ t.label }}
+      <span class="tab-count" *ngIf="t.count > 0">{{ t.count }}</span>
     </button>
   </div>
 
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="fa-solid fa-users" title="Aucun groupe dans cette catégorie"
-    description="Vous n'avez pas encore de groupe ici.">
-    <a routerLink="/groups" class="btn-gold">Rejoindre un groupe</a>
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-users"
+    [title]="activeTab === 'all' ? 'Aucun groupe rejoint' : 'Aucun groupe dans cette catégorie'"
+    [description]="activeTab === 'all'
+      ? 'Rejoignez votre premier groupe et commencez à économiser.'
+      : 'Changez de filtre pour voir vos autres groupes.'">
+    <a routerLink="/groups" class="btn-gold btn-round">
+      <i class="fa-solid fa-compass"></i> Parcourir les groupes
+    </a>
   </app-empty-state>
 
+  <!-- ══ ALERTE SEUIL ATTEINT ══════════════════════════════════ -->
+  <div class="mg-urgent-banner"
+       *ngIf="!loading && tabList[2].count > 0 && activeTab !== 'threshold'">
+    <i class="fa-solid fa-fire"></i>
+    <span>
+      <strong>{{ tabList[2].count }} groupe{{ tabList[2].count > 1 ? 's' : '' }}</strong>
+      {{ tabList[2].count > 1 ? 'ont atteint leur' : 'a atteint son' }} seuil — paiement requis !
+    </span>
+    <button class="btn-gold btn-sm btn-round" (click)="setTab('threshold')">
+      Voir <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- ══ GRILLE GROUPES ═════════════════════════════════════════ -->
   <div class="mg-grid" *ngIf="!loading && filtered.length > 0">
     <app-group-card
-      *ngFor="let g of filtered"
+      *ngFor="let g of filtered; trackBy: trackById"
       [group]="g"
       [memberView]="true"
       (join)="onJoin(g)"

@@ -1,32 +1,83 @@
-<div>
-  <div class="flex-between mb-20">
-    <div class="flex gap-12" style="align-items:center">
-      <h2 class="font-display" style="font-size:20px;font-weight:700">Notifications</h2>
-      <span class="badge-err" *ngIf="unread > 0">{{ unread }} non lues</span>
+<div class="notifs-page">
+
+  <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
+  <div class="notifs-header mb-24">
+    <div class="notifs-title-wrap">
+      <h2 class="notifs-title">
+        <i class="fa-solid fa-bell"></i> Notifications
+      </h2>
+      <span class="badge-err" *ngIf="unread > 0">
+        {{ unread }} non lue{{ unread > 1 ? 's' : '' }}
+      </span>
     </div>
-    <button class="btn-ghost btn-sm" (click)="markAll()">Tout marquer comme lu</button>
+
+    <button
+      class="btn-ghost btn-sm btn-round"
+      *ngIf="unread > 0"
+      (click)="markAll()">
+      <i class="fa-solid fa-check-double"></i> Tout marquer comme lu
+    </button>
   </div>
 
-  <div class="glass notif-wrap" *ngIf="notifs.length > 0">
-    <ng-container *ngIf="today.length > 0">
-      <div class="notif-section-label">Aujourd'hui</div>
-      <app-notification-item
-        *ngFor="let n of today"
-        [notif]="n" (clicked)="onNotifClick($event)">
-      </app-notification-item>
-    </ng-container>
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-    <ng-container *ngIf="thisWeek.length > 0">
-      <div class="notif-section-label">Cette semaine</div>
-      <app-notification-item
-        *ngFor="let n of thisWeek"
-        [notif]="n" (clicked)="onNotifClick($event)">
-      </app-notification-item>
-    </ng-container>
-  </div>
-
-  <app-empty-state *ngIf="notifs.length === 0"
-    icon="fa-solid fa-bell" title="Aucune notification"
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && notifs.length === 0"
+    icon="fa-solid fa-bell-slash"
+    title="Aucune notification"
     description="Vous êtes à jour ! Aucune nouvelle notification.">
   </app-empty-state>
+
+  <!-- ══ LISTE NOTIFICATIONS ════════════════════════════════════ -->
+  <div class="notifs-wrap" *ngIf="!loading && notifs.length > 0">
+
+    <!-- Aujourd'hui -->
+    <ng-container *ngIf="today.length > 0">
+      <div class="notif-section-label">
+        <i class="fa-solid fa-sun" style="color:#F4A902"></i> Aujourd'hui
+        <span class="notif-section-count">{{ today.length }}</span>
+      </div>
+      <div class="glass notif-group">
+        <app-notification-item
+          *ngFor="let n of today; trackBy: trackById"
+          [notif]="n"
+          (clicked)="onNotifClick($event)">
+        </app-notification-item>
+      </div>
+    </ng-container>
+
+    <!-- Cette semaine -->
+    <ng-container *ngIf="thisWeek.length > 0">
+      <div class="notif-section-label">
+        <i class="fa-solid fa-calendar-week" style="color:#0DA487"></i> Cette semaine
+        <span class="notif-section-count">{{ thisWeek.length }}</span>
+      </div>
+      <div class="glass notif-group">
+        <app-notification-item
+          *ngFor="let n of thisWeek; trackBy: trackById"
+          [notif]="n"
+          (clicked)="onNotifClick($event)">
+        </app-notification-item>
+      </div>
+    </ng-container>
+
+    <!-- Plus anciennes -->
+    <ng-container *ngIf="older.length > 0">
+      <div class="notif-section-label">
+        <i class="fa-solid fa-clock-rotate-left" style="color:#718096"></i> Plus anciennes
+        <span class="notif-section-count">{{ older.length }}</span>
+      </div>
+      <div class="glass notif-group">
+        <app-notification-item
+          *ngFor="let n of older; trackBy: trackById"
+          [notif]="n"
+          (clicked)="onNotifClick($event)">
+        </app-notification-item>
+      </div>
+    </ng-container>
+
+  </div>
+
 </div>
