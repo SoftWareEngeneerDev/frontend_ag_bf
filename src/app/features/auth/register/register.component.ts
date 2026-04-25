@@ -53,7 +53,6 @@ export class RegisterComponent {
     });
   }
 
-  // ── Step 1 : Choisir le profil ────────────────────────────────
   selectProfile(type: 'MEMBER' | 'SUPPLIER'): void {
     this.profileType = type;
     this.step        = 2;
@@ -71,7 +70,7 @@ export class RegisterComponent {
   get pwLabel(): string { return ['', 'Faible', 'Moyen', 'Fort', 'Très fort'][this.pwStrength] || ''; }
   get pwColor(): string { return ['', '#FF4D6A', '#FFB347', '#F5A623', '#10D98B'][this.pwStrength] || ''; }
 
-  // ── Step 2 : POST /auth/register avec role ────────────────────
+  // ── Step 2 : POST /auth/register ─────────────────────────────
   submitAccount(): void {
     if (this.form.get('fullName')?.invalid || this.form.get('phone')?.invalid) {
       this.form.markAllAsTouched();
@@ -83,20 +82,22 @@ export class RegisterComponent {
     }
 
     this.errorMessage = '';
-    this.otpPhone     = this.auth.formatPhone(this.form.value.phone);
+    // Sauvegarder le téléphone formaté pour l'OTP et le profil fournisseur
+    this.otpPhone = this.auth.formatPhone(this.form.value.phone);
 
     this.auth.register({
       fullName:        this.form.value.fullName,
       phone:           this.form.value.phone,
-      email:           this.form.value.email     || undefined,
+      email:           this.form.value.email        || undefined,
       password:        this.form.value.password,
       confirmPassword: this.form.value.password,
       referralCode:    this.form.value.referralCode || undefined,
       acceptTerms:     true,
-      role:            this.profileType, // ← ENVOI DU RÔLE AU BACKEND
+      role:            this.profileType,
     }).subscribe({
       next: () => {
-        this.step = 3; // → infos entreprise (supplier) ou OTP (membre)
+        // SUPPLIER → step 3 (infos entreprise) | MEMBER → step 3 (OTP)
+        this.step = 3;
       },
       error: (err) => {
         const msg = err?.error?.error?.message ?? err?.error?.message;
@@ -105,7 +106,7 @@ export class RegisterComponent {
     });
   }
 
-  // ── Step 3 Fournisseur : Infos entreprise ─────────────────────
+  // ── Step 3 Fournisseur : valider le formulaire entreprise ─────
   submitCompany(): void {
     if (this.companyForm.invalid) {
       this.companyForm.markAllAsTouched();
@@ -119,15 +120,16 @@ export class RegisterComponent {
     this.errorMessage = '';
 
     this.auth.verifyOtp({
-      phone: this.otpPhone || this.form.value.phone,
+      phone: this.otpPhone || this.auth.formatPhone(this.form.value.phone),
       otp,
     }).subscribe({
-      next: (res: any) => {
+      next: () => {
         if (this.profileType === 'SUPPLIER') {
-          // Fournisseur → soumettre les infos entreprise puis page de confirmation
+          // Fournisseur → soumettre les infos entreprise
           this.submitSupplierProfile();
         } else {
-          this.step = 4; // Membre → bienvenue
+          // Membre → page de bienvenue
+          this.step = 4;
         }
       },
       error: (err) => {
@@ -137,9 +139,13 @@ export class RegisterComponent {
     });
   }
 
-  // ── Soumettre les infos entreprise → POST /auth/supplier-profile
+  // ── POST /auth/supplier-profile ───────────────────────────────
+  // CORRECTION : envoyer phone dans le body (pas de JWT requis)
   private submitSupplierProfile(): void {
+    const phone = this.otpPhone || this.auth.formatPhone(this.form.value.phone);
+
     this.http.post<any>(`${API}/auth/supplier-profile`, {
+      phone,
       companyName: this.companyForm.value.companyName,
       taxId:       this.companyForm.value.taxId    || undefined,
       siret:       this.companyForm.value.siret    || undefined,
@@ -147,7 +153,7 @@ export class RegisterComponent {
       address:     this.companyForm.value.address  || undefined,
     }).subscribe({
       next:  () => { this.step = 5; },
-      error: () => { this.step = 5; } // Passer même si erreur
+      error: () => { this.step = 5; } // Passer à la confirmation même si erreur
     });
   }
 
