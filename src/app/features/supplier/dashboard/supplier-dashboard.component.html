@@ -1,5 +1,10 @@
 <div class="sup-page">
 
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <ng-container *ngIf="!loading">
+
   <!-- ══ PROFIL FOURNISSEUR ════════════════════════════════════════ -->
   <div class="sup-hero">
     <div class="suph-left">
@@ -21,9 +26,14 @@
         </div>
         <div class="suph-stars" *ngIf="supplierRating > 0">
           <i *ngFor="let s of stars(supplierRating)"
-             [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-          <span class="suph-rating-val">{{ supplierRating }}</span>
+             [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"
+             style="color:#F4A902">
+          </i>
+          <span class="suph-rating-val">{{ supplierRating }}/5</span>
           <span class="suph-rating-sub">({{ supplierReviews }} avis)</span>
+        </div>
+        <div class="suph-stars" *ngIf="supplierRating === 0">
+          <span class="text-muted" style="font-size:12px">Aucun avis pour le moment</span>
         </div>
       </div>
     </div>
@@ -64,16 +74,16 @@
       <div class="sup-kpi-body">
         <div class="sup-kpi-val">{{ k.val }}</div>
         <div class="sup-kpi-label">{{ k.label }}</div>
-        <div class="sup-kpi-sub">{{ k.sub }}</div>
+        <div class="sup-kpi-sub" *ngIf="k.sub">{{ k.sub }}</div>
       </div>
-      <div class="sup-kpi-trend" [class.up]="k.up" [class.down]="!k.up">
+      <div class="sup-kpi-trend" *ngIf="k.trend" [class.up]="k.up" [class.down]="!k.up">
         <i [class]="k.up ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
         {{ k.trend }}
       </div>
     </div>
   </div>
 
-  <!-- ══ CHARTS ROW ═════════════════════════════════════════════════ -->
+  <!-- ══ CHARTS ROW ════════════════════════════════════════════════ -->
   <div class="sup-charts-row">
 
     <!-- Revenus 6 mois -->
@@ -82,10 +92,13 @@
         <div class="sup-panel-title">
           <i class="fa-solid fa-chart-column"></i> Revenus — 6 derniers mois
         </div>
+        <button class="sup-see-all" (click)="goRevenue()">
+          Détails <i class="fa-solid fa-arrow-right"></i>
+        </button>
       </div>
       <div class="sup-bar-chart">
         <div class="sbc-col" *ngFor="let v of chartData; let i = index">
-          <div class="sbc-val">{{ (v/1000).toFixed(0) }}k</div>
+          <div class="sbc-val">{{ (v / 1000).toFixed(0) }}k</div>
           <div class="sbc-bar-wrap">
             <div class="sbc-bar"
                  [class.active]="i === chartData.length - 1"
@@ -103,7 +116,11 @@
         <div class="sup-panel-title">
           <i class="fa-solid fa-chart-pie"></i> Statut des groupes
         </div>
+        <button class="sup-see-all" (click)="goGroups()">
+          Voir <i class="fa-solid fa-arrow-right"></i>
+        </button>
       </div>
+
       <div class="sup-donut-wrap">
         <div class="sup-donut"></div>
         <div class="sup-donut-center">
@@ -111,6 +128,7 @@
           <div class="sdc-label">groupes</div>
         </div>
       </div>
+
       <div class="sup-legend">
         <div class="sl-item" *ngFor="let d of groupStatus">
           <div class="sl-dot" [style.background]="d.color"></div>
@@ -121,10 +139,19 @@
           </div>
         </div>
       </div>
+
+      <!-- État vide groupes -->
+      <div class="sup-empty-mini" *ngIf="totalGroups === 0">
+        <i class="fa-solid fa-layer-group text-muted"></i>
+        <span class="text-muted">Aucun groupe créé</span>
+        <button class="btn-primary btn-sm btn-round" (click)="goGroups()">
+          Créer un groupe
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- ══ COMMANDES URGENTES ═════════════════════════════════════════ -->
+  <!-- ══ COMMANDES URGENTES ════════════════════════════════════════ -->
   <div class="sup-panel">
     <div class="sup-panel-head">
       <div class="sup-panel-title">
@@ -139,9 +166,11 @@
       </button>
     </div>
 
-    <app-empty-state *ngIf="urgentOrders.length === 0"
-      icon="fa-solid fa-check-circle" title="Aucune commande urgente"
-      description="Toutes vos commandes sont à jour.">
+    <app-empty-state
+      *ngIf="urgentOrders.length === 0"
+      icon="fa-solid fa-circle-check"
+      title="Aucune commande urgente"
+      description="Toutes vos commandes sont à jour. 🎉">
     </app-empty-state>
 
     <div class="sup-orders-table" *ngIf="urgentOrders.length > 0">
@@ -159,7 +188,7 @@
           <tr *ngFor="let o of urgentOrders">
             <td>
               <div class="sot-group">{{ o.group }}</div>
-              <div class="sot-product">{{ o.product }}</div>
+              <div class="sot-product text-muted">{{ o.product }}</div>
             </td>
             <td>
               <span class="sot-participants">
@@ -185,7 +214,7 @@
     </div>
   </div>
 
-  <!-- ══ TOP PRODUITS ═══════════════════════════════════════════════ -->
+  <!-- ══ TOP PRODUITS ══════════════════════════════════════════════ -->
   <div class="sup-panel">
     <div class="sup-panel-head">
       <div class="sup-panel-title">
@@ -196,23 +225,36 @@
       </button>
     </div>
 
-    <app-empty-state *ngIf="topProducts.length === 0"
-      icon="fa-solid fa-box" title="Aucun produit approuvé"
+    <app-empty-state
+      *ngIf="topProducts.length === 0"
+      icon="fa-solid fa-box"
+      title="Aucun produit approuvé"
       description="Soumettez vos premiers produits pour commencer.">
+      <button class="btn-primary btn-round" (click)="goProducts()">
+        <i class="fa-solid fa-plus"></i> Ajouter un produit
+      </button>
     </app-empty-state>
 
     <div class="sup-top-products" *ngIf="topProducts.length > 0">
       <div class="stp-item" *ngFor="let p of topProducts; let i = index">
-        <div class="stp-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+        <div class="stp-rank"
+             [class.gold]="i === 0"
+             [class.silver]="i === 1"
+             [class.bronze]="i === 2">
           #{{ i + 1 }}
         </div>
         <div class="stp-body">
           <div class="stp-name">{{ p.name }}</div>
           <div class="stp-meta">
-            <span><i class="fa-solid fa-layer-group"></i> {{ p.groups }} groupes</span>
+            <span>
+              <i class="fa-solid fa-layer-group"></i>
+              {{ p.groups }} groupe{{ p.groups !== 1 ? 's' : '' }}
+            </span>
             <span class="stp-stars">
               <i *ngFor="let s of stars(p.rating)"
-                 [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                 [class]="s ? 'fa-solid fa-star' : 'fa-regular fa-star'"
+                 style="color:#F4A902;font-size:11px">
+              </i>
             </span>
           </div>
         </div>
@@ -226,4 +268,5 @@
     </div>
   </div>
 
+  </ng-container>
 </div>

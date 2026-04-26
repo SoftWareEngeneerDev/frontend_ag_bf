@@ -1,83 +1,135 @@
-<div>
+<div class="rev-page">
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <ng-container *ngIf="!loading">
 
-    <!-- KPIs -->
-    <div class="kpi-grid mb-24">
-      <app-stats-card *ngFor="let k of kpis"
-        [icon]="k.icon" [value]="k.val" [label]="k.label" [sub]="k.sub" [color]="k.color">
-      </app-stats-card>
-    </div>
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
+  <div class="rev-header mb-24">
+    <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+      <i class="fa-solid fa-sack-dollar"></i> Revenus & Finances
+    </h2>
+    <p class="text-muted" style="font-size:13px">
+      Suivi de vos revenus, commissions et transactions
+    </p>
+  </div>
 
-    <!-- Bar chart -->
-    <div class="glass p-24 mb-24">
-      <h3 class="font-display" style="font-size:15px;font-weight:700;margin-bottom:18px">
-        Évolution des revenus (6 derniers mois)
-      </h3>
-      <div class="rev-chart">
-        <div class="rev-col" *ngFor="let r of revData; let i = index">
-          <div class="rev-val text-muted">{{ (r.revenue/1000000).toFixed(1) }}M</div>
-          <div class="rev-bar" [style.height.%]="(r.revenue/revMax)*100"
-               [class.active]="i === revData.length - 1"></div>
-          <div class="rev-lbl text-muted">{{ r.month }}</div>
-        </div>
+  <!-- ══ KPIs ══════════════════════════════════════════════════════ -->
+  <div class="kpi-grid mb-24">
+    <div class="glass rev-kpi" *ngFor="let k of kpis">
+      <div class="rev-kpi-icon">{{ k.icon }}</div>
+      <div class="rev-kpi-body">
+        <div class="rev-kpi-val font-mono" [style.color]="k.color">{{ k.val }}</div>
+        <div class="rev-kpi-label">{{ k.label }}</div>
+        <div class="rev-kpi-sub text-muted" *ngIf="k.sub">{{ k.sub }}</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ GRAPHIQUE REVENUS ════════════════════════════════════════ -->
+  <div class="glass p-24 mb-24">
+    <div class="flex-between mb-20">
+      <h3 class="font-display" style="font-size:15px;font-weight:700">
+        <i class="fa-solid fa-chart-column"></i> Évolution des revenus — 6 derniers mois
+      </h3>
       <div class="rev-legend">
         <div class="rev-leg-item">
           <div class="rev-leg-dot" style="background:var(--gold)"></div>
-          <span class="text-muted">Revenu brut</span>
+          <span class="text-muted" style="font-size:12px">Revenu brut</span>
         </div>
         <div class="rev-leg-item">
-          <div class="rev-leg-dot" style="background:var(--err)"></div>
-          <span class="text-muted">Commission (7%)</span>
+          <div class="rev-leg-dot" style="background:#FF4D6A"></div>
+          <span class="text-muted" style="font-size:12px">Commission (7%)</span>
         </div>
       </div>
     </div>
 
-    <!-- Transactions -->
-    <div class="glass p-20">
-      <h3 class="font-display" style="font-size:15px;font-weight:700;margin-bottom:16px">
-        Historique des transactions
-      </h3>
-
-      <!-- Empty -->
-      <div *ngIf="transactions.length === 0" style="text-align:center;padding:32px 0">
-        <i class="fa-solid fa-receipt" style="font-size:32px;color:var(--primary);margin-bottom:12px;display:block"></i>
-        <p class="text-muted">Aucune transaction pour le moment.</p>
+    <!-- Graphique -->
+    <div class="rev-chart">
+      <div class="rev-col" *ngFor="let r of revData; let i = index; trackBy: trackByMonth">
+        <div class="rev-val text-muted">
+          {{ r.revenue >= 1000000 ? (r.revenue/1000000).toFixed(1) + 'M' : (r.revenue/1000).toFixed(0) + 'k' }}
+        </div>
+        <div class="rev-bars">
+          <!-- Barre revenu brut -->
+          <div class="rev-bar rev-bar-gross"
+               [class.active]="i === revData.length - 1"
+               [style.height.%]="(r.revenue / revMax) * 100"
+               [title]="formatXOF(r.revenue)">
+          </div>
+          <!-- Barre commission -->
+          <div class="rev-bar rev-bar-commission"
+               [style.height.%]="(r.commissions / revMax) * 100"
+               [title]="formatXOF(r.commissions)">
+          </div>
+        </div>
+        <div class="rev-lbl text-muted">{{ r.month }}</div>
       </div>
+    </div>
 
-      <table class="tbl" *ngIf="transactions.length > 0">
+    <!-- État vide graphique -->
+    <div class="rev-empty" *ngIf="revMax === 1" style="text-align:center;padding:20px 0">
+      <p class="text-muted" style="font-size:13px">
+        <i class="fa-solid fa-chart-column"></i>
+        Aucune donnée de revenus pour le moment
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ TRANSACTIONS ══════════════════════════════════════════════ -->
+  <div class="glass p-20">
+    <div class="flex-between mb-16">
+      <h3 class="font-display" style="font-size:15px;font-weight:700">
+        <i class="fa-solid fa-receipt"></i> Historique des transactions
+      </h3>
+      <span class="text-muted" style="font-size:12px">
+        {{ transactions.length }} transaction{{ transactions.length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+
+    <!-- État vide -->
+    <div class="rev-no-transactions" *ngIf="transactions.length === 0"
+         style="text-align:center;padding:32px 0">
+      <i class="fa-solid fa-receipt"
+         style="font-size:32px;color:var(--primary);margin-bottom:12px;display:block">
+      </i>
+      <p class="text-muted">Aucune transaction pour le moment.</p>
+    </div>
+
+    <!-- Table -->
+    <div class="rev-table-wrap" *ngIf="transactions.length > 0">
+      <table class="tbl">
         <thead>
           <tr>
             <th>Date</th>
             <th>Description</th>
             <th>Type</th>
-            <th>Montant</th>
+            <th style="text-align:right">Montant</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let t of transactions">
+          <tr *ngFor="let t of transactions; trackBy: trackByDate">
             <td class="text-muted" style="font-size:12px;white-space:nowrap">{{ t.date }}</td>
             <td style="font-size:13px">{{ t.desc }}</td>
             <td>
-              <span class="badge"
+              <span class="rev-badge"
                     [style.background]="t.color + '15'"
                     [style.color]="t.color"
                     [style.border]="'1px solid ' + t.color + '30'">
                 {{ t.type }}
               </span>
             </td>
-            <td class="font-mono" style="font-weight:700"
-                [style.color]="t.amount > 0 ? 'var(--ok)' : 'var(--err)'">
-              {{ t.amount > 0 ? '+' : '' }}{{ t.amount | currencyXof }}
+            <td class="font-mono rev-amount"
+                [style.color]="t.amount >= 0 ? 'var(--ok)' : 'var(--err)'"
+                style="text-align:right;font-weight:700">
+              {{ t.amount >= 0 ? '+' : '' }}{{ t.amount | currencyXof }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+  </div>
 
   </ng-container>
 </div>
