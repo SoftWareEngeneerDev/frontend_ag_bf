@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -28,6 +28,8 @@ export class RegisterComponent {
       ? ['Profil', 'Infos', 'Entreprise', 'Vérification', 'Bienvenue']
       : ['Profil', 'Infos', 'Vérification', 'Bienvenue'];
   }
+
+  @Output() switchToLogin = new EventEmitter<void>();
 
   constructor(
     private fb:     FormBuilder,
@@ -166,4 +168,8 @@ export class RegisterComponent {
   }
 
   get user() { return this.auth.currentUser(); }
+
+  goToLogin() {
+    this.switchToLogin.emit();
+  }
 }

@@ -19,15 +19,19 @@ import { WelcomeComponent }            from './welcome/welcome.component';
   ],
   imports: [
     SharedModule,
-    LayoutModule,
+    // LayoutModule,
     RouterModule.forChild([
       { path: 'login',               component: LoginComponent },
       { path: 'register',            component: RegisterComponent },
       { path: 'otp',                 component: OtpComponent },
       { path: 'forgot-password',     component: ForgotPasswordComponent },
       { path: 'welcome',             component: WelcomeComponent },
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      // { path: '', redirectTo: 'login', pathMatch: 'full' },
     ]),
   ],
+  exports: [
+    LoginComponent,
+    RegisterComponent,
+  ]
 })
 export class AuthModule {}

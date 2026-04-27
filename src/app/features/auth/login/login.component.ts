@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -12,6 +12,8 @@ export class LoginComponent {
   form: FormGroup;
   error = '';
   showPassword = false;
+
+  @Output() switchToRegister = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -45,4 +47,8 @@ export class LoginComponent {
   }
 
   get loading(): boolean { return this.auth.isLoading(); }
+
+  goToRegister() {
+    this.switchToRegister.emit();
+  }
 }

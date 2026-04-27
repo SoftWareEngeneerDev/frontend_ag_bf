@@ -22,8 +22,10 @@
     <!-- Right: Actions -->
     <div class="nb-actions">
       <ng-container *ngIf="!auth.isLoggedIn(); else loggedIn">
-        <a routerLink="/auth/login"    class="btn-outline btn-sm nb-desktop-only">Connexion</a>
-        <a routerLink="/auth/register" class="btn-primary btn-sm nb-desktop-only">S'inscrire</a>
+        <!-- <a routerLink="/auth/login"    class="btn-outline btn-sm nb-desktop-only">Connexion</a> -->
+        <button class="btn-outline btn-sm nb-desktop-only" (click)="openLogin()"> Connexion </button>
+        <!-- <a routerLink="/auth/register" class="btn-primary btn-sm nb-desktop-only">S'inscrire</a> -->
+        <button class="btn-primary btn-sm nb-desktop-only" (click)="openRegister()"> S'inscrire </button>
       </ng-container>
 
       <ng-template #loggedIn>
@@ -78,5 +80,29 @@
         </a>
       </ng-template>
     </div>
+  </div>
+</div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" *ngIf="showLoginModal" >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      
+      <!-- Bouton fermer -->
+      <button class="modal-close" (click)="closeModal()">×</button>
+
+      <!-- Ton component login -->
+      <app-login (switchToRegister)="openRegister()"></app-login>
+
+    </div>
+  </div>
+
+  <!-- REGISTER MODAL -->
+<div class="modal-overlay" *ngIf="showRegisterModal">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <button class="modal-close" (click)="closeModal()">×</button>
+
+    <app-register (switchToLogin)="openLogin()"></app-register>
+
   </div>
 </div>
