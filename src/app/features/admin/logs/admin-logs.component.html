@@ -1,29 +1,55 @@
-<div>
+<div class="al-page">
+
+  <!-- ══ MESSAGE ════════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Logs Système</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} entrées affichées</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-scroll"></i> Logs Système
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filtered.length }} entrée{{ filtered.length !== 1 ? 's' : '' }} affichée{{ filtered.length !== 1 ? 's' : '' }}
+        <span *ngIf="hasMore" class="text-muted"> · {{ logs.length }} chargées</span>
+      </p>
     </div>
     <div class="flex gap-10">
-      <input class="inp" style="width:260px" placeholder="Rechercher action, entité, utilisateur..."
+      <input class="inp" style="width:260px"
+             placeholder="🔍 Action, entité, utilisateur..."
              [(ngModel)]="search">
-      <button class="btn-ghost btn-sm">
-        <i class="fa-solid fa-download"></i> Exporter
+      <button class="btn-ghost btn-sm btn-round" (click)="exportCsv()">
+        <i class="fa-solid fa-download"></i> Exporter CSV
       </button>
     </div>
   </div>
 
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
-  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading && logs.length === 0" [full]="true"></app-loading-spinner>
 
-  <div class="glass" *ngIf="!loading">
-    <table class="tbl">
+  <!-- ══ TABLEAU ════════════════════════════════════════════════════ -->
+  <div class="glass" *ngIf="!loading || logs.length > 0">
+
+    <!-- État vide -->
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <i class="fa-solid fa-scroll" style="font-size:36px;color:var(--primary);margin-bottom:12px;display:block"></i>
+      <p class="text-muted">Aucun log trouvé pour cette recherche.</p>
+    </div>
+
+    <table class="tbl" *ngIf="filtered.length > 0">
       <thead>
         <tr>
           <th>Horodatage</th>
@@ -36,24 +62,52 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let l of filtered">
-          <td class="font-mono" style="font-size:11px;color:var(--muted);white-space:nowrap">{{ l.time }}</td>
+        <tr *ngFor="let l of filtered; trackBy: trackByTime"
+            [class.al-row-warn]="l.level === 'WARN'"
+            [class.al-row-err]="l.level === 'ERROR'">
+
+          <!-- Horodatage -->
+          <td class="font-mono" style="font-size:11px;color:var(--muted);white-space:nowrap">
+            {{ l.time }}
+          </td>
+
+          <!-- Utilisateur -->
           <td style="font-size:13px">{{ l.user }}</td>
-          <td class="font-mono" style="font-size:12px;color:var(--cyan)">{{ l.action }}</td>
+
+          <!-- Action -->
+          <td class="font-mono" style="font-size:12px;color:var(--cyan)">
+            {{ l.action }}
+          </td>
+
+          <!-- Entité -->
           <td class="text-muted" style="font-size:12px">{{ l.entity }}</td>
+
+          <!-- IP -->
           <td class="font-mono" style="font-size:11px;color:var(--muted)">{{ l.ip }}</td>
-          <td><span class="badge-grey" style="font-size:10px">{{ l.module }}</span></td>
-          <td><span [class]="levelClass(l.level)" style="font-size:10px">{{ l.level }}</span></td>
+
+          <!-- Module -->
+          <td>
+            <span class="badge-grey" style="font-size:10px">{{ l.module }}</span>
+          </td>
+
+          <!-- Niveau -->
+          <td>
+            <span [class]="levelClass(l.level)" style="font-size:10px">
+              {{ l.level }}
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Empty -->
-    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px">
-        <i class="fa-solid fa-scroll" style="color:var(--primary)"></i>
-      </div>
-      <p class="text-muted">Aucun log trouvé pour cette recherche.</p>
+    <!-- Charger plus -->
+    <div class="al-load-more" *ngIf="hasMore && filtered.length > 0">
+      <button class="btn-ghost btn-sm btn-round" (click)="loadMore()" [disabled]="loading">
+        <i *ngIf="loading" class="fa-solid fa-spinner fa-spin"></i>
+        <i *ngIf="!loading" class="fa-solid fa-chevron-down"></i>
+        {{ loading ? 'Chargement...' : 'Charger plus de logs' }}
+      </button>
     </div>
   </div>
+
 </div>

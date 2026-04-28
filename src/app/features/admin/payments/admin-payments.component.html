@@ -1,47 +1,72 @@
-<div>
-  <!-- En-tête -->
+<div class="pay-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Paiements</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} transaction(s) affichée(s)</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-credit-card"></i> Paiements
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filtered.length }} transaction{{ filtered.length !== 1 ? 's' : '' }} affichée{{ filtered.length !== 1 ? 's' : '' }}
+      </p>
     </div>
-    <input class="inp" style="width:300px" placeholder="Référence, utilisateur, produit..."
+    <input class="inp" style="width:300px"
+           placeholder="🔍 Référence, utilisateur, produit..."
            [(ngModel)]="search">
   </div>
 
-  <!-- Stats rapides -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
-    <div class="glass" style="padding:20px">
-      <div class="text-muted" style="font-size:11px;margin-bottom:6px">TOTAL ENCAISSÉ</div>
-      <div style="font-size:20px;font-weight:700;color:#10D98B">{{ formatXOF(totalSuccess) }}</div>
+  <!-- ══ STATS ══════════════════════════════════════════════════════ -->
+  <div class="pay-stats-grid mb-20">
+    <div class="glass pay-stat">
+      <div class="text-muted pay-stat-label">TOTAL ENCAISSÉ</div>
+      <div class="pay-stat-val" style="color:#10D98B">{{ totalSuccess | currencyXof }}</div>
     </div>
-    <div class="glass" style="padding:20px">
-      <div class="text-muted" style="font-size:11px;margin-bottom:6px">EN ATTENTE</div>
-      <div style="font-size:20px;font-weight:700;color:#F5A623">{{ formatXOF(totalPending) }}</div>
+    <div class="glass pay-stat">
+      <div class="text-muted pay-stat-label">EN ESCROW / ATTENTE</div>
+      <div class="pay-stat-val" style="color:#F5A623">{{ totalPending | currencyXof }}</div>
     </div>
-    <div class="glass" style="padding:20px">
-      <div class="text-muted" style="font-size:11px;margin-bottom:6px">REMBOURSÉS</div>
-      <div style="font-size:20px;font-weight:700;color:#888">{{ formatXOF(totalRefunded) }}</div>
+    <div class="glass pay-stat">
+      <div class="text-muted pay-stat-label">REMBOURSÉS</div>
+      <div class="pay-stat-val" style="color:#888">{{ totalRefunded | currencyXof }}</div>
     </div>
-    <div class="glass" style="padding:20px">
-      <div class="text-muted" style="font-size:11px;margin-bottom:6px">COMMISSIONS</div>
-      <div style="font-size:20px;font-weight:700;color:var(--gold)">{{ formatXOF(totalCommissions) }}</div>
+    <div class="glass pay-stat">
+      <div class="text-muted pay-stat-label">COMMISSIONS</div>
+      <div class="pay-stat-val" style="color:var(--gold)">{{ totalCommissions | currencyXof }}</div>
     </div>
   </div>
 
-  <!-- Onglets -->
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <!-- Tableau -->
+  <!-- ══ TABLEAU ════════════════════════════════════════════════════ -->
   <div class="glass" *ngIf="!loading">
-    <table class="tbl">
+
+    <!-- État vide -->
+    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <i class="fa-solid fa-credit-card" style="font-size:36px;color:var(--primary);margin-bottom:12px;display:block"></i>
+      <p class="text-muted">Aucune transaction trouvée.</p>
+    </div>
+
+    <table class="tbl" *ngIf="filtered.length > 0">
       <thead>
         <tr>
           <th>Référence</th>
@@ -56,66 +81,139 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let p of filtered">
+        <tr *ngFor="let p of filtered; trackBy: trackById">
+
           <!-- Référence -->
           <td>
-            <div class="font-mono" style="font-size:12px;font-weight:500">{{ p.reference }}</div>
-            <div class="text-muted font-mono" style="font-size:10px">{{ p.transactionId }}</div>
+            <div class="font-mono" style="font-size:12px;font-weight:500">
+              {{ p.reference | slice:0:14 }}
+            </div>
+            <div class="text-muted font-mono" style="font-size:10px">
+              {{ p.transactionId | slice:0:14 }}
+            </div>
           </td>
+
           <!-- Utilisateur -->
           <td>
             <div style="font-weight:500;font-size:13px">{{ p.user }}</div>
             <div class="text-muted font-mono" style="font-size:11px">{{ p.phone }}</div>
           </td>
+
           <!-- Produit / Groupe -->
           <td>
-            <div style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-              {{ p.product }}
+            <div class="pay-prod-name">{{ p.product }}</div>
+            <div class="text-muted font-mono" style="font-size:10px">
+              {{ p.groupId | slice:0:8 }}...
             </div>
-            <div class="text-muted font-mono" style="font-size:10px">{{ p.groupId }}</div>
           </td>
+
           <!-- Type -->
-          <td><span [class]="typeClass(p.type)">{{ typeLabel(p.type) }}</span></td>
-          <!-- Méthode -->
           <td>
-            <span style="font-size:13px">{{ methodIcon(p.method) }} {{ methodLabel(p.method) }}</span>
+            <span [class]="typeClass(p.type)">{{ typeLabel(p.type) }}</span>
           </td>
+
+          <!-- Méthode -->
+          <td style="font-size:13px">
+            {{ methodIcon(p.method) }} {{ methodLabel(p.method) }}
+          </td>
+
           <!-- Montant -->
           <td>
             <span class="font-mono" style="font-size:13px;font-weight:600"
-                  [style.color]="p.type === 'REFUND' ? '#888' : p.type === 'COMMISSION' ? 'var(--gold)' : '#10D98B'">
-              {{ p.type === 'REFUND' ? '-' : '+' }}{{ formatXOF(p.amount) }}
+                  [style.color]="amountColor(p)">
+              {{ p.type === 'REFUND' ? '-' : '+' }}{{ p.amount | currencyXof }}
             </span>
           </td>
+
           <!-- Statut -->
-          <td><span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
+          <td>
+            <span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span>
+          </td>
+
           <!-- Date -->
           <td class="text-muted" style="font-size:12px">{{ p.date }}</td>
+
           <!-- Actions -->
           <td>
             <div class="flex gap-6">
-              <button class="btn-ghost btn-sm">Voir</button>
-              <button class="btn-err btn-sm"
-                      *ngIf="p.status === 'PENDING'"
-                      (click)="refund(p)">
-                Annuler
-              </button>
-              <button class="btn-ok btn-sm"
-                      *ngIf="p.status === 'FAILED'">
-                Relancer
+              <button class="btn-err btn-sm btn-round"
+                      *ngIf="p.status === 'PENDING' || p.status === 'ESCROWED'"
+                      [disabled]="refunding === p.id"
+                      (click)="openRefundModal(p)">
+                <i *ngIf="refunding === p.id" class="fa-solid fa-spinner fa-spin"></i>
+                <i *ngIf="refunding !== p.id" class="fa-solid fa-rotate-left"></i>
+                Rembourser
               </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <!-- Empty -->
-    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px">
-        <i class="fa-solid fa-credit-card" style="color:var(--primary)"></i>
+  <!-- ══ MODAL — REMBOURSEMENT ══════════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showRefundModal" (click)="showRefundModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-rotate-left" style="color:#F4A902"></i> Rembourser le paiement
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showRefundModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <p class="text-muted">Aucune transaction trouvée pour cette recherche.</p>
+
+      <div class="modal-body" *ngIf="selectedPayment">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #F4A902">
+          <div class="flex-between">
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:2px">
+                {{ selectedPayment.user }}
+              </div>
+              <div class="text-muted" style="font-size:12px">
+                {{ selectedPayment.product }} · {{ selectedPayment.reference }}
+              </div>
+            </div>
+            <div class="font-mono" style="font-size:16px;font-weight:700;color:#F4A902">
+              {{ selectedPayment.amount | currencyXof }}
+            </div>
+          </div>
+        </div>
+
+        <div class="inp-group">
+          <label>
+            Motif du remboursement <span style="color:var(--err)">*</span>
+          </label>
+          <textarea
+            class="inp"
+            rows="3"
+            [(ngModel)]="refundReason"
+            placeholder="Ex: Litige résolu en faveur du membre, groupe annulé..."
+            style="resize:vertical">
+          </textarea>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-bell"></i>
+          Le membre sera notifié par SMS du remboursement sur son compte mobile.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showRefundModal = false"
+                  [disabled]="!!refunding">
+            Annuler
+          </button>
+          <button class="btn-gold btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmRefund()"
+                  [disabled]="!refundReason.trim() || !!refunding">
+            <i *ngIf="refunding"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!refunding" class="fa-solid fa-rotate-left"></i>
+            {{ refunding ? 'Traitement...' : 'Confirmer le remboursement' }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>

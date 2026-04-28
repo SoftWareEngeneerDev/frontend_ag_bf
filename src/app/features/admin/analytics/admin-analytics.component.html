@@ -1,19 +1,31 @@
-<div>
+<div class="an-page">
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-24">
-    <h2 class="font-display" style="font-size:20px;font-weight:700">Analytics Plateforme</h2>
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700">
+        <i class="fa-solid fa-chart-line"></i> Analytics Plateforme
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        Données pour la période : <strong>{{ activeRange }}</strong>
+      </p>
+    </div>
     <div class="tab-nav">
-      <button class="tab-btn" *ngFor="let r of ranges"
+      <button class="tab-btn"
+              *ngFor="let r of ranges"
               [class.active]="activeRange === r"
-              (click)="onRangeChange(r)">{{ r }}</button>
+              (click)="onRangeChange(r)">
+        {{ r }}
+      </button>
     </div>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
   <ng-container *ngIf="!loading">
 
-    <!-- KPIs -->
+    <!-- ══ KPIs ══════════════════════════════════════════════════════ -->
     <div class="an-kpi-grid mb-24">
       <div class="kpi-card text-center" *ngFor="let k of kpis">
         <div class="font-mono an-val" [style.color]="k.color">{{ k.val }}</div>
@@ -22,23 +34,32 @@
       </div>
     </div>
 
+    <!-- ══ CATÉGORIES + GAUGES ════════════════════════════════════════ -->
     <div class="an-grid mb-24">
 
       <!-- Catégories -->
       <div class="glass p-22">
-        <h3 class="font-display an-title">Activité par catégorie</h3>
+        <h3 class="font-display an-title">
+          <i class="fa-solid fa-tags"></i> Activité par catégorie
+        </h3>
 
-        <!-- Empty state -->
-        <div *ngIf="categories.length === 0" class="text-muted" style="font-size:13px;padding:20px 0;text-align:center">
-          Aucune donnée de catégorie disponible.
-        </div>
+        <app-empty-state
+          *ngIf="categories.length === 0"
+          icon="fa-solid fa-tags"
+          title="Aucune donnée"
+          description="Aucune donnée de catégorie disponible.">
+        </app-empty-state>
 
-        <div class="cat-row" *ngFor="let c of categories">
+        <div class="cat-row"
+             *ngFor="let c of categories; trackBy: trackByName">
           <span style="font-size:18px;width:24px;text-align:center">{{ c.icon }}</span>
           <div style="flex:1">
             <div class="flex-between" style="font-size:12px;margin-bottom:3px">
               <span>{{ c.name }}</span>
-              <span class="font-mono text-gold-c">{{ c.pct }}%</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span class="text-muted" style="font-size:11px">{{ c.count }} groupes</span>
+                <span class="font-mono text-gold-c">{{ c.pct }}%</span>
+              </div>
             </div>
             <div class="prog-wrap" style="height:6px">
               <div class="prog-fill" [style.width.%]="c.pct"></div>
@@ -47,36 +68,59 @@
         </div>
       </div>
 
-      <!-- Gauges + top fournisseurs -->
+      <!-- Gauges + Top fournisseurs -->
       <div class="glass p-22">
-        <h3 class="font-display an-title">Indicateurs clés</h3>
+        <h3 class="font-display an-title">
+          <i class="fa-solid fa-gauge-high"></i> Indicateurs clés
+        </h3>
 
         <div class="gauges-row">
           <div class="gauge-item" *ngFor="let g of gauges">
-            <app-circle-progress [size]="76" [sw]="7" [pct]="g.pct" [color]="g.color">
-              <span class="font-mono" style="font-size:13px;font-weight:700" [style.color]="g.color">{{ g.val }}</span>
+            <app-circle-progress
+              [size]="76"
+              [sw]="7"
+              [pct]="g.pct"
+              [color]="g.color">
+              <span class="font-mono"
+                    style="font-size:13px;font-weight:700"
+                    [style.color]="g.color">
+                {{ g.val }}
+              </span>
             </app-circle-progress>
-            <div class="text-muted" style="font-size:11px;margin-top:6px;text-align:center">{{ g.label }}</div>
+            <div class="text-muted" style="font-size:11px;margin-top:6px;text-align:center">
+              {{ g.label }}
+            </div>
           </div>
         </div>
 
         <div class="divider" style="margin:16px 0"></div>
 
-        <div style="font-size:13px;font-weight:600;margin-bottom:12px">Top Fournisseurs</div>
-
-        <!-- Empty state -->
-        <div *ngIf="topSuppliers.length === 0" class="text-muted" style="font-size:13px;padding:10px 0;text-align:center">
-          Aucun fournisseur disponible.
+        <!-- Top fournisseurs -->
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px">
+          <i class="fa-solid fa-trophy" style="color:#F4A902"></i> Top Fournisseurs
         </div>
 
-        <div class="sup-row" *ngFor="let s of topSuppliers; let i = index">
-          <span class="sup-rank font-mono">#{{ i + 1 }}</span>
-          <span style="flex:1">{{ s.name }}</span>
+        <app-empty-state
+          *ngIf="topSuppliers.length === 0"
+          icon="fa-solid fa-store"
+          title="Aucun fournisseur"
+          description="Aucune donnée fournisseur disponible.">
+        </app-empty-state>
+
+        <div class="sup-row"
+             *ngFor="let s of topSuppliers; let i = index">
+          <span class="sup-rank font-mono"
+                [class.gold]="i === 0"
+                [class.silver]="i === 1"
+                [class.bronze]="i === 2">
+            #{{ i + 1 }}
+          </span>
+          <span style="flex:1;font-size:13px">{{ s.name }}</span>
           <span class="font-mono text-gold-c" style="font-size:12px">{{ s.rev }}</span>
           <span class="text-muted" style="font-size:11px;margin-left:8px">{{ s.groups }}</span>
         </div>
       </div>
-
     </div>
+
   </ng-container>
 </div>

@@ -1,24 +1,52 @@
-<div>
+<div class="au-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Utilisateurs</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} utilisateur(s) affiché(s)</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-users"></i> Utilisateurs
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filtered.length }} utilisateur{{ filtered.length !== 1 ? 's' : '' }} affiché{{ filtered.length !== 1 ? 's' : '' }}
+      </p>
     </div>
-    <input class="inp" style="width:260px" placeholder="Rechercher nom, téléphone..."
+    <input class="inp" style="width:260px"
+           placeholder="🔍 Nom, téléphone, email..."
            [(ngModel)]="search">
   </div>
 
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
+  <!-- ══ TABLEAU ════════════════════════════════════════════════════ -->
   <div class="glass" *ngIf="!loading">
-    <table class="tbl">
+
+    <!-- État vide -->
+    <div class="au-empty" *ngIf="filtered.length === 0">
+      <i class="fa-solid fa-users" style="font-size:36px;color:var(--primary);margin-bottom:12px"></i>
+      <p class="text-muted">Aucun utilisateur trouvé.</p>
+    </div>
+
+    <table class="tbl" *ngIf="filtered.length > 0">
       <thead>
         <tr>
           <th>Utilisateur</th>
@@ -32,25 +60,35 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let u of filtered">
+        <tr *ngFor="let u of filtered; trackBy: trackById">
+
+          <!-- Nom -->
           <td>
             <div class="flex gap-10" style="align-items:center">
-              <app-avatar [name]="u.name" [size]="32"
-                          [bg]="u.role === 'SUPPLIER' ? '#00D4FF' : '#F5A623'"></app-avatar>
-              <span style="font-weight:500">{{ u.name }}</span>
+              <app-avatar [name]="u.name" [size]="32" [bg]="avatarBg(u.role)"></app-avatar>
+              <div>
+                <div style="font-weight:500;font-size:13px">{{ u.name }}</div>
+                <div class="text-muted" style="font-size:11px">{{ u.email }}</div>
+              </div>
             </div>
           </td>
+
+          <!-- Téléphone -->
           <td class="font-mono text-muted" style="font-size:12px">{{ u.phone }}</td>
+
+          <!-- Rôle -->
           <td>
-            <span [class]="u.role === 'SUPPLIER' ? 'badge-cyan' : u.role === 'ADMIN' ? 'badge-err' : 'badge-grey'">
-              {{ u.role === 'SUPPLIER' ? 'Fournisseur' : u.role === 'ADMIN' ? 'Admin' : 'Membre' }}
-            </span>
+            <span [class]="roleBadge(u.role)">{{ roleLabel(u.role) }}</span>
           </td>
+
+          <!-- Statut -->
           <td>
             <span [class]="u.status === 'ACTIVE' ? 'badge-ok' : 'badge-err'">
-              {{ u.status === 'ACTIVE' ? 'Actif' : 'Suspendu' }}
+              {{ u.status === 'ACTIVE' ? '✅ Actif' : '🔴 Suspendu' }}
             </span>
           </td>
+
+          <!-- Score -->
           <td>
             <div class="flex gap-6" style="align-items:center">
               <div class="prog-wrap" style="width:50px;height:4px">
@@ -59,25 +97,35 @@
               <span class="font-mono" style="font-size:12px;color:var(--gold)">{{ u.score }}</span>
             </div>
           </td>
-          <td class="font-mono" style="text-align:center">{{ u.groups }}</td>
+
+          <!-- Groupes -->
+          <td class="font-mono" style="text-align:center;font-size:13px">{{ u.groups }}</td>
+
+          <!-- Date -->
           <td class="text-muted" style="font-size:12px">{{ u.joined }}</td>
+
+          <!-- Actions -->
           <td>
             <div class="flex gap-6">
-              <button class="btn-ghost btn-sm" [routerLink]="['/admin/users', u.id]">Voir</button>
-              <button class="btn-err btn-sm" *ngIf="u.status === 'ACTIVE'"    (click)="suspend(u)">Suspendre</button>
-              <button class="btn-ok   btn-sm" *ngIf="u.status === 'SUSPENDED'" (click)="reactivate(u)">Réactiver</button>
+              <button class="btn-ghost btn-sm btn-round"
+                      [routerLink]="['/admin/users', u.id]">
+                <i class="fa-solid fa-eye"></i> Voir
+              </button>
+              <button class="btn-err btn-sm btn-round"
+                      *ngIf="u.status === 'ACTIVE' && u.role !== 'ADMIN'"
+                      (click)="suspend(u)">
+                Suspendre
+              </button>
+              <button class="btn-ok btn-sm btn-round"
+                      *ngIf="u.status === 'SUSPENDED'"
+                      (click)="reactivate(u)">
+                Réactiver
+              </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
-
-    <!-- Empty -->
-    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px">
-        <i class="fa-solid fa-users" style="color:var(--primary)"></i>
-      </div>
-      <p class="text-muted">Aucun utilisateur trouvé.</p>
-    </div>
   </div>
+
 </div>

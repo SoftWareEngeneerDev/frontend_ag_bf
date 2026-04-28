@@ -1,86 +1,137 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { AdminService } from '../../../core/services/admin.service';
 
+const MODULE_KEYWORDS: Record<string, string[]> = {
+  'Authentification': ['auth', 'login', 'otp', 'register', 'session', 'logout'],
+  'Paiements'       : ['payment', 'refund', 'escrow', 'commission'],
+  'Groupes'         : ['group'],
+  'Fournisseurs'    : ['supplier'],
+  'Système'         : ['system', 'cron', 'backup', 'health'],
+};
+
 @Component({
-  selector: 'app-admin-logs',
+  selector   : 'app-admin-logs',
   templateUrl: './admin-logs.component.html',
-  styleUrls:  ['./admin-logs.component.scss']
+  styleUrls  : ['./admin-logs.component.scss']
 })
-export class AdminLogsComponent implements OnInit {
+export class AdminLogsComponent implements OnInit, OnDestroy {
   search    = '';
   activeTab = 'Tous';
   loading   = true;
-  tabs      = ['Tous', 'Authentification', 'Paiements', 'Groupes', 'Système'];
-  logs: any[] = [];
+  page      = 1;
+  hasMore   = true;
+
+  readonly tabs  = ['Tous', 'Authentification', 'Paiements', 'Groupes', 'Fournisseurs', 'Système'];
+  readonly LIMIT = 50;
+
+  logs       : any[] = [];
+  successMsg  = '';
+
+  private destroy$ = new Subject<void>();
 
   constructor(private adminService: AdminService) {}
 
-  ngOnInit(): void {
-    this.loadLogs();
+  ngOnInit(): void { this.loadLogs(); }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  // ── GET /admin/audit-logs ─────────────────────────────────────
-  private loadLogs(): void {
+  private loadLogs(append = false): void {
     this.loading = true;
-    this.adminService.getAuditLogs({ limit: 100 }).subscribe({
-      next: (res) => {
-        const data    = res.data?.logs ?? res.data ?? [];
-        this.logs     = data.map((l: any) => this.mapLog(l));
-        this.loading  = false;
-      },
-      error: () => { this.loading = false; }
-    });
+    this.adminService.getAuditLogs({ limit: this.LIMIT, page: this.page })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          const mapped = (res as any[]).map((l: any) => this.mapLog(l));
+          this.logs    = append ? [...this.logs, ...mapped] : mapped;
+          this.hasMore = mapped.length === this.LIMIT;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erreur chargement logs:', err);
+          this.loading = false;
+        }
+      });
+  }
+
+  loadMore(): void {
+    if (!this.hasMore || this.loading) return;
+    this.page++;
+    this.loadLogs(true);
   }
 
   get filtered(): any[] {
+    const q = this.search.toLowerCase();
     return this.logs.filter(l => {
-      const matchSearch = !this.search ||
-        l.action.toLowerCase().includes(this.search.toLowerCase()) ||
-        l.user.toLowerCase().includes(this.search.toLowerCase()) ||
-        l.entity.toLowerCase().includes(this.search.toLowerCase());
+      const matchSearch = !q
+        || l.action.toLowerCase().includes(q)
+        || l.user.toLowerCase().includes(q)
+        || l.entity.toLowerCase().includes(q)
+        || l.module.toLowerCase().includes(q);
 
-      const moduleMap: Record<string, string[]> = {
-        'Authentification': ['auth', 'login', 'otp', 'register', 'session'],
-        'Paiements':        ['payment', 'refund', 'escrow'],
-        'Groupes':          ['group'],
-        'Système':          ['system', 'cron', 'backup'],
-      };
-
-      const matchTab = this.activeTab === 'Tous' ||
-        (moduleMap[this.activeTab] ?? []).some(k =>
-          l.module.toLowerCase().includes(k) ||
-          l.action.toLowerCase().includes(k)
-        );
+      const matchTab = this.activeTab === 'Tous'
+        || (MODULE_KEYWORDS[this.activeTab] ?? []).some(k =>
+            l.module.toLowerCase().includes(k) ||
+            l.action.toLowerCase().includes(k)
+          );
 
       return matchSearch && matchTab;
     });
   }
 
-  levelClass(l: string): string {
-    return l === 'INFO' ? 'badge-ok' : l === 'WARN' ? 'badge-warn' : 'badge-err';
+  tabCount(t: string): number {
+    if (t === 'Tous') return this.logs.length;
+    return this.logs.filter(l =>
+      (MODULE_KEYWORDS[t] ?? []).some(k =>
+        l.module.toLowerCase().includes(k) ||
+        l.action.toLowerCase().includes(k)
+      )
+    ).length;
   }
 
-  // ── Helper mapper ─────────────────────────────────────────────
+  exportCsv(): void {
+    const headers = ['Horodatage', 'Utilisateur', 'Action', 'Entité', 'Module', 'Niveau', 'IP'];
+    const rows    = this.filtered.map(l =>
+      [l.time, l.user, l.action, l.entity, l.module, l.level, l.ip]
+        .map(v => `"${(v ?? '').toString().replace(/"/g, '""')}"`)
+        .join(',')
+    );
+    const csv  = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `djula-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.successMsg = `${this.filtered.length} entrées exportées`;
+    setTimeout(() => { this.successMsg = ''; }, 3000);
+  }
+
+  levelClass(l: string): string {
+    const m: Record<string, string> = { INFO: 'badge-ok', WARN: 'badge-warn', ERROR: 'badge-err' };
+    return m[l] ?? 'badge-grey';
+  }
+
+  trackByTime(_: number, l: any): string { return l.time + l.action; }
+
   private mapLog(l: any): any {
     const action = (l.action ?? '').toUpperCase();
-
-    // Déduire le module depuis l'action ou l'entité
     const module = this.inferModule(action, l.entity ?? '');
-
-    // Déduire le niveau depuis l'action
-    const level = ['DELETE', 'SUSPEND', 'BAN', 'REJECT', 'FAIL', 'ERROR'].some(k => action.includes(k))
-      ? 'WARN'
-      : 'INFO';
-
+    const level  = ['DELETE', 'SUSPEND', 'BAN', 'REJECT', 'FAIL', 'ERROR', 'CLOSE'].some(k => action.includes(k))
+      ? 'WARN' : 'INFO';
     return {
-      time:   new Date(l.createdAt).toLocaleString('fr-FR', {
+      time  : new Date(l.createdAt).toLocaleString('fr-FR', {
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit'
       }),
-      user:   l.user?.name ?? 'System',
+      user  : l.user?.name ?? 'System',
       action,
       entity: `${l.entity ?? ''}${l.entityId ? ' · ' + l.entityId.slice(0, 8) : ''}`,
-      ip:     l.ipAddress ?? '—',
+      ip    : l.ipAddress ?? '—',
       module,
       level,
     };
@@ -89,13 +140,9 @@ export class AdminLogsComponent implements OnInit {
   private inferModule(action: string, entity: string): string {
     const a = action.toLowerCase();
     const e = entity.toLowerCase();
-    if (a.includes('auth') || a.includes('login') || a.includes('otp') || a.includes('session')) return 'Authentification';
-    if (a.includes('payment') || a.includes('refund') || e.includes('payment')) return 'Paiement';
-    if (a.includes('group') || e.includes('group')) return 'Groupe';
-    if (a.includes('product') || e.includes('product')) return 'Produit';
-    if (a.includes('supplier') || e.includes('supplier')) return 'Fournisseur';
-    if (a.includes('user') || e.includes('user')) return 'Utilisateur';
-    if (a.includes('cron') || a.includes('backup') || a.includes('system')) return 'Système';
+    for (const [mod, keywords] of Object.entries(MODULE_KEYWORDS)) {
+      if (keywords.some(k => a.includes(k) || e.includes(k))) return mod;
+    }
     return 'Autre';
   }
 }

@@ -1,111 +1,169 @@
 <div *ngIf="!loading && product; else notFound">
 
-  <!-- En-tête -->
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()">
+      <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
         <i class="fa-solid fa-arrow-left"></i> Retour
       </button>
       <div>
-        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail produit</h2>
-        <p class="text-muted font-mono" style="font-size:12px">{{ product.id }}</p>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">
+          Détail produit
+        </h2>
+        <p class="text-muted font-mono" style="font-size:12px">{{ product!.id }}</p>
       </div>
     </div>
+
     <div class="flex gap-8">
-      <ng-container *ngIf="product.status === 'PENDING'">
-        <button class="btn-ok  btn-sm" (click)="approve()"><i class="fa-solid fa-circle-check"></i> Approuver</button>
-        <button class="btn-err btn-sm" (click)="reject()"><i class="fa-solid fa-xmark"></i> Rejeter</button>
+      <ng-container *ngIf="product!.status === 'PENDING'">
+        <button class="btn-ok btn-sm btn-round"
+                [disabled]="processing"
+                (click)="approve()">
+          <i *ngIf="processing" class="fa-solid fa-spinner fa-spin"></i>
+          <i *ngIf="!processing" class="fa-solid fa-circle-check"></i>
+          Approuver
+        </button>
+        <button class="btn-err btn-sm btn-round"
+                [disabled]="processing"
+                (click)="openRejectModal()">
+          <i class="fa-solid fa-xmark"></i> Rejeter
+        </button>
       </ng-container>
-      <button class="btn-err btn-sm" *ngIf="product.status === 'ACTIVE'" (click)="reject()">Désactiver</button>
-      <button class="btn-ok  btn-sm" *ngIf="product.status === 'INACTIVE'" (click)="approve()">Réactiver</button>
+      <button class="btn-err btn-sm btn-round"
+              *ngIf="product!.status === 'ACTIVE'"
+              [disabled]="processing"
+              (click)="openRejectModal()">
+        <i class="fa-solid fa-ban"></i> Désactiver
+      </button>
+      <button class="btn-ok btn-sm btn-round"
+              *ngIf="product!.status === 'INACTIVE' || product!.status === 'REJECTED'"
+              [disabled]="processing"
+              (click)="approve()">
+        <i class="fa-solid fa-rotate-left"></i> Réactiver
+      </button>
     </div>
   </div>
 
-  <!-- Carte identité produit -->
+  <!-- ══ CARTE IDENTITÉ ════════════════════════════════════════════ -->
   <div class="glass mb-20" style="padding:24px">
     <div class="flex gap-20" style="align-items:flex-start">
       <div class="apd-prod-img">
-        <img [src]="product.images[0] || 'https://picsum.photos/seed/' + product.id + '/100/100'"
-             [alt]="product.name" loading="lazy">
+        <img [src]="product!.images[0] || 'https://picsum.photos/seed/' + product!.id + '/100/100'"
+             [alt]="product!.name" loading="lazy">
       </div>
       <div style="flex:1">
         <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
-          <span style="font-size:20px;font-weight:700">{{ product.name }}</span>
+          <span style="font-size:20px;font-weight:700">{{ product!.name }}</span>
           <span [class]="statusClass">{{ statusLabel }}</span>
         </div>
         <div class="flex gap-20 text-muted mb-12" style="font-size:13px;flex-wrap:wrap">
-          <span><i [class]="product.category.icon"></i> {{ product.category.name }}</span>
-          <span><i class="fa-solid fa-store"></i> {{ product.supplier.companyName }}</span>
-          <span><i class="fa-solid fa-star" style="color:#F4A902"></i> {{ product.rating }}/5 ({{ product.reviewCount }} avis)</span>
-          <span><i class="fa-solid fa-calendar-days"></i> Ajouté le {{ product.createdAt | date:'d MMM yyyy' }}</span>
+          <span><i [class]="product!.category.icon"></i> {{ product!.category.name }}</span>
+          <span><i class="fa-solid fa-store"></i> {{ product!.supplier.companyName }}</span>
+          <span>
+            <i class="fa-solid fa-star" style="color:#F4A902"></i>
+            {{ product!.rating }}/5 ({{ product!.reviewCount }} avis)
+          </span>
+          <span>
+            <i class="fa-solid fa-calendar-days"></i>
+            Ajouté le {{ product!.createdAt | date:'d MMM yyyy' }}
+          </span>
         </div>
-        <p class="text-muted" style="font-size:13px;line-height:1.5">{{ product.description }}</p>
+        <p class="text-muted" style="font-size:13px;line-height:1.5">
+          {{ product!.description || 'Aucune description.' }}
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- Stats clés -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:var(--gold)">{{ formatXOF(product.soloPrice) }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Prix solo</div>
+  <!-- ══ STATS CLÉS ════════════════════════════════════════════════ -->
+  <div class="apd-stats-grid mb-20">
+    <div class="glass apd-stat">
+      <div class="apd-stat-val" style="color:var(--gold)">
+        {{ product!.soloPrice | currencyXof }}
+      </div>
+      <div class="text-muted apd-stat-label">Prix solo</div>
     </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ formatXOF(product.minGroupPrice ?? 0) }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Meilleur prix groupe (-{{ discountPercent }}%)</div>
+    <div class="glass apd-stat">
+      <div class="apd-stat-val" style="color:#10D98B">
+        {{ (product!.minGroupPrice ?? 0) | currencyXof }}
+      </div>
+      <div class="text-muted apd-stat-label">Meilleur prix groupe (-{{ discountPercent }}%)</div>
     </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700" [style.color]="stockColor">{{ product.stock }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Unités en stock</div>
+    <div class="glass apd-stat">
+      <div class="apd-stat-val" [style.color]="stockColor">{{ product!.stock }}</div>
+      <div class="text-muted apd-stat-label">Unités en stock</div>
     </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ product.activeGroupCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Groupes actifs</div>
+    <div class="glass apd-stat">
+      <div class="apd-stat-val" style="color:#00D4FF">{{ product!.activeGroupCount }}</div>
+      <div class="text-muted apd-stat-label">Groupes actifs</div>
     </div>
   </div>
 
-  <!-- Détails et fournisseur -->
+  <!-- ══ DÉTAILS + FOURNISSEUR ══════════════════════════════════════ -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
     <!-- Informations produit -->
     <div class="glass" style="padding:20px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Informations produit</h3>
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-box"></i> Informations produit
+      </h3>
       <table class="tbl">
         <tbody>
           <tr>
             <td class="text-muted" style="font-size:12px;width:45%">Identifiant</td>
-            <td class="font-mono" style="font-size:12px">{{ product.id }}</td>
+            <td class="font-mono" style="font-size:11px">{{ product!.id }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Catégorie</td>
-            <td style="font-size:13px"><i [class]="product.category.icon"></i> {{ product.category.name }}</td>
+            <td style="font-size:13px">
+              <i [class]="product!.category.icon"></i> {{ product!.category.name }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Prix solo</td>
-            <td class="font-mono" style="font-size:13px">{{ formatXOF(product.soloPrice) }}</td>
+            <td class="font-mono" style="font-size:13px">
+              {{ product!.soloPrice | currencyXof }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Prix groupe min.</td>
-            <td class="font-mono" style="font-size:13px;color:#10D98B">{{ formatXOF(product.minGroupPrice ?? 0) }}</td>
+            <td class="font-mono" style="font-size:13px;color:#10D98B">
+              {{ (product!.minGroupPrice ?? 0) | currencyXof }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Réduction max.</td>
-            <td style="font-size:13px;color:#10D98B;font-weight:600">-{{ discountPercent }}%</td>
+            <td style="font-size:13px;color:#10D98B;font-weight:600">
+              -{{ discountPercent }}%
+            </td>
           </tr>
           <tr>
-            <td class="text-muted" style="font-size:12px">Stock disponible</td>
-            <td class="font-mono" style="font-size:13px" [style.color]="stockColor">{{ product.stock }} unités</td>
+            <td class="text-muted" style="font-size:12px">Stock</td>
+            <td class="font-mono" style="font-size:13px" [style.color]="stockColor">
+              {{ product!.stock }} unités
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Note moyenne</td>
             <td>
               <i class="fa-solid fa-star" style="color:#F5A623"></i>
-              <span class="font-mono" style="font-size:13px"> {{ product.rating }}/5</span>
-              <span class="text-muted" style="font-size:11px"> ({{ product.reviewCount }} avis)</span>
+              <span class="font-mono" style="font-size:13px"> {{ product!.rating }}/5</span>
+              <span class="text-muted" style="font-size:11px"> ({{ product!.reviewCount }} avis)</span>
             </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Groupes actifs</td>
-            <td class="font-mono" style="font-size:13px;color:#00D4FF">{{ product.activeGroupCount }}</td>
+            <td class="font-mono" style="font-size:13px;color:#00D4FF">
+              {{ product!.activeGroupCount }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Statut</td>
@@ -117,35 +175,37 @@
 
     <!-- Fournisseur -->
     <div class="glass" style="padding:20px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Fournisseur</h3>
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-store"></i> Fournisseur
+      </h3>
       <table class="tbl">
         <tbody>
           <tr>
             <td class="text-muted" style="font-size:12px;width:45%">Entreprise</td>
-            <td style="font-size:13px;font-weight:500">{{ product.supplier.companyName }}</td>
+            <td style="font-size:13px;font-weight:500">{{ product!.supplier.companyName }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Contact</td>
-            <td style="font-size:13px">{{ product.supplier.contactName }}</td>
+            <td style="font-size:13px">{{ product!.supplier.contactName }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Téléphone</td>
-            <td class="font-mono" style="font-size:12px">{{ product.supplier.phone }}</td>
+            <td class="font-mono" style="font-size:12px">{{ product!.supplier.phone }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Email</td>
-            <td style="font-size:12px">{{ product.supplier.email }}</td>
+            <td style="font-size:12px">{{ product!.supplier.email || '—' }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Ville</td>
-            <td style="font-size:13px">{{ product.supplier.city }}</td>
+            <td style="font-size:13px">{{ product!.supplier.city }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Note fournisseur</td>
             <td>
               <i class="fa-solid fa-star" style="color:#F5A623"></i>
-              <span class="font-mono" style="font-size:13px"> {{ product.supplier.rating }}/5</span>
-              <span class="text-muted" style="font-size:11px"> ({{ product.supplier.reviewCount }} avis)</span>
+              <span class="font-mono" style="font-size:13px"> {{ product!.supplier.rating }}/5</span>
+              <span class="text-muted" style="font-size:11px"> ({{ product!.supplier.reviewCount }} avis)</span>
             </td>
           </tr>
           <tr>
@@ -153,29 +213,84 @@
             <td>
               <div class="flex gap-8" style="align-items:center">
                 <div class="prog-wrap" style="width:60px;height:4px">
-                  <div class="prog-fill" [style.width.%]="product.supplier.successRate"></div>
+                  <div class="prog-fill" [style.width.%]="product!.supplier.successRate"></div>
                 </div>
-                <span class="font-mono" style="font-size:12px;color:#10D98B">{{ product.supplier.successRate }}%</span>
+                <span class="font-mono" style="font-size:12px;color:#10D98B">
+                  {{ product!.supplier.successRate }}%
+                </span>
               </div>
             </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Total groupes</td>
-            <td class="font-mono" style="font-size:13px">{{ product.supplier.totalGroups }}</td>
+            <td class="font-mono" style="font-size:13px">{{ product!.supplier.totalGroups }}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
+  <!-- ══ MODAL — REJETER PRODUIT ═══════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showRejectModal" (click)="showRejectModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-xmark" style="color:#FF4D6A"></i>
+          {{ product!.status === 'ACTIVE' ? 'Désactiver' : 'Rejeter' }} le produit
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showRejectModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #F4A902">
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px">{{ product!.name }}</div>
+          <div class="text-muted" style="font-size:12px">{{ product!.supplier.companyName }}</div>
+        </div>
+
+        <div class="inp-group">
+          <label>Motif <span style="color:var(--err)">*</span></label>
+          <textarea class="inp" rows="4" [(ngModel)]="rejectReason"
+                    placeholder="Ex: Images non conformes, description insuffisante..."
+                    style="resize:vertical"></textarea>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-bell"></i>
+          Le fournisseur sera notifié par email.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showRejectModal = false" [disabled]="processing">
+            Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmReject()"
+                  [disabled]="!rejectReason.trim() || processing">
+            <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-xmark"></i>
+            {{ processing ? 'En cours...' : 'Confirmer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
+<!-- ══ NOT FOUND ═════════════════════════════════════════════════ -->
 <ng-template #notFound>
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
   <div *ngIf="!loading" style="text-align:center;padding:60px 0">
-    <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-box" style="color:var(--primary)"></i></div>
+    <i class="fa-solid fa-box" style="font-size:48px;color:var(--primary);margin-bottom:16px;display:block"></i>
     <h3 style="font-weight:600;margin-bottom:8px">Produit introuvable</h3>
-    <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun produit.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</button>
+    <p class="text-muted" style="margin-bottom:24px">
+      Cet identifiant ne correspond à aucun produit.
+    </p>
+    <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+    </button>
   </div>
 </ng-template>

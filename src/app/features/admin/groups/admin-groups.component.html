@@ -1,50 +1,75 @@
-<div>
-  <!-- En-tête -->
+<div class="ag-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Groupes d'achat</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} groupe(s) affiché(s)</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-layer-group"></i> Groupes d'achat
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filtered.length }} groupe{{ filtered.length !== 1 ? 's' : '' }} affiché{{ filtered.length !== 1 ? 's' : '' }}
+      </p>
     </div>
-    <input class="inp" style="width:280px" placeholder="Rechercher groupe, produit, fournisseur..."
+    <input class="inp" style="width:280px"
+           placeholder="🔍 Groupe, produit, fournisseur..."
            [(ngModel)]="search">
   </div>
 
-  <!-- Stats rapides -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ groups.length }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Total groupes</div>
+  <!-- ══ STATS RAPIDES ══════════════════════════════════════════════ -->
+  <div class="ag-stats-grid mb-20">
+    <div class="glass ag-stat">
+      <div class="ag-stat-val" style="color:#00D4FF">{{ groups.length }}</div>
+      <div class="text-muted ag-stat-label">Total groupes</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ openCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Ouverts</div>
+    <div class="glass ag-stat">
+      <div class="ag-stat-val" style="color:#10D98B">{{ openCount }}</div>
+      <div class="text-muted ag-stat-label">Ouverts</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ thresholdCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Seuil atteint</div>
+    <div class="glass ag-stat">
+      <div class="ag-stat-val" style="color:#F5A623">{{ thresholdCount }}</div>
+      <div class="text-muted ag-stat-label">Seuil atteint</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#888">{{ completedCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Terminés</div>
+    <div class="glass ag-stat">
+      <div class="ag-stat-val" style="color:#888">{{ completedCount }}</div>
+      <div class="text-muted ag-stat-label">Terminés</div>
     </div>
   </div>
 
-  <!-- Onglets -->
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <!-- Tableau -->
+  <!-- ══ TABLEAU ════════════════════════════════════════════════════ -->
   <div class="glass" *ngIf="!loading">
-    <table class="tbl">
+
+    <!-- État vide -->
+    <div class="ag-empty" *ngIf="filtered.length === 0">
+      <i class="fa-solid fa-fire" style="font-size:36px;color:var(--orange);margin-bottom:12px"></i>
+      <p class="text-muted">Aucun groupe trouvé.</p>
+    </div>
+
+    <table class="tbl" *ngIf="filtered.length > 0">
       <thead>
         <tr>
-          <th>Groupe</th>
+          <th>Groupe / Produit</th>
           <th>Fournisseur</th>
           <th>Statut</th>
           <th>Membres</th>
@@ -55,53 +80,84 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let g of filtered">
+        <tr *ngFor="let g of filtered; trackBy: trackById">
+
+          <!-- Produit -->
           <td>
             <div class="flex gap-10" style="align-items:center">
               <div class="ag-prod-icon">
                 <i [class]="g.product.category.icon"></i>
               </div>
               <div>
-                <div style="font-weight:500;font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                  {{ g.product.name }}
+                <div class="ag-prod-name">{{ g.product.name | truncate:30 }}</div>
+                <div class="text-muted font-mono" style="font-size:11px">
+                  {{ g.id | slice:0:8 }}...
                 </div>
-                <div class="text-muted font-mono" style="font-size:11px">{{ g.id }}</div>
               </div>
             </div>
           </td>
-          <td class="text-muted" style="font-size:12px">{{ g.supplier.companyName }}</td>
-          <td><span [class]="statusClass(g.status)">{{ statusLabel(g.status) }}</span></td>
+
+          <!-- Fournisseur -->
+          <td class="text-muted" style="font-size:12px">
+            {{ g.supplier.companyName }}
+          </td>
+
+          <!-- Statut -->
           <td>
-            <div>
-              <div class="flex gap-6 mb-4" style="align-items:center">
-                <span class="font-mono" style="font-size:13px;font-weight:600"
-                      [style.color]="fillColor(g)">{{ g.currentCount }}</span>
-                <span class="text-muted" style="font-size:12px">/ {{ g.minParticipants }}</span>
-              </div>
-              <div class="prog-wrap" style="width:80px;height:4px">
-                <div class="prog-fill" [style.width.%]="fillPercent(g)"
-                     [style.background]="fillColor(g)"></div>
+            <span [class]="statusClass(g.status)">{{ statusLabel(g.status) }}</span>
+          </td>
+
+          <!-- Membres + barre -->
+          <td>
+            <div class="flex gap-6 mb-4" style="align-items:center">
+              <span class="font-mono" style="font-size:13px;font-weight:600"
+                    [style.color]="fillColor(g)">
+                {{ g.currentCount }}
+              </span>
+              <span class="text-muted" style="font-size:12px">/ {{ g.minParticipants }}</span>
+            </div>
+            <div class="prog-wrap" style="width:80px;height:4px">
+              <div class="prog-fill"
+                   [style.width.%]="fillPercent(g)"
+                   [style.background]="fillColor(g)">
               </div>
             </div>
           </td>
+
+          <!-- Réduction -->
           <td>
             <span class="font-mono" style="font-size:13px;font-weight:600;color:#10D98B">
               -{{ g.discountPercent }}%
             </span>
           </td>
-          <td class="font-mono" style="font-size:12px">{{ formatXOF(g.currentPrice) }}</td>
+
+          <!-- Prix -->
+          <td class="font-mono" style="font-size:12px">
+            {{ g.currentPrice | currencyXof }}
+          </td>
+
+          <!-- Expiration -->
           <td>
             <span class="font-mono" style="font-size:12px"
                   [style.color]="isExpiringSoon(g.expiresAt) ? '#FF4D6A' : 'inherit'">
+              <i *ngIf="isExpiringSoon(g.expiresAt)" class="fa-solid fa-triangle-exclamation"></i>
               {{ formatExpiry(g.expiresAt) }}
             </span>
           </td>
+
+          <!-- Actions -->
           <td>
             <div class="flex gap-6">
-              <button class="btn-ghost btn-sm" [routerLink]="['/admin/groups', g.id]">Voir</button>
-              <button class="btn-err btn-sm"
+              <button class="btn-ghost btn-sm btn-round"
+                      [routerLink]="['/admin/groups', g.id]">
+                <i class="fa-solid fa-eye"></i> Voir
+              </button>
+              <button class="btn-err btn-sm btn-round"
                       *ngIf="g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED'"
+                      [disabled]="closing === g.id"
                       (click)="closeGroup(g)">
+                <i *ngIf="closing === g.id" class="fa-solid fa-spinner fa-spin"></i>
+                <i *ngIf="closing !== g.id" class="fa-solid fa-ban"></i>
                 Fermer
               </button>
             </div>
@@ -109,12 +165,6 @@
         </tr>
       </tbody>
     </table>
-
-    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px">
-        <i class="fa-solid fa-fire" style="color:var(--orange)"></i>
-      </div>
-      <p class="text-muted">Aucun groupe trouvé pour cette recherche.</p>
-    </div>
   </div>
+
 </div>
