@@ -7,9 +7,32 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
   year = new Date().getFullYear();
+
   footerLinks = [
-    { title:'Acheter', links:['Groupes actifs','Catalogue','Nouveautés','Promotions','Comment ça marche'] },
-    { title:'Vendre', links:['Devenir fournisseur','Créer un groupe','Gérer vos produits','Conditions vendeur'] },
-    { title:'Aide', links:['FAQ','Nous contacter','Politique retours','Livraison','Litiges'] },
+    {
+      title: 'Acheter',
+      links: [
+        { label: 'Groupes actifs',      route: '/groups' },
+        { label: 'Catalogue',           route: '/catalog' },
+        { label: 'Comment ça marche',   route: '/how-it-works' },
+      ]
+    },
+    {
+      title: 'Vendre',
+      links: [
+        { label: 'Devenir fournisseur', route: '/auth/register' },
+        { label: 'Créer un groupe',     route: '/auth/register' },
+      ]
+    },
+    {
+      title: 'Aide',
+      links: [
+        { label: 'FAQ',                 route: '/faq' },
+        { label: 'Nous contacter',      route: '/contact' },
+        { label: 'Politique retours',   route: '/retours' },
+        { label: 'Livraison',           route: '/livraison' },
+        { label: 'Litiges',             route: '/litiges' },
+      ]
+    },
   ];
 }

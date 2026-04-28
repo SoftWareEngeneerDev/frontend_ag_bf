@@ -1,93 +1,180 @@
-<div>
+<div class="dis-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Litiges</h2>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-gavel"></i> Litiges
+      </h2>
       <p class="text-muted" style="font-size:13px">
-        {{ openCount }} litige(s) ouvert(s) —
-        {{ urgentCount }} urgents
+        {{ openCount }} litige{{ openCount !== 1 ? 's' : '' }} ouvert{{ openCount !== 1 ? 's' : '' }}
+        <span *ngIf="urgentCount > 0" style="color:#FF4D6A;font-weight:600">
+          · {{ urgentCount }} urgent{{ urgentCount !== 1 ? 's' : '' }}
+        </span>
       </p>
     </div>
-    <span class="badge-err">
-      <i class="fa-solid fa-triangle-exclamation"></i> {{ urgentCount }} urgents
+    <span class="badge-err" *ngIf="urgentCount > 0">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ urgentCount }} urgent{{ urgentCount !== 1 ? 's' : '' }}
     </span>
   </div>
 
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="setTab(t)">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <!-- Empty -->
-  <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="fa-solid fa-gavel" title="Aucun litige"
-    description="Aucun litige dans cette catégorie.">
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-handshake"
+    title="Aucun litige"
+    description="Aucun litige dans cette catégorie. 🎉">
   </app-empty-state>
 
-  <div class="dis-list" *ngIf="!loading">
-    <div class="glass dis-card" *ngFor="let d of filtered"
-         [style.borderColor]="d.urgent ? 'rgba(255,77,106,.3)' : 'var(--border)'">
+  <!-- ══ LISTE DES LITIGES ══════════════════════════════════════════ -->
+  <div class="dis-list" *ngIf="!loading && filtered.length > 0">
+    <div class="glass dis-card"
+         *ngFor="let d of filtered; trackBy: trackById"
+         [class.dis-card-urgent]="d.urgent">
 
       <div class="dis-head">
         <div class="dis-left">
           <div class="flex gap-8" style="align-items:center;margin-bottom:4px">
-            <span class="font-mono" style="font-size:11px;color:var(--muted)">{{ d.id }}</span>
-            <span *ngIf="d.urgent" class="badge-err" style="font-size:10px">
+            <span class="font-mono" style="font-size:11px;color:var(--muted)">
+              {{ d.id | slice:0:8 }}...
+            </span>
+            <span class="badge-err" style="font-size:10px" *ngIf="d.urgent">
               <i class="fa-solid fa-bolt"></i> Urgent
             </span>
           </div>
-          <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">{{ d.reason }}</div>
+          <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">
+            {{ d.reason }}
+          </div>
           <div class="text-muted" style="font-size:12px">
-            Plaignant : <strong style="color:var(--txt)">{{ d.reporter }}</strong>
+            Plaignant :
+            <strong style="color:var(--txt)">{{ d.reporter }}</strong>
             <ng-container *ngIf="d.product !== 'N/A'">
-              · Réf : <strong style="color:var(--txt)">{{ d.product }}</strong>
+              · Réf : <strong style="color:var(--txt)">{{ d.product | slice:0:8 }}...</strong>
             </ng-container>
           </div>
         </div>
         <div class="dis-right">
           <span [class]="statusClass(d.status)">{{ statusLabel(d.status) }}</span>
-          <div class="text-muted" style="font-size:11px;margin-top:6px">{{ d.date }}</div>
+          <div class="text-muted" style="font-size:11px;margin-top:6px">
+            <i class="fa-regular fa-calendar"></i> {{ d.date }}
+          </div>
         </div>
       </div>
 
+      <!-- Actions selon statut -->
       <div class="dis-actions">
-        <!-- ── Ouvert ── -->
+
+        <!-- OPEN -->
         <ng-container *ngIf="d.status === 'OPEN'">
-          <button class="btn-cyan  btn-sm" (click)="takeCharge(d)">
+          <button class="btn-cyan btn-sm btn-round" (click)="takeCharge(d)">
             <i class="fa-solid fa-magnifying-glass"></i> Prendre en charge
           </button>
-          <button class="btn-ok    btn-sm" (click)="resolve(d)">
+          <button class="btn-ok btn-sm btn-round" (click)="openResolveModal(d)">
             <i class="fa-solid fa-circle-check"></i> Résoudre
           </button>
-          <button class="btn-ghost btn-sm">
-            <i class="fa-solid fa-envelope"></i> Contacter parties
-          </button>
         </ng-container>
 
-        <!-- ── En cours ── -->
+        <!-- IN_REVIEW -->
         <ng-container *ngIf="d.status === 'IN_REVIEW'">
-          <button class="btn-gold  btn-sm" (click)="refund(d)">
+          <button class="btn-gold btn-sm btn-round" (click)="refund(d)"
+                  [disabled]="!d.paymentId">
             <i class="fa-solid fa-sack-dollar"></i> Rembourser
           </button>
-          <button class="btn-ok    btn-sm" (click)="resolve(d)">
+          <button class="btn-ok btn-sm btn-round" (click)="openResolveModal(d)">
             <i class="fa-solid fa-lock"></i> Clôturer
           </button>
-          <button class="btn-ghost btn-sm">
-            <i class="fa-solid fa-envelope"></i> Message
-          </button>
         </ng-container>
 
-        <!-- ── Résolu ── -->
+        <!-- RESOLVED / CLOSED -->
         <ng-container *ngIf="d.status === 'RESOLVED' || d.status === 'CLOSED'">
-          <button class="btn-ghost btn-sm">
-            <i class="fa-solid fa-eye"></i> Voir détails
-          </button>
+          <span class="badge-ok" style="font-size:12px">
+            <i class="fa-solid fa-circle-check"></i> Traité
+          </span>
         </ng-container>
-      </div>
 
+      </div>
     </div>
   </div>
+
+  <!-- ══ MODAL — RÉSOUDRE UN LITIGE ════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showResolveModal" (click)="showResolveModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-gavel"></i> Résoudre le litige
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showResolveModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedDispute">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #FF4D6A">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px">
+            {{ selectedDispute.reason }}
+          </div>
+          <div class="text-muted" style="font-size:12px">
+            Plaignant : {{ selectedDispute.reporter }} · {{ selectedDispute.date }}
+          </div>
+        </div>
+
+        <div class="inp-group">
+          <label>
+            Décision / Résolution <span style="color:var(--err)">*</span>
+          </label>
+          <textarea
+            class="inp"
+            rows="4"
+            [(ngModel)]="resolution"
+            placeholder="Ex: Remboursement accordé — produit non conforme constaté. Le membre sera remboursé sous 48h."
+            style="resize:vertical">
+          </textarea>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-bell"></i>
+          Le membre et le fournisseur seront notifiés par SMS et email de la décision.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showResolveModal = false"
+                  [disabled]="resolving">
+            Annuler
+          </button>
+          <button class="btn-ok btn-round" style="flex:1;justify-content:center"
+                  (click)="resolve()"
+                  [disabled]="!resolution.trim() || resolving">
+            <i *ngIf="resolving" class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!resolving" class="fa-solid fa-circle-check"></i>
+            {{ resolving ? 'Résolution...' : 'Confirmer la résolution' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

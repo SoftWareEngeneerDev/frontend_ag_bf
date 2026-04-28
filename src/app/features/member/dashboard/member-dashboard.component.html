@@ -1,16 +1,21 @@
 <div class="md-page">
 
-  <!-- ══ HERO PERSONNALISÉ ══════════════════════════════════════════ -->
+  <!-- ══ HERO ═══════════════════════════════════════════════════════ -->
   <div class="md-hero">
     <div class="mdh-left">
-      <app-avatar [name]="firstName" [size]="64" bg="linear-gradient(135deg,#0DA487,#065F46)"></app-avatar>
+      <app-avatar
+        [name]="firstName"
+        [size]="64"
+        bg="linear-gradient(135deg,#0DA487,#065F46)">
+      </app-avatar>
       <div class="mdh-info">
         <p class="mdh-greeting">{{ greeting }},</p>
         <h2 class="mdh-name">{{ firstName }} !</h2>
         <p class="mdh-sub">
-          <i class="fa-solid fa-users"></i> {{ myGroups.length }} groupes actifs
+          <i class="fa-solid fa-users"></i> {{ myGroups.length }} groupe{{ myGroups.length !== 1 ? 's' : '' }} actif{{ myGroups.length !== 1 ? 's' : '' }}
           &nbsp;·&nbsp;
-          <i class="fa-solid fa-star" style="color:#F4A902"></i> Score 95/100
+          <i class="fa-solid fa-star" style="color:#F4A902"></i>
+          Score {{ auth.currentUser()?.trustScore ?? 100 }}/100
         </p>
       </div>
     </div>
@@ -19,9 +24,9 @@
       <div class="mdh-sav-label">
         <i class="fa-solid fa-piggy-bank"></i> Total économisé
       </div>
-      <div class="mdh-sav-val">47 500 XOF</div>
+      <div class="mdh-sav-val">{{ totalSaved | currencyXof }}</div>
       <span class="mdh-sav-trend">
-        <i class="fa-solid fa-arrow-trend-up"></i> +12% ce mois
+        <i class="fa-solid fa-arrow-trend-up"></i> Sur tous vos groupes
       </span>
     </div>
 
@@ -30,7 +35,7 @@
         <i class="fa-solid fa-users"></i><span>Mes groupes</span>
       </button>
       <button class="mdh-btn mdh-btn-gold" (click)="goPayment()">
-        <i class="fa-solid fa-credit-card"></i><span>Payer</span>
+        <i class="fa-solid fa-credit-card"></i><span>Paiements</span>
       </button>
       <button class="mdh-btn mdh-btn-ghost" (click)="goBrowse()">
         <i class="fa-solid fa-compass"></i><span>Parcourir</span>
@@ -38,7 +43,7 @@
     </div>
   </div>
 
-  <!-- ══ KPI STRIP ═════════════════════════════════════════════════ -->
+  <!-- ══ KPI STRIP ══════════════════════════════════════════════════ -->
   <div class="md-kpi-grid">
     <div class="md-kpi" *ngFor="let k of kpis">
       <div class="md-kpi-icon" [style.background]="k.bg" [style.color]="k.color">
@@ -52,18 +57,17 @@
     </div>
   </div>
 
-  <!-- ══ ALERTE URGENTE (seuil atteint) ════════════════════════════ -->
+  <!-- ══ ALERTE URGENTE ════════════════════════════════════════════ -->
   <div class="md-urgent" *ngIf="urgentGroup">
     <div class="mdu-left">
       <div class="mdu-pulse">
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
       <div>
-        <div class="mdu-title">Action requise — Seuil atteint !</div>
+        <div class="mdu-title">⚡ Action requise — Seuil atteint !</div>
         <div class="mdu-desc">
           <strong>{{ urgentGroup.product.name }}</strong> a atteint son minimum.
-          Payez le solde de <strong>{{ urgentGroup.currentPrice - urgentGroup.depositAmount | currencyXof }}</strong>
-          avant l'expiration pour confirmer votre commande.
+          Payez le solde avant l'expiration pour confirmer votre commande.
         </div>
       </div>
     </div>
@@ -81,18 +85,24 @@
         <div class="md-panel-title">
           <i class="fa-solid fa-layer-group"></i> Mes groupes actifs
         </div>
-        <button class="md-see-all" (click)="goGroups()">Voir tout <i class="fa-solid fa-arrow-right"></i></button>
+        <button class="md-see-all" (click)="goGroups()">
+          Voir tout <i class="fa-solid fa-arrow-right"></i>
+        </button>
       </div>
 
+      <!-- Loading -->
       <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
+      <!-- Liste groupes -->
       <div class="mg-cards" *ngIf="!loading">
-        <div class="mg-item" *ngFor="let g of myGroups" [class.mg-item-hot]="isThreshold(g)">
+        <div class="mg-item"
+             *ngFor="let g of myGroups"
+             [class.mg-item-hot]="isThreshold(g)">
 
           <div class="mg-item-img">
             <img [src]="productImage(g)" [alt]="g.product.name" loading="lazy">
             <span class="mg-item-badge" *ngIf="isThreshold(g)">
-              <i class="fa-solid fa-fire"></i>
+              <i class="fa-solid fa-fire"></i> Urgent
             </span>
           </div>
 
@@ -100,17 +110,22 @@
             <div class="mg-item-top">
               <span class="mg-item-name">{{ g.product.name | truncate:32 }}</span>
               <span class="mg-item-status" [class.hot]="isThreshold(g)">
-                {{ isThreshold(g) ? 'Seuil atteint' : 'Actif' }}
+                {{ isThreshold(g) ? '🔥 Seuil atteint' : '✅ Actif' }}
               </span>
             </div>
 
-            <div class="mg-item-supplier">{{ g.supplier.companyName }}</div>
+            <div class="mg-item-supplier">
+              <i class="fa-solid fa-store" style="font-size:11px"></i>
+              {{ g.supplier.companyName || '—' }}
+            </div>
 
+            <!-- Barre de progression -->
             <div class="mg-item-prog">
               <div class="mg-prog-track">
                 <div class="mg-prog-fill"
                      [class.hot]="isThreshold(g)"
-                     [style.width.%]="progressPct(g)"></div>
+                     [style.width.%]="progressPct(g)">
+                </div>
               </div>
               <span class="mg-prog-pct">{{ progressPct(g) }}%</span>
             </div>
@@ -125,20 +140,27 @@
               </div>
               <div class="mg-item-actions">
                 <app-countdown [expiresAt]="g.expiresAt"></app-countdown>
-                <button [class]="isThreshold(g) ? 'btn-gold btn-sm btn-round' : 'btn-outline-primary btn-sm btn-round'"
-                        (click)="isThreshold(g) ? goPayment() : goGroupDetail(g)">
-                  {{ isThreshold(g) ? 'Payer' : 'Voir →' }}
+                <button
+                  [class]="isThreshold(g)
+                    ? 'btn-gold btn-sm btn-round'
+                    : 'btn-outline-primary btn-sm btn-round'"
+                  (click)="isThreshold(g) ? goPayment() : goGroupDetail(g)">
+                  {{ isThreshold(g) ? '💳 Payer' : 'Voir →' }}
                 </button>
               </div>
             </div>
           </div>
-
         </div>
 
-        <app-empty-state *ngIf="myGroups.length === 0"
-          icon="fa-solid fa-users" title="Aucun groupe actif"
+        <!-- État vide -->
+        <app-empty-state
+          *ngIf="myGroups.length === 0"
+          icon="fa-solid fa-users"
+          title="Aucun groupe actif"
           description="Rejoignez votre premier groupe pour commencer à économiser.">
-          <button class="btn-primary" (click)="goBrowse()">Parcourir les groupes</button>
+          <button class="btn-primary btn-round" (click)="goBrowse()">
+            <i class="fa-solid fa-compass"></i> Parcourir les groupes
+          </button>
         </app-empty-state>
       </div>
     </div>
@@ -152,13 +174,23 @@
           <div class="md-panel-title">
             <i class="fa-solid fa-clock-rotate-left"></i> Activité récente
           </div>
-          <button class="md-see-all" (click)="goNotifications()">Tout voir <i class="fa-solid fa-arrow-right"></i></button>
+          <button class="md-see-all" (click)="goNotifications()">
+            Tout voir <i class="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
 
-        <div class="md-timeline">
+        <!-- État vide timeline -->
+        <div class="md-timeline-empty" *ngIf="timeline.length === 0">
+          <i class="fa-solid fa-bell-slash"></i>
+          <span>Aucune activité récente</span>
+        </div>
+
+        <div class="md-timeline" *ngIf="timeline.length > 0">
           <div class="mt-item" *ngFor="let t of timeline; let last = last">
             <div class="mt-icon-col">
-              <div class="mt-icon" [style.background]="t.color + '20'" [style.color]="t.color">
+              <div class="mt-icon"
+                   [style.background]="t.color + '20'"
+                   [style.color]="t.color">
                 <i [class]="t.icon"></i>
               </div>
               <div class="mt-line" *ngIf="!last"></div>
@@ -167,8 +199,13 @@
               <div class="mt-text">{{ t.text }}</div>
               <div class="mt-meta">
                 <span class="mt-time">{{ t.time }}</span>
-                <button *ngIf="t.action" class="mt-action" [style.color]="'#F4A902'"
-                        (click)="goPayment()">{{ t.action }} →</button>
+                <button
+                  *ngIf="t.action"
+                  class="mt-action"
+                  [style.color]="'#F4A902'"
+                  (click)="goPayment()">
+                  {{ t.action }} →
+                </button>
               </div>
             </div>
           </div>
@@ -180,11 +217,19 @@
         <div class="mdr-icon"><i class="fa-solid fa-gift"></i></div>
         <div class="mdr-info">
           <div class="mdr-title">Invitez vos proches</div>
-          <div class="mdr-desc">Gagnez <strong>2 500 XOF</strong> par ami inscrit</div>
+          <div class="mdr-desc">
+            Gagnez <strong>2 500 XOF</strong> par ami inscrit
+          </div>
           <div class="mdr-code">
-            <span class="mdr-code-val">KOFI7A2F</span>
-            <button class="mdr-copy" title="Copier">
-              <i class="fa-regular fa-copy"></i>
+            <span class="mdr-code-val font-mono">{{ referralCode }}</span>
+            <button
+              class="mdr-copy"
+              [title]="copied ? 'Copié !' : 'Copier'"
+              (click)="copyReferralCode()">
+              <i [class]="copied
+                ? 'fa-solid fa-check'
+                : 'fa-regular fa-copy'">
+              </i>
             </button>
           </div>
         </div>

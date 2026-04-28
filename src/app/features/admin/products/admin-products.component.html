@@ -1,47 +1,71 @@
-<div>
-  <!-- En-tête -->
+<div class="ap-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Produits</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} produit(s) affiché(s)</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-box"></i> Produits
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filtered.length }} produit{{ filtered.length !== 1 ? 's' : '' }} affiché{{ filtered.length !== 1 ? 's' : '' }}
+      </p>
     </div>
-    <input class="inp" style="width:280px" placeholder="Rechercher produit, fournisseur..."
+    <input class="inp" style="width:280px"
+           placeholder="🔍 Produit, fournisseur..."
            [(ngModel)]="search">
   </div>
 
-  <!-- Stats rapides -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#00D4FF">{{ products.length }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Total produits</div>
+  <!-- ══ STATS ══════════════════════════════════════════════════════ -->
+  <div class="ap-stats-grid mb-20">
+    <div class="glass ap-stat">
+      <div class="ap-stat-val" style="color:#00D4FF">{{ products.length }}</div>
+      <div class="text-muted ap-stat-label">Total</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#10D98B">{{ activeCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Actifs</div>
+    <div class="glass ap-stat">
+      <div class="ap-stat-val" style="color:#10D98B">{{ activeCount }}</div>
+      <div class="text-muted ap-stat-label">Actifs</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#F5A623">{{ pendingCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">En attente</div>
+    <div class="glass ap-stat">
+      <div class="ap-stat-val" style="color:#F5A623">{{ pendingCount }}</div>
+      <div class="text-muted ap-stat-label">En attente</div>
     </div>
-    <div class="glass" style="padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#FF4D6A">{{ rejectedCount }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:3px">Rejetés</div>
+    <div class="glass ap-stat">
+      <div class="ap-stat-val" style="color:#FF4D6A">{{ rejectedCount }}</div>
+      <div class="text-muted ap-stat-label">Rejetés</div>
     </div>
   </div>
 
-  <!-- Onglets -->
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <!-- Tableau -->
+  <!-- ══ TABLEAU ════════════════════════════════════════════════════ -->
   <div class="glass" *ngIf="!loading">
-    <table class="tbl">
+
+    <div class="ap-empty" *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
+      <i class="fa-solid fa-box" style="font-size:36px;color:var(--primary);margin-bottom:12px;display:block"></i>
+      <p class="text-muted">Aucun produit trouvé.</p>
+    </div>
+
+    <table class="tbl" *ngIf="filtered.length > 0">
       <thead>
         <tr>
           <th>Produit</th>
@@ -57,7 +81,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let p of filtered">
+        <tr *ngFor="let p of filtered; trackBy: trackById">
+
           <!-- Produit -->
           <td>
             <div class="flex gap-10" style="align-items:center">
@@ -65,35 +90,47 @@
                 <i [class]="p.category.icon"></i>
               </div>
               <div>
-                <div style="font-weight:500;font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
-                <div class="text-muted font-mono" style="font-size:11px">{{ p.id }}</div>
+                <div class="ap-prod-name">{{ p.name | truncate:28 }}</div>
+                <div class="text-muted font-mono" style="font-size:11px">
+                  {{ p.id | slice:0:8 }}...
+                </div>
               </div>
             </div>
           </td>
+
           <!-- Catégorie -->
-          <td>
-            <span style="font-size:12px"><i [class]="p.category.icon"></i> {{ p.category.name }}</span>
+          <td style="font-size:12px">
+            <i [class]="p.category.icon"></i> {{ p.category.name }}
           </td>
+
           <!-- Fournisseur -->
-          <td class="text-muted" style="font-size:12px">{{ p.supplier.companyName }}</td>
+          <td class="text-muted" style="font-size:12px">
+            {{ p.supplier.companyName }}
+          </td>
+
           <!-- Prix solo -->
-          <td class="font-mono" style="font-size:12px">{{ formatXOF(p.soloPrice) }}</td>
+          <td class="font-mono" style="font-size:12px">
+            {{ p.soloPrice | currencyXof }}
+          </td>
+
           <!-- Prix groupe -->
           <td>
-            <div>
-              <span class="font-mono" style="font-size:12px;color:#10D98B">{{ formatXOF(p.minGroupPrice ?? 0) }}</span>
-              <div class="text-muted" style="font-size:11px">
-                -{{ ((1 - (p.minGroupPrice ?? 0) / p.soloPrice) * 100).toFixed(0) }}%
-              </div>
+            <span class="font-mono" style="font-size:12px;color:#10D98B">
+              {{ (p.minGroupPrice ?? 0) | currencyXof }}
+            </span>
+            <div class="text-muted" style="font-size:11px">
+              -{{ discountPct(p) }}%
             </div>
           </td>
+
           <!-- Stock -->
           <td>
             <span class="font-mono" style="font-size:13px"
-                  [style.color]="p.stock > 50 ? '#10D98B' : p.stock > 10 ? '#F5A623' : '#FF4D6A'">
+                  [style.color]="stockColor(p.stock)">
               {{ p.stock }}
             </span>
           </td>
+
           <!-- Note -->
           <td>
             <div class="flex gap-4" style="align-items:center">
@@ -102,33 +139,114 @@
               <span class="text-muted" style="font-size:11px">({{ p.reviewCount }})</span>
             </div>
           </td>
+
           <!-- Groupes actifs -->
           <td class="font-mono" style="text-align:center">
             <span [style.color]="p.activeGroupCount > 0 ? '#00D4FF' : 'var(--muted)'">
               {{ p.activeGroupCount }}
             </span>
           </td>
+
           <!-- Statut -->
-          <td><span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
+          <td>
+            <span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span>
+          </td>
+
           <!-- Actions -->
           <td>
             <div class="flex gap-6">
-              <button class="btn-ghost btn-sm" [routerLink]="['/admin/products', p.id]">Voir</button>
+              <button class="btn-ghost btn-sm btn-round"
+                      [routerLink]="['/admin/products', p.id]">
+                <i class="fa-solid fa-eye"></i>
+              </button>
               <ng-container *ngIf="p.status === 'PENDING'">
-                <button class="btn-ok  btn-sm" (click)="approve(p)">Approuver</button>
-                <button class="btn-err btn-sm" (click)="reject(p)">Rejeter</button>
+                <button class="btn-ok btn-sm btn-round"
+                        [disabled]="processing === p.id"
+                        (click)="approve(p)">
+                  <i *ngIf="processing === p.id" class="fa-solid fa-spinner fa-spin"></i>
+                  ✅
+                </button>
+                <button class="btn-err btn-sm btn-round"
+                        [disabled]="processing === p.id"
+                        (click)="openRejectModal(p)">
+                  ❌
+                </button>
               </ng-container>
-              <button class="btn-err btn-sm" *ngIf="p.status === 'ACTIVE'" (click)="reject(p)">Désactiver</button>
-              <button class="btn-ok  btn-sm" *ngIf="p.status === 'INACTIVE'" (click)="approve(p)">Réactiver</button>
+              <button class="btn-err btn-sm btn-round"
+                      *ngIf="p.status === 'ACTIVE'"
+                      [disabled]="processing === p.id"
+                      (click)="deactivate(p)">
+                <i class="fa-solid fa-ban"></i>
+              </button>
+              <button class="btn-ok btn-sm btn-round"
+                      *ngIf="p.status === 'INACTIVE' || p.status === 'REJECTED'"
+                      [disabled]="processing === p.id"
+                      (click)="approve(p)">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <div *ngIf="filtered.length === 0" style="text-align:center;padding:48px 0">
-      <div style="font-size:36px;margin-bottom:12px"><i class="fa-solid fa-box" style="color:var(--primary)"></i></div>
-      <p class="text-muted">Aucun produit trouvé pour cette recherche.</p>
+  <!-- ══ MODAL — REJETER PRODUIT ═══════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showRejectModal" (click)="showRejectModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-xmark" style="color:#FF4D6A"></i> Rejeter le produit
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showRejectModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedProduct">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #F4A902">
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px">
+            {{ selectedProduct.name }}
+          </div>
+          <div class="text-muted" style="font-size:12px">
+            {{ selectedProduct.supplier.companyName }}
+          </div>
+        </div>
+
+        <div class="inp-group">
+          <label>
+            Motif du rejet <span style="color:var(--err)">*</span>
+          </label>
+          <textarea
+            class="inp"
+            rows="4"
+            [(ngModel)]="rejectReason"
+            placeholder="Ex: Images non conformes, description insuffisante, prix incohérent..."
+            style="resize:vertical">
+          </textarea>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-bell"></i>
+          Le fournisseur sera notifié par email avec le motif du rejet.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showRejectModal = false"
+                  [disabled]="processing">
+            Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmReject()"
+                  [disabled]="!rejectReason.trim() || !!processing">
+            <i *ngIf="processing" class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-xmark"></i>
+            {{ processing ? 'Rejet...' : 'Confirmer le rejet' }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>

@@ -28,7 +28,7 @@ export type DisputeStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 export type DisputeReason = 'NOT_RECEIVED' | 'QUALITY_ISSUE' | 'WRONG_PRODUCT'
                            | 'REFUND_REFUSED' | 'OTHER';
 
-export type ProductStatus = 'ACTIVE' | 'PENDING' | 'REJECTED' | 'INACTIVE';
+export type ProductStatus = 'ACTIVE' | 'APPROVED' | 'PENDING' | 'PENDING_APPROVAL' | 'REJECTED' | 'INACTIVE' | 'ARCHIVED';
 
 // ── USER ─────────────────────────────────────────────────────────
 export interface User {

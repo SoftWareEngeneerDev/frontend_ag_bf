@@ -38,7 +38,7 @@
         <!-- Links -->
         <div class="ft-col" *ngFor="let col of footerLinks">
           <div class="ft-col-title font-display">{{ col.title }}</div>
-          <a *ngFor="let l of col.links" href="#" class="ft-link">{{ l }}</a>
+          <a *ngFor="let l of col.links" [routerLink]="l.route" class="ft-link">{{ l.label }}</a>
         </div>
       </div>
     </div>
@@ -52,9 +52,9 @@
           © {{ year }} AchatGroupéBF — Ouagadougou, Burkina Faso 🇧🇫
         </span>
         <div class="ft-legal">
-          <a href="#" class="text-muted">CGU</a>
-          <a href="#" class="text-muted">Confidentialité</a>
-          <a href="#" class="text-muted">Contact</a>
+          <a routerLink="/faq"     class="text-muted">CGU</a>
+          <a routerLink="/faq"     class="text-muted">Confidentialité</a>
+          <a routerLink="/contact" class="text-muted">Contact</a>
         </div>
       </div>
     </div>

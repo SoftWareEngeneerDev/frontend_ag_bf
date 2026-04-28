@@ -1,89 +1,143 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AdminService }   from '../../../../core/services/admin.service';
 import { ProductService } from '../../../../core/services/product.service';
+import { FormatService }  from '../../../../core/services/format.service';
 import { Product } from '../../../../core/models';
 
 @Component({
-  selector: 'app-admin-product-detail',
+  selector   : 'app-admin-product-detail',
   templateUrl: './admin-product-detail.component.html',
-  styleUrls: ['./admin-product-detail.component.scss']
+  styleUrls  : ['./admin-product-detail.component.scss']
 })
-export class AdminProductDetailComponent implements OnInit {
-  product: Product | null = null;
-  loading = true;
+export class AdminProductDetailComponent implements OnInit, OnDestroy {
+  product   : Product | null = null;
+  loading    = true;
+  processing = false;
+  successMsg = '';
+  errorMsg   = '';
+
+  // Modal rejet
+  showRejectModal = false;
+  rejectReason    = '';
+
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private route:          ActivatedRoute,
-    private router:         Router,
-    private adminService:   AdminService,
+    private route         : ActivatedRoute,
+    private router        : Router,
+    private adminService  : AdminService,
     private productService: ProductService,
+    public  fmt           : FormatService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.router.navigate(['/admin/products']); return; }
-
-    // ── Charger le produit depuis le backend ───────────────────
-    this.productService.getById(id).subscribe({
-      next: (p) => {
-        this.product = p;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.product = null;
-      }
-    });
+    this.loadProduct(id);
   }
 
-  // ── Approuver le produit ──────────────────────────────────────
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadProduct(id: string): void {
+    this.productService.getById(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next : (p) => { this.product = p; this.loading = false; },
+        error: ()  => { this.product = null; this.loading = false; }
+      });
+  }
+
+  // ── Approuver ─────────────────────────────────────────────────
   approve(): void {
-    if (!this.product) return;
-    this.adminService.validateProduct(this.product.id, true).subscribe({
-      next: () => { if (this.product) this.product.status = 'ACTIVE' as any; },
-      error: () => {}
-    });
+    if (!this.product || this.processing) return;
+    this.processing = true;
+    this.adminService.validateProduct(this.product.id, true)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.product) this.product.status = 'ACTIVE' as any;
+          this.processing = false;
+          this.showSuccess('Produit approuvé — fournisseur notifié');
+        },
+        error: (err) => {
+          this.processing = false;
+          this.showError(err?.error?.error?.message ?? 'Erreur');
+        }
+      });
   }
 
-  // ── Rejeter le produit ────────────────────────────────────────
-  reject(): void {
-    if (!this.product) return;
-    this.adminService.validateProduct(this.product.id, false, 'Non conforme aux standards').subscribe({
-      next: () => { if (this.product) this.product.status = 'REJECTED' as any; },
-      error: () => {}
-    });
+  // ── Ouvrir modal rejet ────────────────────────────────────────
+  openRejectModal(): void {
+    this.rejectReason    = '';
+    this.showRejectModal = true;
+  }
+
+  // ── Confirmer rejet ───────────────────────────────────────────
+  confirmReject(): void {
+    if (!this.product || !this.rejectReason.trim() || this.processing) return;
+    this.processing = true;
+
+    this.adminService.validateProduct(this.product.id, false, this.rejectReason)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.product) this.product.status = 'REJECTED' as any;
+          this.showRejectModal = false;
+          this.processing      = false;
+          this.showSuccess('Produit rejeté — fournisseur notifié');
+        },
+        error: (err) => {
+          this.processing = false;
+          this.showError(err?.error?.error?.message ?? 'Erreur lors du rejet');
+        }
+      });
   }
 
   goBack(): void { this.router.navigate(['/admin/products']); }
 
+  // ── Getters ───────────────────────────────────────────────────
   get statusClass(): string {
     if (!this.product) return '';
-    if (this.product.status === 'ACTIVE'   || this.product.status === ('APPROVED' as any)) return 'badge-ok';
-    if (this.product.status === 'PENDING'  || this.product.status === ('PENDING_APPROVAL' as any)) return 'badge-warn';
-    if (this.product.status === 'REJECTED') return 'badge-err';
+    const s = this.product.status as string;
+    if (['ACTIVE', 'APPROVED'].includes(s))          return 'badge-ok';
+    if (['PENDING', 'PENDING_APPROVAL'].includes(s)) return 'badge-warn';
+    if (s === 'REJECTED')                            return 'badge-err';
     return 'badge-grey';
   }
 
   get statusLabel(): string {
     if (!this.product) return '';
-    if (this.product.status === 'ACTIVE'   || this.product.status === ('APPROVED' as any))        return 'Actif';
-    if (this.product.status === 'PENDING'  || this.product.status === ('PENDING_APPROVAL' as any)) return 'En attente';
-    if (this.product.status === 'REJECTED') return 'Rejeté';
-    return 'Inactif';
+    const s = this.product.status as string;
+    if (['ACTIVE', 'APPROVED'].includes(s))          return '✅ Actif';
+    if (['PENDING', 'PENDING_APPROVAL'].includes(s)) return '⏳ En attente';
+    if (s === 'REJECTED')                            return '❌ Rejeté';
+    return '📦 Inactif';
+  }
+
+  get discountPercent(): number {
+    if (!this.product?.minGroupPrice || this.product.soloPrice === 0) return 0;
+    return Math.round((1 - this.product.minGroupPrice / this.product.soloPrice) * 100);
   }
 
   get stockColor(): string {
     if (!this.product) return 'inherit';
-    return this.product.stock > 50 ? '#10D98B' : this.product.stock > 10 ? '#F5A623' : '#FF4D6A';
+    if (this.product.stock > 50)  return '#10D98B';
+    if (this.product.stock > 10)  return '#F5A623';
+    return '#FF4D6A';
   }
 
-  get discountPercent(): number {
-    if (!this.product || !this.product.minGroupPrice) return 0;
-    return Math.round((1 - this.product.minGroupPrice / this.product.soloPrice) * 100);
+  private showSuccess(msg: string): void {
+    this.successMsg = msg; this.errorMsg = '';
+    setTimeout(() => { this.successMsg = ''; }, 3000);
   }
 
-  formatXOF(val: number): string {
-    return val.toLocaleString('fr-FR') + ' XOF';
+  private showError(msg: string): void {
+    this.errorMsg = msg; this.successMsg = '';
+    setTimeout(() => { this.errorMsg = ''; }, 4000);
   }
 }

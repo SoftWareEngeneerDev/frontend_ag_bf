@@ -1,154 +1,189 @@
 <div *ngIf="!loading && group; else notFound">
 
-  <!-- En-tête -->
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-24">
     <div class="flex gap-12" style="align-items:center">
-      <button class="btn-ghost btn-sm" (click)="goBack()">
+      <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
         <i class="fa-solid fa-arrow-left"></i> Retour
       </button>
       <div>
-        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">Détail groupe</h2>
-        <p class="text-muted font-mono" style="font-size:12px">{{ group.id }}</p>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">
+          Détail du groupe
+        </h2>
+        <p class="text-muted font-mono" style="font-size:12px">{{ group!.id }}</p>
       </div>
     </div>
-    <div class="flex gap-8">
-      <button class="btn-err btn-sm"
-              *ngIf="group.status === 'OPEN' || group.status === 'THRESHOLD_REACHED'"
-              (click)="closeGroup()">
-        Fermer le groupe
-      </button>
-    </div>
+    <button class="btn-err btn-sm btn-round"
+            *ngIf="group!.status === 'OPEN' || group!.status === 'THRESHOLD_REACHED'"
+            [disabled]="closing"
+            (click)="closeGroup()">
+      <i *ngIf="closing"  class="fa-solid fa-spinner fa-spin"></i>
+      <i *ngIf="!closing" class="fa-solid fa-ban"></i>
+      {{ closing ? 'Fermeture...' : 'Fermer le groupe' }}
+    </button>
   </div>
 
-  <!-- Carte identité groupe -->
+  <!-- ══ CARTE IDENTITÉ ════════════════════════════════════════════ -->
   <div class="glass mb-20" style="padding:24px">
     <div class="flex gap-20" style="align-items:flex-start">
       <div class="agd-prod-img">
-        <img [src]="group.product.images[0] || 'https://picsum.photos/seed/' + group.product.id + '/80/80'"
-             [alt]="group.product.name" loading="lazy">
+        <img [src]="group!.product.images[0] || 'https://picsum.photos/seed/' + group!.product.id + '/80/80'"
+             [alt]="group!.product.name" loading="lazy">
       </div>
       <div style="flex:1">
         <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
-          <span style="font-size:18px;font-weight:700">{{ group.product.name }}</span>
+          <span style="font-size:18px;font-weight:700">{{ group!.product.name }}</span>
           <span [class]="statusClass">{{ statusLabel }}</span>
         </div>
         <div class="flex gap-20 text-muted" style="font-size:13px;flex-wrap:wrap">
-          <span><i class="fa-solid fa-store"></i> {{ group.supplier.companyName }}</span>
-          <span><i class="fa-solid fa-calendar"></i> Créé le {{ formatDate(group.createdAt) }}</span>
+          <span><i class="fa-solid fa-store"></i> {{ group!.supplier.companyName }}</span>
+          <span><i class="fa-solid fa-tag"></i> {{ group!.product.category.name }}</span>
+          <span><i class="fa-solid fa-calendar"></i> Créé le {{ formatDate(group!.createdAt) }}</span>
           <span [style.color]="isExpiringSoon ? '#FF4D6A' : 'inherit'">
-            <i class="fa-solid fa-clock"></i> Expire dans {{ formatExpiry(group.expiresAt) }}
+            <i class="fa-solid fa-clock"></i>
+            Expire dans {{ formatExpiry(group!.expiresAt) }}
           </span>
         </div>
       </div>
+
       <!-- Progression membres -->
       <div style="text-align:center;min-width:110px">
         <div style="font-size:28px;font-weight:700" [style.color]="fillColor">
-          {{ group.currentCount }}/{{ group.minParticipants }}
+          {{ group!.currentCount }}/{{ group!.minParticipants }}
         </div>
         <div class="text-muted" style="font-size:11px;margin-bottom:6px">membres</div>
         <div class="prog-wrap" style="width:90px;height:8px;margin:0 auto">
-          <div class="prog-fill" [style.width.%]="fillPercent" [style.background]="fillColor"></div>
+          <div class="prog-fill"
+               [style.width.%]="fillPercent"
+               [style.background]="fillColor">
+          </div>
         </div>
-        <div class="text-muted" style="font-size:11px;margin-top:4px">{{ fillPercent }}% atteint</div>
+        <div class="text-muted" style="font-size:11px;margin-top:4px">
+          {{ fillPercent }}% atteint
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats clés -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#10D98B">-{{ group.discountPercent }}%</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Réduction actuelle</div>
+  <!-- ══ STATS CLÉS ════════════════════════════════════════════════ -->
+  <div class="agd-stats-grid mb-20">
+    <div class="glass agd-stat">
+      <div class="agd-stat-val" style="color:#10D98B">-{{ group!.discountPercent }}%</div>
+      <div class="text-muted agd-stat-label">Réduction actuelle</div>
     </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:20px;font-weight:700;color:var(--gold)">{{ formatXOF(group.currentPrice) }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Prix actuel/unité</div>
-    </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:20px;font-weight:700;color:#00D4FF">{{ formatXOF(group.depositAmount) }}</div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Acompte requis</div>
-    </div>
-    <div class="glass" style="padding:20px;text-align:center">
-      <div style="font-size:22px;font-weight:700;color:#F5A623">
-        {{ formatXOF(group.depositAmount * group.currentCount) }}
+    <div class="glass agd-stat">
+      <div class="agd-stat-val" style="color:var(--gold)">
+        {{ group!.currentPrice | currencyXof }}
       </div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px">Acomptes collectés</div>
+      <div class="text-muted agd-stat-label">Prix actuel/unité</div>
+    </div>
+    <div class="glass agd-stat">
+      <div class="agd-stat-val" style="color:#00D4FF">
+        {{ group!.depositAmount | currencyXof }}
+      </div>
+      <div class="text-muted agd-stat-label">Acompte requis</div>
+    </div>
+    <div class="glass agd-stat">
+      <div class="agd-stat-val" style="color:#F5A623">
+        {{ totalDeposits | currencyXof }}
+      </div>
+      <div class="text-muted agd-stat-label">Acomptes collectés</div>
     </div>
   </div>
 
-  <!-- Détails et paliers -->
+  <!-- ══ DÉTAILS + PALIERS ══════════════════════════════════════════ -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
     <!-- Informations groupe -->
     <div class="glass" style="padding:20px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Informations du groupe</h3>
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-circle-info"></i> Informations du groupe
+      </h3>
       <table class="tbl">
         <tbody>
           <tr>
             <td class="text-muted" style="font-size:12px;width:45%">Identifiant</td>
-            <td class="font-mono" style="font-size:12px">{{ group.id }}</td>
+            <td class="font-mono" style="font-size:11px">{{ group!.id }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Statut</td>
             <td><span [class]="statusClass">{{ statusLabel }}</span></td>
           </tr>
           <tr>
-            <td class="text-muted" style="font-size:12px">Membres actuels</td>
+            <td class="text-muted" style="font-size:12px">Membres</td>
             <td class="font-mono" style="font-size:13px" [style.color]="fillColor">
-              {{ group.currentCount }} / {{ group.minParticipants }}
+              {{ group!.currentCount }} / {{ group!.minParticipants }}
             </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Prix actuel/unité</td>
-            <td class="font-mono" style="font-size:13px;color:var(--gold)">{{ formatXOF(group.currentPrice) }}</td>
+            <td class="font-mono" style="font-size:13px;color:var(--gold)">
+              {{ group!.currentPrice | currencyXof }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Réduction</td>
-            <td style="font-size:13px;color:#10D98B;font-weight:600">-{{ group.discountPercent }}%</td>
+            <td style="font-size:13px;color:#10D98B;font-weight:600">
+              -{{ group!.discountPercent }}%
+            </td>
           </tr>
           <tr>
-            <td class="text-muted" style="font-size:12px">Acompte</td>
-            <td class="font-mono" style="font-size:13px">{{ formatXOF(group.depositAmount) }}</td>
+            <td class="text-muted" style="font-size:12px">Acompte requis</td>
+            <td class="font-mono" style="font-size:13px">
+              {{ group!.depositAmount | currencyXof }}
+            </td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Créé le</td>
-            <td style="font-size:12px">{{ formatDate(group.createdAt) }}</td>
+            <td style="font-size:12px">{{ formatDate(group!.createdAt) }}</td>
           </tr>
           <tr>
             <td class="text-muted" style="font-size:12px">Expire le</td>
             <td style="font-size:12px" [style.color]="isExpiringSoon ? '#FF4D6A' : 'inherit'">
-              {{ formatDate(group.expiresAt) }}
+              {{ formatDate(group!.expiresAt) }}
             </td>
           </tr>
-          <tr *ngIf="group.thresholdReachedAt">
+          <tr *ngIf="group!.thresholdReachedAt">
             <td class="text-muted" style="font-size:12px">Seuil atteint le</td>
-            <td style="font-size:12px;color:#10D98B">{{ formatDate(group.thresholdReachedAt!) }}</td>
+            <td style="font-size:12px;color:#10D98B">
+              {{ formatDate(group!.thresholdReachedAt!) }}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Paliers de prix -->
+    <!-- Paliers + fournisseur -->
     <div class="glass" style="padding:20px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Paliers de réduction</h3>
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-tags"></i> Paliers de réduction
+      </h3>
       <table class="tbl">
         <thead>
           <tr>
-            <th>Membres min.</th>
+            <th>Min. membres</th>
             <th>Réduction</th>
             <th>Prix/unité</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let tier of group.pricingTiers"
-              [style.background]="group.currentCount >= tier.minParticipants ? 'rgba(16,217,139,0.06)' : ''">
+          <tr *ngFor="let tier of group!.pricingTiers"
+              [style.background]="group!.currentCount >= tier.minParticipants ? 'rgba(16,217,139,0.06)' : ''">
             <td class="font-mono" style="font-size:13px">{{ tier.minParticipants }}</td>
             <td style="font-size:13px;font-weight:600;color:#10D98B">-{{ tier.discountPercent }}%</td>
-            <td class="font-mono" style="font-size:12px">{{ formatXOF(tier.price) }}</td>
+            <td class="font-mono" style="font-size:12px">{{ tier.price | currencyXof }}</td>
             <td>
               <span class="badge-ok" style="font-size:10px"
-                    *ngIf="group.currentCount >= tier.minParticipants">
+                    *ngIf="group!.currentCount >= tier.minParticipants">
                 <i class="fa-solid fa-check"></i> Atteint
               </span>
             </td>
@@ -156,34 +191,45 @@
         </tbody>
       </table>
 
+      <!-- Fournisseur -->
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
-        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Fournisseur</h3>
-        <div style="font-size:13px;font-weight:500;margin-bottom:4px">{{ group.supplier.companyName }}</div>
-        <div class="text-muted" style="font-size:12px">{{ group.supplier.contactName }}</div>
-        <div class="text-muted" style="font-size:12px">{{ group.supplier.phone }}</div>
-        <div class="text-muted" style="font-size:12px">{{ group.supplier.city }}</div>
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">
+          <i class="fa-solid fa-store"></i> Fournisseur
+        </h3>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">
+          {{ group!.supplier.companyName }}
+        </div>
+        <div class="text-muted" style="font-size:12px">{{ group!.supplier.contactName }}</div>
+        <div class="text-muted" style="font-size:12px">{{ group!.supplier.phone }}</div>
+        <div class="text-muted" style="font-size:12px">
+          <i class="fa-solid fa-location-dot"></i> {{ group!.supplier.city }}
+        </div>
         <div class="flex gap-6" style="align-items:center;margin-top:8px">
           <i class="fa-solid fa-star" style="color:#F5A623;font-size:13px"></i>
-          <span class="font-mono" style="font-size:13px">{{ group.supplier.rating }}/5</span>
-          <span class="text-muted" style="font-size:11px">({{ group.supplier.reviewCount }} avis)</span>
-          <span class="text-muted" style="font-size:12px">· {{ group.supplier.successRate }}% succès</span>
+          <span class="font-mono" style="font-size:13px">{{ group!.supplier.rating }}/5</span>
+          <span class="text-muted" style="font-size:11px">
+            ({{ group!.supplier.reviewCount }} avis)
+          </span>
+          <span class="text-muted" style="font-size:12px">
+            · {{ group!.supplier.successRate }}% succès
+          </span>
         </div>
       </div>
     </div>
-
   </div>
 
 </div>
 
+<!-- ══ NOT FOUND ═════════════════════════════════════════════════ -->
 <ng-template #notFound>
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
   <div *ngIf="!loading" style="text-align:center;padding:60px 0">
-    <div style="font-size:48px;margin-bottom:16px">
-      <i class="fa-solid fa-fire" style="color:var(--orange)"></i>
-    </div>
+    <i class="fa-solid fa-fire" style="font-size:48px;color:var(--orange);margin-bottom:16px;display:block"></i>
     <h3 style="font-weight:600;margin-bottom:8px">Groupe introuvable</h3>
-    <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun groupe.</p>
-    <button class="btn-ghost btn-sm" (click)="goBack()">
+    <p class="text-muted" style="margin-bottom:24px">
+      Cet identifiant ne correspond à aucun groupe.
+    </p>
+    <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
       <i class="fa-solid fa-arrow-left"></i> Retour à la liste
     </button>
   </div>

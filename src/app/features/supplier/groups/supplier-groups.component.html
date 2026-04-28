@@ -1,29 +1,60 @@
-<div>
-  <div class="flex-between sg-header">
+<div class="sg-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
+  <div class="flex-between sg-header mb-24">
     <div>
-      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">Mes Groupes</h2>
-      <p class="text-muted" style="font-size:13px">{{ filtered.length }} groupe(s) actif(s)</p>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-layer-group"></i> Mes Groupes
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ groups.length }} groupe{{ groups.length !== 1 ? 's' : '' }} au total
+      </p>
     </div>
-    <button class="btn-gold" (click)="showCreateModal = true">+ Créer un groupe</button>
+    <button class="btn-gold btn-round" (click)="showCreateModal = true">
+      <i class="fa-solid fa-plus"></i> Créer un groupe
+    </button>
   </div>
 
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="setTab(t)">{{ t }}</button>
+            (click)="setTab(t)">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="fa-solid fa-users" title="Aucun groupe"
-    description="Créez votre premier groupe d'achat.">
-    <button class="btn-gold" (click)="showCreateModal = true">+ Créer un groupe</button>
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-layer-group"
+    [title]="activeTab === 'Tous' ? 'Aucun groupe créé' : 'Aucun groupe dans cette catégorie'"
+    [description]="activeTab === 'Tous'
+      ? 'Créez votre premier groupe d\'achat pour commencer à vendre.'
+      : 'Changez de filtre pour voir vos autres groupes.'">
+    <button class="btn-gold btn-round" (click)="showCreateModal = true">
+      <i class="fa-solid fa-plus"></i> Créer un groupe
+    </button>
   </app-empty-state>
 
+  <!-- ══ LISTE GROUPES ══════════════════════════════════════════════ -->
   <div class="sg-list" *ngIf="!loading && filtered.length > 0">
-    <div class="glass sg-card" *ngFor="let g of filtered">
+    <div class="glass sg-card" *ngFor="let g of filtered; trackBy: trackById">
 
+      <!-- En-tête -->
       <div class="sg-top">
         <div class="sg-img">
           <img [src]="g.product.images[0] || 'https://picsum.photos/seed/' + g.product.id + '/64/64'"
@@ -40,48 +71,74 @@
         </span>
       </div>
 
+      <!-- Alerte seuil atteint -->
+      <div class="alert-gold alert sg-hot-alert" *ngIf="isHot(g)">
+        <i class="fa-solid fa-fire"></i>
+        <strong>Seuil atteint !</strong>
+        {{ g.currentCount }} commandes prêtes — confirmez les commandes dès maintenant.
+      </div>
+
+      <!-- Progression -->
       <div class="sg-progress">
         <div class="flex-between" style="font-size:12px;margin-bottom:6px">
-          <span class="text-muted">{{ g.currentCount }}/{{ g.minParticipants }} participants</span>
-          <span class="font-mono text-gold-c">{{ pct(g) }}%</span>
+          <span class="text-muted">
+            <i class="fa-solid fa-users"></i>
+            {{ g.currentCount }}/{{ g.minParticipants }} participants
+          </span>
+          <span class="font-mono" [style.color]="isHot(g) ? '#F4A902' : 'var(--primary)'">
+            {{ pct(g) }}%
+          </span>
         </div>
         <div class="prog-wrap" style="height:8px">
-          <div class="prog-fill" [class.ok]="isHot(g)" [style.width.%]="pct(g)"></div>
-        </div>
-      </div>
-
-      <div class="sg-footer">
-        <div class="sg-kpis">
-          <div class="sg-kpi" *ngFor="let k of [
-            {l:'Prix actuel',  v: (g.currentPrice  | currencyXof), gold:true},
-            {l:'Réduction',    v: g.discountPercent + '%',          gold:false},
-            {l:'Dépôt requis', v: (g.depositAmount  | currencyXof), gold:false},
-            {l:'Expire le',    v: (g.expiresAt      | date:'dd/MM'), gold:false}
-          ]">
-            <div class="sg-kpi-v font-mono" [class.text-gold-c]="k.gold">{{ k.v }}</div>
-            <div class="text-muted sg-kpi-l">{{ k.l }}</div>
+          <div class="prog-fill"
+               [class.ok]="isHot(g)"
+               [style.width.%]="pct(g)">
           </div>
         </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="sg-footer">
+        <div class="sg-kpis">
+          <div class="sg-kpi">
+            <div class="sg-kpi-v font-mono text-gold-c">{{ g.currentPrice | currencyXof }}</div>
+            <div class="text-muted sg-kpi-l">Prix actuel</div>
+          </div>
+          <div class="sg-kpi">
+            <div class="sg-kpi-v font-mono">{{ g.discountPercent }}%</div>
+            <div class="text-muted sg-kpi-l">Réduction</div>
+          </div>
+          <div class="sg-kpi">
+            <div class="sg-kpi-v font-mono">{{ g.depositAmount | currencyXof }}</div>
+            <div class="text-muted sg-kpi-l">Dépôt requis</div>
+          </div>
+          <div class="sg-kpi">
+            <div class="sg-kpi-v font-mono">{{ g.expiresAt | date:'dd/MM' }}</div>
+            <div class="text-muted sg-kpi-l">Expire le</div>
+          </div>
+        </div>
+
+        <!-- Actions -->
         <div class="flex gap-8">
-          <button class="btn-gold btn-sm" *ngIf="isHot(g)" (click)="goDetail(g)">
+          <button class="btn-gold btn-sm btn-round" *ngIf="isHot(g)" (click)="goDetail(g)">
             <i class="fa-solid fa-clipboard-check"></i> Confirmer commandes
           </button>
-          <button class="btn-ghost btn-sm" (click)="goDetail(g)">Voir détail →</button>
+          <button class="btn-ghost btn-sm btn-round" (click)="goDetail(g)">
+            Voir détail <i class="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
       </div>
 
-      <div class="alert-gold alert" *ngIf="isHot(g)" style="margin-top:12px;font-size:12px">
-        <i class="fa-solid fa-circle-check"></i>
-        Seuil atteint ! {{ g.currentCount }} commandes prêtes à confirmer.
-      </div>
     </div>
   </div>
 
-  <!-- ── Modal création groupe ─────────────────────────────────── -->
+  <!-- ══ MODAL — CRÉER UN GROUPE ════════════════════════════════════ -->
   <div class="modal-backdrop" *ngIf="showCreateModal" (click)="showCreateModal = false">
     <div class="modal-box glass" (click)="$event.stopPropagation()">
       <div class="flex-between modal-head">
-        <h3 class="font-display" style="font-size:17px;font-weight:700">Créer un groupe d'achat</h3>
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-users-plus"></i> Créer un groupe d'achat
+        </h3>
         <button class="btn-ghost btn-sm btn-icon" (click)="showCreateModal = false">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -91,57 +148,78 @@
 
         <!-- Produit -->
         <div class="inp-group">
-          <label>Produit</label>
+          <label>Produit <span style="color:var(--err)">*</span></label>
           <select class="inp" [(ngModel)]="newGroup.productId">
-            <option value="">-- Choisir un produit --</option>
-            <option *ngFor="let p of myProducts" [value]="p.id">{{ p.name }}</option>
+            <option value="">-- Choisir un produit approuvé --</option>
+            <option *ngFor="let p of myProducts" [value]="$any(p).id">
+              {{ p.name }}
+            </option>
           </select>
+          <div class="inp-hint text-muted" *ngIf="myProducts.length === 0" style="font-size:12px">
+            <i class="fa-solid fa-circle-info"></i>
+            Aucun produit approuvé — soumettez des produits d'abord.
+          </div>
         </div>
 
-        <!-- Participants min/max -->
-        <div class="inp-group">
-          <label>Participants minimum</label>
-          <input class="inp" type="number" [(ngModel)]="newGroup.minParticipants" min="2" placeholder="Ex: 10">
+        <!-- Participants -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Participants minimum</label>
+            <input class="inp" type="number" [(ngModel)]="newGroup.minParticipants" min="2">
+          </div>
+          <div class="inp-group">
+            <label>Participants maximum</label>
+            <input class="inp" type="number" [(ngModel)]="newGroup.maxParticipants" min="2">
+          </div>
         </div>
 
-        <div class="inp-group">
-          <label>Participants maximum</label>
-          <input class="inp" type="number" [(ngModel)]="newGroup.maxParticipants" min="2" placeholder="Ex: 100">
-        </div>
-
-        <!-- Durée -->
-        <div class="inp-group">
-          <label>Durée du groupe (jours)</label>
-          <input class="inp" type="number" [(ngModel)]="newGroup.durationDays" min="1" placeholder="Ex: 7">
+        <!-- Durée + Dépôt -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="inp-group">
+            <label>Durée (jours)</label>
+            <input class="inp" type="number" [(ngModel)]="newGroup.durationDays" min="1" max="60">
+          </div>
+          <div class="inp-group">
+            <label>Acompte (%)</label>
+            <input class="inp" type="number"
+                   [ngModel]="newGroup.depositPercent * 100"
+                   (ngModelChange)="newGroup.depositPercent = $event / 100"
+                   min="5" max="50">
+          </div>
         </div>
 
         <!-- Paliers de prix -->
-        <div class="inp-group">
-          <label>Paliers de réduction</label>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">
+            <i class="fa-solid fa-tags"></i> Paliers de réduction
+          </label>
           <div class="tiers-grid">
             <div class="tier-row glass" *ngFor="let t of newGroup.pricingTiers">
               <div class="inp-prefix">
                 <div class="prefix">≥</div>
-                <input class="inp" type="number" [(ngModel)]="t.participantCount" min="1" style="width:60px">
+                <input class="inp" type="number" [(ngModel)]="t.participantCount" min="1" style="width:70px">
                 <span class="text-muted" style="font-size:12px">pers.</span>
               </div>
-              <div class="inp-prefix" style="margin-left:8px">
-                <input class="inp" type="number" [(ngModel)]="t.discountPercent" min="1" max="90" style="width:60px">
-                <span class="text-muted" style="font-size:12px">%</span>
+              <div class="inp-prefix">
+                <input class="inp" type="number" [(ngModel)]="t.discountPercent" min="1" max="90" style="width:70px">
+                <span class="text-muted" style="font-size:12px">% réduction</span>
               </div>
             </div>
           </div>
         </div>
 
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-circle-info"></i>
+          Le groupe sera visible immédiatement dans le catalogue après création.
+        </div>
+
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center"
-                  (click)="showCreateModal = false">
-            Annuler
-          </button>
-          <button class="btn-gold" style="flex:1;justify-content:center"
+                  (click)="showCreateModal = false">Annuler</button>
+          <button class="btn-gold btn-round" style="flex:1;justify-content:center"
                   (click)="createGroup()"
                   [disabled]="!newGroup.productId || creating">
-            <i *ngIf="creating" class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="creating"  class="fa-solid fa-spinner fa-spin"></i>
             <i *ngIf="!creating" class="fa-solid fa-rocket"></i>
             {{ creating ? 'Création...' : 'Créer le groupe' }}
           </button>
@@ -150,4 +228,5 @@
       </div>
     </div>
   </div>
+
 </div>

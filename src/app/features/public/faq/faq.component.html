@@ -1,0 +1,56 @@
+<app-navbar></app-navbar>
+
+<div class="faq-page">
+
+  <!-- Hero -->
+  <div class="faq-hero">
+    <div class="container text-center">
+      <div class="faq-hero-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <h1 class="font-display faq-hero-title">Questions <span class="text-primary">fréquentes</span></h1>
+      <p class="faq-hero-sub text-muted">Trouvez rapidement une réponse à votre question</p>
+    </div>
+  </div>
+
+  <div class="container faq-body">
+
+    <!-- Catégories -->
+    <div class="faq-cats">
+      <button *ngFor="let cat of categories; let i = index"
+              class="faq-cat-btn"
+              [class.active]="activeCategory === i"
+              (click)="activeCategory = i; openItem = null">
+        <i [class]="cat.icon"></i>
+        <span>{{ cat.label }}</span>
+      </button>
+    </div>
+
+    <!-- Accordéon -->
+    <div class="faq-list">
+      <div *ngFor="let item of categories[activeCategory].items; let i = index"
+           class="faq-item glass">
+        <div class="faq-q" (click)="toggle(activeCategory + '-' + i)">
+          <span class="font-display faq-q-text">{{ item.q }}</span>
+          <span class="faq-arrow" [class.open]="isOpen(activeCategory + '-' + i)">
+            <i class="fa-solid fa-chevron-down"></i>
+          </span>
+        </div>
+        <div class="faq-a" *ngIf="isOpen(activeCategory + '-' + i)">
+          <p>{{ item.a }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA contact -->
+    <div class="faq-cta glass text-center">
+      <div class="faq-cta-icon"><i class="fa-solid fa-headset"></i></div>
+      <h3 class="font-display faq-cta-title">Vous n'avez pas trouvé votre réponse ?</h3>
+      <p class="text-muted faq-cta-sub">Notre équipe vous répond en moins de 2h du lundi au samedi.</p>
+      <button class="btn-primary btn-round" (click)="goContact()">
+        <i class="fa-solid fa-envelope"></i> Nous contacter
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

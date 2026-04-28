@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { GroupService }  from '../../../core/services/group.service';
 import { FormatService } from '../../../core/services/format.service';
 import { Group } from '../../../core/models';
@@ -9,11 +10,13 @@ import { Group } from '../../../core/models';
   templateUrl: './member-my-groups.component.html',
   styleUrls:  ['./member-my-groups.component.scss']
 })
-export class MyGroupsComponent implements OnInit {
-  groups:   Group[] = [];
-  filtered: Group[] = [];
-  loading = true;
-  activeTab = 'all';
+export class MyGroupsComponent implements OnInit, OnDestroy {
+  groups   : Group[] = [];
+  filtered : Group[] = [];
+  loading    = true;
+  activeTab  = 'all';
+
+  private destroy$ = new Subject<void>();
 
   tabList = [
     { key: 'all',       icon: 'fa-solid fa-list',         label: 'Tous',          count: 0 },
@@ -23,46 +26,74 @@ export class MyGroupsComponent implements OnInit {
   ];
 
   constructor(
-    private groupService: GroupService,
-    public  fmt: FormatService,
-    private router: Router,
+    private groupService : GroupService,
+    public  fmt          : FormatService,
+    private router       : Router,
   ) {}
 
   ngOnInit(): void {
-    this.groupService.getMyGroups().subscribe({
-      next: (data: any) => {
-        // getMyGroups retourne { active, completed, total }
-        const active    = data?.active    ?? [];
-        const completed = data?.completed ?? [];
+    this.groupService.getMyGroups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: any) => {
+          const active    = data?.active    ?? [];
+          const completed = data?.completed ?? [];
 
-        // Mapper les memberships vers des groupes
-        const activeGroups    = active.map((m: any) => this.groupService.mapGroup(m.group ?? m));
-        const completedGroups = completed.map((m: any) => this.groupService.mapGroup(m.group ?? m));
+          const activeGroups    = active.map   ((m: any) => this.groupService.mapGroup(m.group ?? m));
+          const completedGroups = completed.map((m: any) => this.groupService.mapGroup(m.group ?? m));
 
-        this.groups   = [...activeGroups, ...completedGroups];
-        this.filtered = this.groups;
-        this.loading  = false;
+          this.groups   = [...activeGroups, ...completedGroups];
+          this.loading  = false;
+          this.updateCounts();
+          this.applyFilter(this.activeTab);
+        },
+        error: () => { this.loading = false; }
+      });
+  }
 
-        // CORRECTION : typage explicite (x: Group)
-        this.tabList[0].count = this.groups.length;
-        this.tabList[1].count = this.groups.filter((x: Group) => x.status === 'OPEN').length;
-        this.tabList[2].count = this.groups.filter((x: Group) => x.status === 'THRESHOLD_REACHED').length;
-        this.tabList[3].count = this.groups.filter((x: Group) => x.status === 'COMPLETED').length;
-      },
-      error: () => { this.loading = false; }
-    });
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ── Mettre à jour les compteurs des onglets ───────────────────
+  private updateCounts(): void {
+    this.tabList[0].count = this.groups.length;
+    this.tabList[1].count = this.groups.filter(g => g.status === 'OPEN').length;
+    this.tabList[2].count = this.groups.filter(g => g.status === 'THRESHOLD_REACHED').length;
+    this.tabList[3].count = this.groups.filter(g => g.status === 'COMPLETED').length;
+  }
+
+  // ── Appliquer le filtre actif ─────────────────────────────────
+  private applyFilter(key: string): void {
+    const filters: Record<string, string[]> = {
+      open      : ['OPEN'],
+      threshold : ['THRESHOLD_REACHED'],
+      done      : ['COMPLETED', 'EXPIRED', 'CANCELLED'],
+    };
+    this.filtered = filters[key]
+      ? this.groups.filter(g => filters[key].includes(g.status))
+      : this.groups;
   }
 
   setTab(key: string): void {
     this.activeTab = key;
-    if      (key === 'open')      this.filtered = this.groups.filter((g: Group) => g.status === 'OPEN');
-    else if (key === 'threshold') this.filtered = this.groups.filter((g: Group) => g.status === 'THRESHOLD_REACHED');
-    else if (key === 'done')      this.filtered = this.groups.filter((g: Group) => g.status === 'COMPLETED');
-    else                          this.filtered = this.groups;
+    this.applyFilter(key);
   }
 
-  pct(g: Group): number       { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
-  isHot(g: Group): boolean    { return g.status === 'THRESHOLD_REACHED'; }
-  onJoin(g: Group): void      { g.status === 'THRESHOLD_REACHED' ? this.router.navigate(['/member/payment']) : this.goDetail(g); }
-  goDetail(g: Group): void    { this.router.navigate(['/groups', g.id]); }
+  // ── Helpers ───────────────────────────────────────────────────
+  pct(g: Group): number    { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
+  isHot(g: Group): boolean { return g.status === 'THRESHOLD_REACHED'; }
+
+  onJoin(g: Group): void {
+    if (g.status === 'THRESHOLD_REACHED') {
+      this.router.navigate(['/member/payment']);
+    } else {
+      this.goDetail(g);
+    }
+  }
+
+  goDetail(g: Group): void { this.router.navigate(['/groups', g.id]); }
+
+  trackById(_: number, g: Group): string { return g.id; }
 }

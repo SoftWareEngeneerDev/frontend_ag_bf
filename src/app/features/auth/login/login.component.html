@@ -1,7 +1,7 @@
 <div class="auth-page">
 
   <!-- Left -->
-  <div class="auth-left">
+  <!-- <div class="auth-left">
     <div class="al-logo"><app-logo [size]="20"></app-logo></div>
     <div class="al-body">
       <div class="al-icon"><i class="fa-solid fa-cart-shopping"></i></div>
@@ -26,7 +26,7 @@
       </div>
     </div>
     <p class="al-footer">© 2026 Djula Market · Ouagadougou</p>
-  </div>
+  </div> -->
 
   <!-- Right -->
   <div class="auth-right">
@@ -77,34 +77,10 @@
 
         <div class="auth-switch">
           Pas encore membre ?
-          <a routerLink="/auth/register">Créer un compte gratuit</a>
-        </div>
-
-        <!-- ── Lien inscription fournisseur ── -->
-        <div class="auth-switch">
-          Vous êtes fournisseur ?
-          <a routerLink="/auth/supplier-register">
-            <i class="fa-solid fa-store" style="font-size:12px"></i>
-            S'inscrire comme fournisseur
-          </a>
+          <!-- <a routerLink="/auth/register">Créer un compte gratuit</a> -->
+          <a class="auth-link" role="button" tabindex="0" (click)="goToRegister()">Créer un compte gratuit</a>
         </div>
       </form>
-
-      <!-- Demo box -->
-      <div class="demo-box">
-        <div class="demo-title"><i class="fa-solid fa-flask"></i> Accès démo rapide</div>
-        <div class="demo-btns">
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('MEMBER')">
-            <i class="fa-solid fa-user"></i> Membre
-          </button>
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('SUPPLIER')">
-            <i class="fa-solid fa-store"></i> Fournisseur
-          </button>
-          <button class="btn-outline btn-sm btn-round" (click)="demoLogin('ADMIN')">
-            <i class="fa-solid fa-shield-halved"></i> Admin
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </div>

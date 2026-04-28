@@ -1,0 +1,254 @@
+.del-page { background: var(--bg); min-height: 100vh; }
+
+// ── HERO ──────────────────────────────────────────────────────────
+.del-hero {
+  background: linear-gradient(140deg, #1a0533 0%, #7B2FBE 55%, #FF8C00 100%);
+  padding: 80px 0 64px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    left: -60px; bottom: -80px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,140,0,.1);
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) { padding: 52px 0 40px; }
+}
+
+.del-hero-icon {
+  width: 72px; height: 72px;
+  background: rgba(255,255,255,.15);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: #fff;
+  margin: 0 auto 20px;
+
+  @media (max-width: 480px) { width: 56px; height: 56px; font-size: 24px; }
+}
+
+.del-hero-title {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900; color: #fff; margin-bottom: 12px;
+  letter-spacing: -.5px;
+}
+
+.del-hero-sub { font-size: 15px; color: rgba(255,255,255,.78); font-weight: 500; }
+
+// ── BODY ──────────────────────────────────────────────────────────
+.del-body { padding: 52px 24px 72px; max-width: 940px; margin: 0 auto; }
+
+// ── KPI ROW ───────────────────────────────────────────────────────
+.del-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+  @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+.del-kpi {
+  text-align: center;
+  padding: 22px 16px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1.5px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+  transition: transform .2s, box-shadow .2s;
+
+  &:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.1); }
+}
+
+.del-kpi-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin: 0 auto 12px;
+}
+
+.del-kpi-val   { font-size: 24px; font-weight: 900; color: #1a1a2e; margin-bottom: 4px; letter-spacing: -.3px; }
+.del-kpi-label { font-size: 12px; color: #6B7280; font-weight: 600; }
+
+// ── SECTIONS ──────────────────────────────────────────────────────
+.del-section {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  border: 1.5px solid #f0f0f0;
+  box-shadow: 0 2px 14px rgba(0,0,0,.05);
+
+  @media (max-width: 480px) { padding: 20px 16px; border-radius: 16px; }
+}
+
+.del-section-head  { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+
+.del-section-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.del-section-title { font-size: 18px; font-weight: 900; color: #1a1a2e; }
+
+// ── TABLEAU ───────────────────────────────────────────────────────
+.del-table-wrap { overflow-x: auto; border-radius: 12px; }
+
+.del-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+
+  th {
+    background: #F8FAFB;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 800;
+    color: #374151;
+    white-space: nowrap;
+    border-bottom: 2px solid #F0F0F0;
+  }
+
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #F5F5F5;
+    vertical-align: middle;
+    color: #4B5563;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+}
+
+.del-city  { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+.del-note  { font-size: 11px; color: #9CA3AF; }
+
+// ── ÉTAPES ────────────────────────────────────────────────────────
+.del-steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.del-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  background: #F8FAFB;
+  border-radius: 14px;
+  border: 1.5px solid #f0f0f0;
+  transition: all .2s;
+
+  &:hover {
+    background: #fff;
+    border-color: #d4f0e8;
+    box-shadow: 0 4px 16px rgba(13,164,135,.08);
+  }
+}
+
+.del-step-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.del-step-title { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 5px; }
+.del-step-desc  { font-size: 12px; color: #6B7280; line-height: 1.6; }
+
+// ── PARTENAIRES ───────────────────────────────────────────────────
+.del-partners { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.del-partner {
+  flex: 1; min-width: 180px;
+  background: #F8FAFB;
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  border: 1.5px solid #f0f0f0;
+  transition: all .2s;
+
+  &:hover {
+    background: #fff;
+    border-color: #d4f0e8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.07);
+  }
+
+  @media (max-width: 480px) { min-width: 100%; }
+}
+
+.del-partner-icon { font-size: 30px; color: var(--primary); margin-bottom: 10px; }
+.del-partner-name { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+.del-partner-cover{ font-size: 12px; color: #6B7280; }
+
+// ── FAQ ───────────────────────────────────────────────────────────
+.del-faq-list { display: flex; flex-direction: column; gap: 0; }
+
+.del-faq-item {
+  border-bottom: 1px solid #F5F5F5;
+  &:last-child { border-bottom: none; }
+}
+
+.del-faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  transition: color .18s;
+
+  &:hover { color: var(--primary); }
+}
+
+.del-faq-arr {
+  font-size: 12px;
+  color: #9CA3AF;
+  transition: transform .25s, color .2s;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #F5F5F5;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+
+  &.open {
+    transform: rotate(180deg);
+    color: var(--primary);
+    background: var(--primary-l);
+  }
+}
+
+.del-faq-a { font-size: 13px; color: #6B7280; line-height: 1.75; padding-bottom: 18px; font-weight: 500; }
+
+// ── CTA ───────────────────────────────────────────────────────────
+.del-cta {
+  padding: 36px;
+  border-radius: 20px;
+  text-align: center;
+
+  @media (max-width: 480px) { padding: 24px 18px; }
+}
+
+.del-cta-icon {
+  width: 60px; height: 60px;
+  background: rgba(255,255,255,.15);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 14px;
+}

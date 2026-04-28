@@ -25,6 +25,9 @@ export class OtpComponent implements OnInit, OnDestroy {
   ngOnInit(): void  { this.startTimer(); }
   ngOnDestroy(): void { if (this.timer) clearInterval(this.timer); }
 
+  // ── trackBy pour éviter la recréation des inputs ──────────────
+  trackByIndex(index: number): number { return index; }
+
   startTimer(): void {
     if (this.timer) clearInterval(this.timer);
     this.countdown = 120;
@@ -37,19 +40,16 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   onInput(event: Event, idx: number): void {
     const input = event.target as HTMLInputElement;
-    // Garder seulement le dernier chiffre saisi
-    const val = input.value.replace(/\D/g, '').slice(-1);
+    const val   = input.value.replace(/\D/g, '').slice(-1);
 
-    // Forcer la valeur de l'input
+    // Forcer la valeur DOM
     input.value = val;
 
-    // Mettre à jour le tableau
-    const newDigits = [...this.digits];
-    newDigits[idx]  = val;
-    this.digits     = newDigits;
+    // Mettre à jour le tableau SANS recréer (pour éviter le rerender)
+    this.digits[idx] = val;
 
-    // Focus suivant
     if (val && idx < 5) {
+      // Passer au champ suivant
       setTimeout(() => {
         const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
         boxes[idx + 1]?.focus();
@@ -62,21 +62,15 @@ export class OtpComponent implements OnInit, OnDestroy {
   onKeydown(event: KeyboardEvent, idx: number): void {
     if (event.key === 'Backspace') {
       if (!this.digits[idx] && idx > 0) {
-        const newDigits    = [...this.digits];
-        newDigits[idx - 1] = '';
-        this.digits        = newDigits;
-        // Forcer le vidage de l'input précédent
+        this.digits[idx - 1] = '';
         setTimeout(() => {
           const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
           if (boxes[idx - 1]) boxes[idx - 1].value = '';
           boxes[idx - 1]?.focus();
         }, 10);
       } else {
-        const newDigits = [...this.digits];
-        newDigits[idx]  = '';
-        this.digits     = newDigits;
-        const input     = event.target as HTMLInputElement;
-        input.value     = '';
+        this.digits[idx] = '';
+        (event.target as HTMLInputElement).value = '';
       }
       event.preventDefault();
     }
@@ -93,13 +87,13 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
-    const text   = event.clipboardData?.getData('text') ?? '';
-    const nums   = text.replace(/\D/g, '').slice(0, 6).split('');
+    const text = event.clipboardData?.getData('text') ?? '';
+    const nums = text.replace(/\D/g, '').slice(0, 6).split('');
     if (nums.length !== 6) return;
 
-    this.digits = nums;
+    // Mettre à jour directement sans recréer le tableau
+    nums.forEach((n, i) => { this.digits[i] = n; });
 
-    // Mettre à jour les inputs DOM
     setTimeout(() => {
       const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
       nums.forEach((n, i) => { if (boxes[i]) boxes[i].value = n; });
@@ -109,7 +103,6 @@ export class OtpComponent implements OnInit, OnDestroy {
   }
 
   private checkComplete(): void {
-    console.log('digits:', this.digits);
     const code = this.digits.join('');
     if (code.length === 6 && this.digits.every(d => d !== '') && !this.emitted) {
       this.emitted = true;
@@ -125,7 +118,6 @@ export class OtpComponent implements OnInit, OnDestroy {
     this.resendLoading = true;
     this.emitted       = false;
 
-    // Vider les inputs DOM
     const boxes = document.querySelectorAll<HTMLInputElement>('.otp-box');
     boxes.forEach(b => b.value = '');
     this.digits = ['', '', '', '', '', ''];

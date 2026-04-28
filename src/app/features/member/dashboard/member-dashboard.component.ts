@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin, Subject, takeUntil, catchError, of } from 'rxjs';
 import { GroupService }        from '../../../core/services/group.service';
 import { OrderService }        from '../../../core/services/order.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -12,84 +13,115 @@ import { Group, Order, Notification, NotifType } from '../../../core/models';
   templateUrl: './member-dashboard.component.html',
   styleUrls:  ['./member-dashboard.component.scss']
 })
-export class MemberDashboardComponent implements OnInit {
-  myGroups:  Group[]        = [];
-  orders:    Order[]        = [];
+export class MemberDashboardComponent implements OnInit, OnDestroy {
+  myGroups : Group[]        = [];
+  orders   : Order[]        = [];
   loading    = true;
+  copied     = false;
+
+  private destroy$ = new Subject<void>();
 
   kpis = [
-    { icon: 'fa-solid fa-users',      label: 'Groupes actifs',     val: '0',       sub: '',              color: '#0DA487', bg: '#E6FAF5' },
-    { icon: 'fa-solid fa-piggy-bank', label: 'Total économisé',    val: '0 XOF',   sub: '',              color: '#10D98B', bg: '#E8FDF2' },
+    { icon: 'fa-solid fa-users',      label: 'Groupes actifs',     val: '0',       sub: 'En cours',      color: '#0DA487', bg: '#E6FAF5' },
+    { icon: 'fa-solid fa-piggy-bank', label: 'Total économisé',    val: '0 XOF',   sub: 'Cumulé',        color: '#10D98B', bg: '#E8FDF2' },
     { icon: 'fa-solid fa-box',        label: 'Commandes en cours', val: '0',       sub: 'En expédition', color: '#00D4FF', bg: '#E0F9FF' },
     { icon: 'fa-solid fa-star',       label: 'Score de confiance', val: '100/100', sub: 'Excellent',     color: '#7B2FBE', bg: '#F0E8FD' },
   ];
 
-  timeline: { icon: string; color: string; time: string; text: string; action: string }[] = [
+  timeline: {
+    icon: string;
+    color: string;
+    time: string;
+    text: string;
+    action: string;
+  }[] = [
     { icon: 'fa-solid fa-bell', color: '#7B2FBE', time: '', text: 'Chargement de l\'activité...', action: '' },
   ];
 
   constructor(
-    private groupService:  GroupService,
-    private orderService:  OrderService,
-    public  notifService:  NotificationService,
-    public  auth:          AuthService,
-    public  fmt:           FormatService,
-    private router:        Router,
+    private groupService : GroupService,
+    private orderService : OrderService,
+    public  notifService : NotificationService,
+    public  auth         : AuthService,
+    public  fmt          : FormatService,
+    private router       : Router,
   ) {}
 
   ngOnInit(): void {
-    // ── Charger mes groupes ────────────────────────────────────
-    this.groupService.getMyGroups().subscribe({
-      next: (data: any) => {
-        const active    = data?.active    ?? [];
-        const completed = data?.completed ?? [];
+    this.loadDashboard();
+  }
 
-        this.myGroups = [
-          ...active.map((m: any)    => this.groupService.mapGroup(m.group ?? m)),
-          ...completed.map((m: any) => this.groupService.mapGroup(m.group ?? m)),
-        ].filter(g => g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED');
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-        this.loading = false;
-
-        this.kpis[0].val = this.myGroups.length.toString();
-        this.kpis[0].sub = `${this.myGroups.length} en cours`;
-        this.kpis[3].val = `${this.auth.currentUser()?.trustScore ?? 100}/100`;
-      },
-      error: () => { this.loading = false; }
-    });
-
-    // ── Charger mes commandes ──────────────────────────────────
-    this.orderService.getMyOrders().subscribe({
-      next: (orders: Order[]) => {
-        this.orders = orders.slice(0, 3);
-        const inProgress = orders.filter(o =>
-          o.status === 'PROCESSING' || o.status === 'SHIPPED'
-        ).length;
-        this.kpis[2].val = inProgress.toString();
-      },
-      error: () => {}
-    });
-
-    // ── Charger les notifications pour la timeline ─────────────
-    this.notifService.getAll().subscribe({
-      next: (notifs: Notification[]) => {
-        if (notifs.length > 0) {
-          this.timeline = notifs.slice(0, 5).map(n => ({
-            icon:   this.notifIcon(n.type),
-            color:  this.notifColor(n.type),
-            time:   new Date(n.createdAt).toLocaleDateString('fr-FR'),
-            text:   n.title + (n.body ? ' — ' + n.body : ''),
-            // CORRECTION : utiliser THRESHOLD_REACHED (type front)
-            action: n.type === 'THRESHOLD_REACHED' ? 'Payer' : '',
-          }));
-        }
-      },
-      error: () => {}
+  // ── Charger toutes les données en parallèle ───────────────────
+  private loadDashboard(): void {
+    forkJoin({
+      groups : this.groupService.getMyGroups().pipe(catchError(() => of(null))),
+      orders : this.orderService.getMyOrders().pipe(catchError(() => of([]))),
+      notifs : this.notifService.getAll().pipe(catchError(() => of([]))),
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(({ groups, orders, notifs }) => {
+      this.processGroups(groups);
+      this.processOrders(orders as Order[]);
+      this.processNotifs(notifs as Notification[]);
+      this.loading = false;
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
+  // ── Traitement des groupes ────────────────────────────────────
+  private processGroups(data: any): void {
+    if (!data) return;
+    const active    = data?.active    ?? [];
+    const completed = data?.completed ?? [];
 
+    this.myGroups = [
+      ...active.map   ((m: any) => this.groupService.mapGroup(m.group ?? m)),
+      ...completed.map((m: any) => this.groupService.mapGroup(m.group ?? m)),
+    ].filter(g => g.status === 'OPEN' || g.status === 'THRESHOLD_REACHED');
+
+    this.kpis[0].val = this.myGroups.length.toString();
+    this.kpis[0].sub = `${this.myGroups.length} en cours`;
+    this.kpis[3].val = `${this.auth.currentUser()?.trustScore ?? 100}/100`;
+  }
+
+  // ── Traitement des commandes ──────────────────────────────────
+  private processOrders(orders: Order[]): void {
+    this.orders = orders.slice(0, 3);
+    const inProgress = orders.filter(o =>
+      ['PROCESSING', 'SHIPPED'].includes(o.status)
+    ).length;
+    this.kpis[2].val = inProgress.toString();
+
+    // Calcul économies totales (prix solo - prix groupe × quantité)
+    const saved = orders
+      .filter(o => o.status === 'DELIVERED')
+      .reduce((acc, o) => acc + ((o as any).savedAmount ?? 0), 0);
+    if (saved > 0) {
+      this.kpis[1].val = this.fmt.currency(saved);
+      this.kpis[1].sub = 'Économisé au total';
+    }
+  }
+
+  // ── Traitement des notifications → timeline ───────────────────
+  private processNotifs(notifs: Notification[]): void {
+    if (!notifs.length) {
+      this.timeline = [];
+      return;
+    }
+    this.timeline = notifs.slice(0, 5).map(n => ({
+      icon   : this.notifIcon(n.type),
+      color  : this.notifColor(n.type),
+      time   : new Date(n.createdAt).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }),
+      text   : n.title + (n.body ? ' — ' + n.body : ''),
+      action : n.type === 'THRESHOLD_REACHED' ? 'Payer' : '',
+    }));
+  }
+
+  // ── Getters ───────────────────────────────────────────────────
   get greeting(): string {
     const h = new Date().getHours();
     if (h < 12) return 'Bonjour';
@@ -106,11 +138,17 @@ export class MemberDashboardComponent implements OnInit {
   }
 
   get referralCode(): string {
-    return this.auth.currentUser()?.referralCode || '';
+    return this.auth.currentUser()?.referralCode || '—';
   }
 
+  get totalSaved(): number {
+    return this.auth.currentUser()?.totalSaved ?? 0;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
   productImage(g: Group): string {
-    return g.product.images?.[0] ?? `https://picsum.photos/seed/${g.product.id}/120/120`;
+    return g.product?.images?.[0]
+      ?? `https://picsum.photos/seed/${g.product?.id}/120/120`;
   }
 
   progressPct(g: Group): number {
@@ -121,47 +159,51 @@ export class MemberDashboardComponent implements OnInit {
     return g.status === 'THRESHOLD_REACHED';
   }
 
-  // CORRECTION : utiliser les types NotifType du front
+  // ── Copier le code de parrainage ──────────────────────────────
+  copyReferralCode(): void {
+    if (!this.referralCode || this.referralCode === '—') return;
+    navigator.clipboard?.writeText(this.referralCode).then(() => {
+      this.copied = true;
+      setTimeout(() => { this.copied = false; }, 2000);
+    });
+  }
+
+  // ── Icônes et couleurs notifications ─────────────────────────
   private notifIcon(type: NotifType | string): string {
     const map: Record<string, string> = {
-      'NEW_MEMBER':       'fa-solid fa-user-plus',
-      'THRESHOLD_REACHED':'fa-solid fa-fire',        // ← CORRECTION
-      'GROUP_EXPIRED':    'fa-solid fa-times-circle',
-      'PAYMENT_REMINDER': 'fa-solid fa-credit-card',
-      'PAYMENT_SUCCESS':  'fa-solid fa-circle-check',
-      'ORDER_SHIPPED':    'fa-solid fa-truck-fast',
-      'ORDER_DELIVERED':  'fa-solid fa-box-open',
-      'PROMO':            'fa-solid fa-tag',
-      'SYSTEM':           'fa-solid fa-bell',
+      NEW_MEMBER       : 'fa-solid fa-user-plus',
+      THRESHOLD_REACHED: 'fa-solid fa-fire',
+      GROUP_EXPIRED    : 'fa-solid fa-times-circle',
+      PAYMENT_REMINDER : 'fa-solid fa-credit-card',
+      PAYMENT_SUCCESS  : 'fa-solid fa-circle-check',
+      ORDER_SHIPPED    : 'fa-solid fa-truck-fast',
+      ORDER_DELIVERED  : 'fa-solid fa-box-open',
+      PROMO            : 'fa-solid fa-tag',
+      SYSTEM           : 'fa-solid fa-bell',
     };
     return map[type] ?? 'fa-solid fa-bell';
   }
 
-  // CORRECTION : utiliser les types NotifType du front
   private notifColor(type: NotifType | string): string {
     const map: Record<string, string> = {
-      'NEW_MEMBER':       '#0DA487',
-      'THRESHOLD_REACHED':'#F4A902',  // ← CORRECTION
-      'GROUP_EXPIRED':    '#FF4D6A',
-      'PAYMENT_REMINDER': '#F4A902',
-      'PAYMENT_SUCCESS':  '#10D98B',
-      'ORDER_SHIPPED':    '#00D4FF',
-      'ORDER_DELIVERED':  '#10D98B',
-      'PROMO':            '#7B2FBE',
-      'SYSTEM':           '#7B2FBE',
+      NEW_MEMBER       : '#0DA487',
+      THRESHOLD_REACHED: '#F4A902',
+      GROUP_EXPIRED    : '#FF4D6A',
+      PAYMENT_REMINDER : '#F4A902',
+      PAYMENT_SUCCESS  : '#10D98B',
+      ORDER_SHIPPED    : '#00D4FF',
+      ORDER_DELIVERED  : '#10D98B',
+      PROMO            : '#7B2FBE',
+      SYSTEM           : '#7B2FBE',
     };
     return map[type] ?? '#7B2FBE';
   }
 
-  copyReferralCode(): void {
-    navigator.clipboard?.writeText(this.referralCode);
-  }
-
   // ── Navigation ────────────────────────────────────────────────
-  goGroups():              void { this.router.navigate(['/member/groups']); }
-  goPayment():             void { this.router.navigate(['/member/payment']); }
-  goBrowse():              void { this.router.navigate(['/groups']); }
-  goOrders():              void { this.router.navigate(['/member/orders']); }
-  goNotifications():       void { this.router.navigate(['/member/notifications']); }
-  goGroupDetail(g: Group): void { this.router.navigate(['/groups', g.id]); }
+  goGroups()              : void { this.router.navigate(['/member/groups']); }
+  goPayment()             : void { this.router.navigate(['/member/payment']); }
+  goBrowse()              : void { this.router.navigate(['/groups']); }
+  goOrders()              : void { this.router.navigate(['/member/orders']); }
+  goNotifications()       : void { this.router.navigate(['/member/notifications']); }
+  goGroupDetail(g: Group) : void { this.router.navigate(['/groups', g.id]); }
 }

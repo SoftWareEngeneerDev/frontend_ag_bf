@@ -1,0 +1,147 @@
+<app-navbar></app-navbar>
+
+<div class="ret-page">
+
+  <!-- Hero -->
+  <div class="ret-hero">
+    <div class="container text-center">
+      <div class="ret-hero-icon"><i class="fa-solid fa-rotate-left"></i></div>
+      <h1 class="font-display ret-hero-title">Politique de <span style="color:#FF8C00">retours</span></h1>
+      <p class="ret-hero-sub">Dernière mise à jour : Mars 2025</p>
+    </div>
+  </div>
+
+  <div class="container ret-body">
+
+    <!-- Bandeau confiance -->
+    <div class="ret-trust-row">
+      <div class="ret-trust-item">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Produit endommagé → remboursé</span>
+      </div>
+      <div class="ret-trust-item">
+        <i class="fa-solid fa-clock"></i>
+        <span>7 jours pour signaler</span>
+      </div>
+      <div class="ret-trust-item">
+        <i class="fa-solid fa-money-bill-wave"></i>
+        <span>Remboursement sous 5 jours</span>
+      </div>
+    </div>
+
+    <!-- Section : Conditions -->
+    <div class="ret-section glass">
+      <div class="ret-section-head">
+        <div class="ret-section-icon" style="background:#E6F7F4;color:var(--primary)">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h2 class="font-display ret-section-title">Conditions de retour acceptées</h2>
+      </div>
+      <p class="ret-intro">Vous pouvez demander un retour dans les situations suivantes :</p>
+      <ul class="ret-list">
+        <li><i class="fa-solid fa-check text-primary"></i> Produit reçu endommagé ou défectueux</li>
+        <li><i class="fa-solid fa-check text-primary"></i> Produit non conforme à la description du groupe</li>
+        <li><i class="fa-solid fa-check text-primary"></i> Produit incorrect ou manquant dans la commande</li>
+        <li><i class="fa-solid fa-check text-primary"></i> Groupe annulé avant expédition (remboursement automatique)</li>
+        <li><i class="fa-solid fa-check text-primary"></i> Produit jamais reçu après délai maximum</li>
+      </ul>
+    </div>
+
+    <!-- Section : Délais -->
+    <div class="ret-section glass">
+      <div class="ret-section-head">
+        <div class="ret-section-icon" style="background:#FFF3E0;color:var(--orange)">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h2 class="font-display ret-section-title">Délais à respecter</h2>
+      </div>
+      <div class="ret-table-wrap">
+        <table class="ret-table">
+          <thead>
+            <tr>
+              <th>Motif du retour</th>
+              <th>Délai pour signaler</th>
+              <th>Remboursement sous</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of [
+              {motif:'Produit endommagé / défectueux', delai:'7 jours après réception', remb:'3–5 jours ouvrés'},
+              {motif:'Produit non conforme',           delai:'7 jours après réception', remb:'3–5 jours ouvrés'},
+              {motif:'Produit manquant',               delai:'48h après livraison',     remb:'2–3 jours ouvrés'},
+              {motif:'Groupe annulé (seuil non atteint)', delai:'Automatique',          remb:'3–5 jours ouvrés'},
+              {motif:'Commande non reçue',             delai:'14 jours après date prévue', remb:'5–7 jours ouvrés'},
+            ]">
+              <td>{{ row.motif }}</td>
+              <td>{{ row.delai }}</td>
+              <td class="badge-ok" style="white-space:nowrap">{{ row.remb }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section : Procédure -->
+    <div class="ret-section glass">
+      <div class="ret-section-head">
+        <div class="ret-section-icon" style="background:#F3EAFF;color:var(--purple)">
+          <i class="fa-solid fa-list-ol"></i>
+        </div>
+        <h2 class="font-display ret-section-title">Procédure de retour</h2>
+      </div>
+      <div class="ret-steps">
+        <div class="ret-step" *ngFor="let s of [
+          {n:'1', icon:'fa-solid fa-right-to-bracket', title:'Connectez-vous', desc:'Accédez à votre espace membre via l\'application ou le site.'},
+          {n:'2', icon:'fa-solid fa-box',              title:'Accédez à Mes Commandes', desc:'Trouvez la commande concernée et cliquez sur « Signaler un problème ».'},
+          {n:'3', icon:'fa-solid fa-camera',           title:'Décrivez le problème', desc:'Ajoutez des photos si possible et décrivez le problème avec précision.'},
+          {n:'4', icon:'fa-solid fa-paper-plane',      title:'Soumettez la demande', desc:'Notre équipe examine votre demande sous 24h et vous contacte pour la suite.'},
+          {n:'5', icon:'fa-solid fa-money-bill-wave',  title:'Remboursement', desc:'Si le retour est validé, le remboursement est effectué via le même mode de paiement.'},
+        ]">
+          <div class="ret-step-num font-display">{{ s.n }}</div>
+          <div class="ret-step-icon"><i [class]="s.icon"></i></div>
+          <div class="ret-step-body">
+            <div class="ret-step-title font-display">{{ s.title }}</div>
+            <div class="ret-step-desc text-muted">{{ s.desc }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section : Exceptions -->
+    <div class="ret-section glass">
+      <div class="ret-section-head">
+        <div class="ret-section-icon" style="background:#FFEAEA;color:var(--red)">
+          <i class="fa-solid fa-ban"></i>
+        </div>
+        <h2 class="font-display ret-section-title">Produits non retournables</h2>
+      </div>
+      <p class="ret-intro">Les articles suivants ne peuvent pas faire l'objet d'un retour sauf défaut de fabrication :</p>
+      <ul class="ret-list ret-list-err">
+        <li><i class="fa-solid fa-xmark"></i> Produits alimentaires ou périssables</li>
+        <li><i class="fa-solid fa-xmark"></i> Médicaments et produits pharmaceutiques</li>
+        <li><i class="fa-solid fa-xmark"></i> Articles d'hygiène personnelle ouverts</li>
+        <li><i class="fa-solid fa-xmark"></i> Logiciels ou contenus numériques téléchargés</li>
+        <li><i class="fa-solid fa-xmark"></i> Produits endommagés par l'acheteur après réception</li>
+        <li><i class="fa-solid fa-xmark"></i> Articles sur-mesure ou personnalisés</li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="ret-cta glass text-center">
+      <p class="text-muted" style="margin-bottom:16px">
+        Besoin d'aide pour un retour ou un remboursement ?
+      </p>
+      <div class="ret-cta-btns">
+        <button class="btn-primary btn-round" (click)="goDisputes()">
+          <i class="fa-solid fa-flag"></i> Ouvrir un litige
+        </button>
+        <button class="btn-outline btn-round" (click)="goContact()">
+          <i class="fa-solid fa-headset"></i> Contacter le support
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

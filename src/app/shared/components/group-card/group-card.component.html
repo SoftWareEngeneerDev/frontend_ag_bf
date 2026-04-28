@@ -4,7 +4,7 @@
   <div class="gc-img-wrap">
     <img [src]="imageUrl" [alt]="group.product.name" class="gc-img" loading="lazy">
 
-    <!-- Badges statut (coin gauche) -->
+    <!-- Badge statut (coin haut-gauche) -->
     <span class="gc-badge gc-badge-hot" *ngIf="isHot">
       <i class="fa-solid fa-fire"></i> Seuil atteint
     </span>
@@ -12,10 +12,10 @@
       <i class="fa-solid fa-circle-dot"></i> Ouvert
     </span>
 
-    <!-- Remise (coin droit) -->
+    <!-- Remise (coin haut-droit) -->
     <span class="gc-discount">-{{ group.discountPercent }}%</span>
 
-    <!-- Actions survol (colonne droite) -->
+    <!-- Actions survol -->
     <div class="gc-actions">
       <button class="gc-act-btn"
               title="Rejoindre"
@@ -41,9 +41,9 @@
     <span class="gc-cat">{{ group.product.category.name }}</span>
 
     <!-- Nom du produit -->
-    <h3 class="gc-name">{{ group.product.name | truncate:52 }}</h3>
+    <h3 class="gc-name">{{ group.product.name | truncate:48 }}</h3>
 
-    <!-- Étoiles + avis -->
+    <!-- Étoiles -->
     <div class="gc-rating">
       <span class="gc-stars">
         <i *ngFor="let s of stars"
@@ -54,12 +54,23 @@
       <span class="gc-review-count">({{ group.product.reviewCount }} avis)</span>
     </div>
 
+    <!-- Statut + Temps restant -->
+    <div class="gc-status-row">
+      <span class="gc-status-dot" [class.hot]="isHot">
+        {{ isHot ? 'Seuil atteint' : 'En cours' }}
+      </span>
+      <div class="gc-countdown-wrap">
+        <i class="fa-regular fa-clock gc-cd-icon"></i>
+        <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
+      </div>
+    </div>
+
     <!-- Progression des membres -->
     <div class="gc-progress">
       <div class="gc-prog-header">
         <span>
           <i class="fa-solid fa-users gc-prog-icon"></i>
-          {{ group.currentCount }}/{{ group.minParticipants }} membres
+          {{ group.currentCount }}/{{ group.minParticipants }} participants
         </span>
         <span class="gc-pct" [class.gc-pct-full]="pct >= 100">{{ pct }}%</span>
       </div>
@@ -68,36 +79,33 @@
       </div>
     </div>
 
-    <!-- Prix + countdown -->
+    <!-- Prix -->
     <div class="gc-price-row">
       <div class="gc-prices">
-        <span class="gc-old-price">{{ group.product.soloPrice | currencyXof }}</span>
         <span class="gc-price">{{ group.currentPrice | currencyXof }}</span>
-      </div>
-      <div class="gc-countdown-wrap">
-        <i class="fa-regular fa-clock gc-cd-icon"></i>
-        <app-countdown [expiresAt]="group.expiresAt"></app-countdown>
+        <span class="gc-old-price">{{ group.product.soloPrice | currencyXof }}</span>
       </div>
     </div>
 
-    <!-- CTA -->
-    <!-- Mode public : rejoindre avec dépôt -->
+    <!-- CTA public : rejoindre -->
     <button *ngIf="!memberView"
-            class="btn-primary gc-cta"
+            class="gc-cta"
             (click)="$event.stopPropagation(); join.emit(group)">
-      <i class="fa-solid fa-bolt"></i>
-      Rejoindre — dépôt {{ group.depositAmount | currencyXof }}
+      <i class="fa-solid fa-arrow-right"></i>
+      Rejoindre le groupe
     </button>
 
-    <!-- Mode membre : payer le solde ou voir le groupe -->
+    <!-- CTA membre : payer le solde -->
     <button *ngIf="memberView && isHot"
-            class="btn-gold gc-cta"
+            class="gc-cta btn-gold"
             (click)="$event.stopPropagation(); join.emit(group)">
       <i class="fa-solid fa-credit-card"></i>
       Payer le solde maintenant
     </button>
+
+    <!-- CTA membre : voir le groupe -->
     <button *ngIf="memberView && !isHot"
-            class="btn-outline-primary gc-cta"
+            class="gc-cta btn-outline-primary"
             (click)="$event.stopPropagation(); details.emit(group)">
       <i class="fa-solid fa-arrow-right"></i>
       Voir mon groupe

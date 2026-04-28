@@ -3,21 +3,19 @@
   <h2 class="font-display otp-title">Vérifiez votre numéro</h2>
   <p class="text-muted otp-sub">Code envoyé au</p>
   <p class="font-mono otp-phone">{{ phone }}</p>
-
   <div class="otp-inputs">
     <input
       class="otp-box"
-      *ngFor="let d of digits; let i = index"
+      *ngFor="let d of digits; let i = index; trackBy: trackByIndex"
       type="text"
       inputmode="numeric"
       maxlength="1"
       [value]="digits[i]"
       (input)="onInput($event, i)"
       (keydown)="onKeydown($event, i)"
-      (paste)="i === 0 ? onPaste($event) : null"
+      (paste)="onPaste($event)"
       autocomplete="one-time-code">
   </div>
-
   <div class="otp-timer text-muted" style="margin-top:16px">
     <span *ngIf="!canResend">
       Renvoyer le code dans
@@ -30,7 +28,6 @@
       <span *ngIf="resendLoading">Envoi en cours...</span>
     </button>
   </div>
-
   <button class="btn-ghost btn-blk" style="margin-top:12px" (click)="back.emit()">
     ← Modifier le numéro
   </button>

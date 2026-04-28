@@ -1,0 +1,120 @@
+<app-navbar></app-navbar>
+
+<div class="lit-page">
+
+  <!-- Hero -->
+  <div class="lit-hero">
+    <div class="container text-center">
+      <div class="lit-hero-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h1 class="font-display lit-hero-title">Centre de <span style="color:#FF4D6A">litiges</span></h1>
+      <p class="lit-hero-sub">Votre achat est protégé · Résolution garantie sous 7 jours</p>
+    </div>
+  </div>
+
+  <div class="container lit-body">
+
+    <!-- Garantie acheteur -->
+    <div class="lit-guarantee glass">
+      <div class="lit-guarantee-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="lit-guarantee-body">
+        <h2 class="font-display lit-guarantee-title">Garantie Acheteur AchatGroupéBF</h2>
+        <p class="text-muted">Tous vos achats sont protégés. Si vous avez un problème avec votre commande, notre équipe intervient pour trouver une solution équitable — remboursement, échange ou compensation.</p>
+      </div>
+    </div>
+
+    <!-- Types de litiges -->
+    <div class="glass lit-section">
+      <div class="lit-section-head">
+        <div class="lit-section-icon" style="background:#FFF8E6;color:var(--gold)"><i class="fa-solid fa-list-check"></i></div>
+        <h2 class="font-display lit-section-title">Quels problèmes peut-on résoudre ?</h2>
+      </div>
+      <div class="lit-types">
+        <div class="lit-type" *ngFor="let t of types">
+          <div class="lit-type-icon" [style.color]="t.color"><i [class]="t.icon"></i></div>
+          <div>
+            <div class="lit-type-title font-display">{{ t.title }}</div>
+            <div class="lit-type-desc text-muted">{{ t.desc }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Processus de résolution -->
+    <div class="glass lit-section">
+      <div class="lit-section-head">
+        <div class="lit-section-icon" style="background:#E6F7F4;color:var(--primary)"><i class="fa-solid fa-route"></i></div>
+        <h2 class="font-display lit-section-title">Comment se déroule la résolution ?</h2>
+      </div>
+      <div class="lit-steps">
+        <div class="lit-step" *ngFor="let s of steps; let last = last">
+          <div class="lit-step-left">
+            <div class="lit-step-num font-display">{{ s.n }}</div>
+            <div class="lit-step-line" *ngIf="!last"></div>
+          </div>
+          <div class="lit-step-body">
+            <div class="lit-step-icon"><i [class]="s.icon"></i></div>
+            <div>
+              <div class="lit-step-title font-display">{{ s.title }}</div>
+              <div class="lit-step-desc text-muted">{{ s.desc }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Délais de traitement -->
+    <div class="glass lit-section">
+      <div class="lit-section-head">
+        <div class="lit-section-icon" style="background:#FFF3E0;color:var(--orange)"><i class="fa-solid fa-clock"></i></div>
+        <h2 class="font-display lit-section-title">Délais de traitement</h2>
+      </div>
+      <div class="lit-delays">
+        <div class="lit-delay" *ngFor="let d of [
+          {label:'Accusé de réception',        time:'Immédiat',      color:'var(--ok)'},
+          {label:'Prise en charge du dossier', time:'Sous 24h',      color:'var(--ok)'},
+          {label:'Contact fournisseur',         time:'Sous 48h',      color:'var(--warn)'},
+          {label:'Décision finale',             time:'Sous 7 jours',  color:'var(--warn)'},
+          {label:'Remboursement (si accordé)',  time:'3–5 jours ouvrés', color:'var(--info)'},
+        ]">
+          <div class="lit-delay-label">{{ d.label }}</div>
+          <div class="lit-delay-time" [style.color]="d.color"><i class="fa-solid fa-clock"></i> {{ d.time }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="glass lit-section">
+      <div class="lit-section-head">
+        <div class="lit-section-icon" style="background:#F3EAFF;color:var(--purple)"><i class="fa-solid fa-circle-question"></i></div>
+        <h2 class="font-display lit-section-title">Questions fréquentes</h2>
+      </div>
+      <div class="lit-faq">
+        <div class="lit-faq-item" *ngFor="let f of faqs; let i = index">
+          <div class="lit-faq-q" (click)="toggleFaq(i)">
+            <span class="font-display">{{ f.q }}</span>
+            <i class="fa-solid fa-chevron-down lit-faq-arr" [class.open]="openFaq === i"></i>
+          </div>
+          <div class="lit-faq-a text-muted" *ngIf="openFaq === i">{{ f.a }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="lit-cta glass text-center">
+      <div class="lit-cta-icon"><i class="fa-solid fa-flag"></i></div>
+      <h3 class="font-display lit-cta-title">Vous avez un problème avec une commande ?</h3>
+      <p class="text-muted lit-cta-sub">Connectez-vous à votre espace membre pour ouvrir un litige officiel.</p>
+      <div class="lit-cta-btns">
+        <button class="btn-err btn-round" (click)="goLogin()">
+          <i class="fa-solid fa-flag"></i> Ouvrir un litige
+        </button>
+        <button class="btn-outline btn-round" (click)="goContact()">
+          <i class="fa-solid fa-headset"></i> Contacter le support
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

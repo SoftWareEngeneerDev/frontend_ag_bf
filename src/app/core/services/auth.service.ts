@@ -216,7 +216,7 @@ export class AuthService {
       showCancelButton: true,
       confirmButtonText: 'Oui, me déconnecter',
       cancelButtonText: 'Non, Annuler'
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
 
       if (result.isConfirmed) {
 

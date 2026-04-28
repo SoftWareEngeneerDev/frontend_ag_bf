@@ -1,83 +1,104 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { GroupService } from '../../../../core/services/group.service';
+import { Subject, takeUntil } from 'rxjs';
+import { AdminService }  from '../../../../core/services/admin.service';
+import { GroupService }  from '../../../../core/services/group.service';
+import { FormatService } from '../../../../core/services/format.service';
 import { Group } from '../../../../core/models';
 
-const API = 'http://localhost:3000/api/v1';
+const STATUS_LABELS: Record<string, string> = {
+  OPEN             : 'Ouvert',
+  THRESHOLD_REACHED: 'Seuil atteint',
+  PAYMENT_PENDING  : 'Paiement en attente',
+  PROCESSING       : 'En cours',
+  COMPLETED        : 'Terminé',
+  CANCELLED        : 'Annulé',
+  EXPIRED          : 'Expiré',
+};
+
+const STATUS_CLASSES: Record<string, string> = {
+  OPEN             : 'badge-cyan',
+  THRESHOLD_REACHED: 'badge-ok',
+  PAYMENT_PENDING  : 'badge-warn',
+  PROCESSING       : 'badge-gold',
+  COMPLETED        : 'badge-grey',
+  CANCELLED        : 'badge-err',
+  EXPIRED          : 'badge-err',
+};
 
 @Component({
-  selector: 'app-admin-group-detail',
+  selector   : 'app-admin-group-detail',
   templateUrl: './admin-group-detail.component.html',
-  styleUrls: ['./admin-group-detail.component.scss']
+  styleUrls  : ['./admin-group-detail.component.scss']
 })
-export class AdminGroupDetailComponent implements OnInit {
-  group:   Group | null = null;
+export class AdminGroupDetailComponent implements OnInit, OnDestroy {
+  group  : Group | null = null;
   loading = true;
+  closing = false;
+  successMsg = '';
+  errorMsg   = '';
+
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private route:        ActivatedRoute,
-    private router:       Router,
-    private http:         HttpClient,
-    private groupService: GroupService,
+    private route        : ActivatedRoute,
+    private router       : Router,
+    private adminService : AdminService,
+    private groupService : GroupService,
+    public  fmt          : FormatService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.router.navigate(['/admin/groups']); return; }
-
-    // ── GET /groups/:id ────────────────────────────────────────
-    this.groupService.getById(id).subscribe({
-      next: (g) => {
-        this.group   = g;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.group   = null;
-      }
-    });
+    this.loadGroup(id);
   }
 
-  // ── PATCH /admin/groups/:id/close ────────────────────────────
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadGroup(id: string): void {
+    this.groupService.getById(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next : (g) => { this.group = g; this.loading = false; },
+        error: ()  => { this.group = null; this.loading = false; }
+      });
+  }
+
+  // ── Fermer le groupe ──────────────────────────────────────────
   closeGroup(): void {
-    if (!this.group) return;
-    this.http.patch(`${API}/admin/groups/${this.group.id}/close`, {
-      reason: 'Fermé manuellement par admin'
-    }).subscribe({
-      next: () => { if (this.group) this.group.status = 'CANCELLED' as any; },
-      error: () => {}
-    });
+    if (!this.group || this.closing) return;
+    this.closing = true;
+
+    this.adminService.forceCloseGroup(this.group.id, 'Fermé manuellement par admin')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.group) this.group.status = 'CANCELLED' as any;
+          this.closing = false;
+          this.showSuccess('Groupe fermé avec succès');
+        },
+        error: (err) => {
+          this.closing = false;
+          this.showError(err?.error?.error?.message ?? 'Erreur lors de la fermeture');
+        }
+      });
   }
 
   goBack(): void { this.router.navigate(['/admin/groups']); }
 
-  get statusClass(): string {
-    if (!this.group) return '';
-    const s = this.group.status;
-    if (s === 'OPEN')              return 'badge-cyan';
-    if (s === 'THRESHOLD_REACHED') return 'badge-ok';
-    if (s === 'PAYMENT_PENDING')   return 'badge-warn';
-    if (s === 'PROCESSING')        return 'badge-gold';
-    if (s === 'COMPLETED')         return 'badge-grey';
-    return 'badge-err';
-  }
-
-  get statusLabel(): string {
-    if (!this.group) return '';
-    const s = this.group.status;
-    if (s === 'OPEN')              return 'Ouvert';
-    if (s === 'THRESHOLD_REACHED') return 'Seuil atteint';
-    if (s === 'PAYMENT_PENDING')   return 'Paiement en attente';
-    if (s === 'PROCESSING')        return 'En cours';
-    if (s === 'COMPLETED')         return 'Terminé';
-    if (s === 'CANCELLED')         return 'Annulé';
-    return 'Expiré';
-  }
+  // ── Getters ───────────────────────────────────────────────────
+  get statusClass() : string { return this.group ? (STATUS_CLASSES[this.group.status] ?? 'badge-grey') : ''; }
+  get statusLabel() : string { return this.group ? (STATUS_LABELS[this.group.status]  ?? this.group.status) : ''; }
 
   get fillPercent(): number {
     if (!this.group) return 0;
-    return Math.min(100, Math.round((this.group.currentCount / this.group.minParticipants) * 100));
+    return this.group.minParticipants > 0
+      ? Math.min(100, Math.round((this.group.currentCount / this.group.minParticipants) * 100))
+      : 0;
   }
 
   get fillColor(): string {
@@ -88,13 +109,15 @@ export class AdminGroupDetailComponent implements OnInit {
 
   get isExpiringSoon(): boolean {
     if (!this.group) return false;
-    return (new Date(this.group.expiresAt).getTime() - Date.now()) < 24 * 3600000;
+    return new Date(this.group.expiresAt).getTime() - Date.now() < 24 * 3600000;
   }
 
-  formatXOF(val: number): string {
-    return val.toLocaleString('fr-FR') + ' XOF';
+  get totalDeposits(): number {
+    if (!this.group) return 0;
+    return this.group.depositAmount * this.group.currentCount;
   }
 
+  // ── Helpers ───────────────────────────────────────────────────
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       day: 'numeric', month: 'long', year: 'numeric'
@@ -103,10 +126,20 @@ export class AdminGroupDetailComponent implements OnInit {
 
   formatExpiry(date: Date): string {
     const diff = new Date(date).getTime() - Date.now();
-    const h    = Math.floor(diff / 3600000);
-    const d    = Math.floor(h / 24);
+    if (diff <= 0) return 'Expiré';
+    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(h / 24);
     if (d > 0) return `${d}j ${h % 24}h`;
-    if (h > 0) return `${h}h`;
-    return 'Expiré';
+    return `${h}h`;
+  }
+
+  private showSuccess(msg: string): void {
+    this.successMsg = msg; this.errorMsg = '';
+    setTimeout(() => { this.successMsg = ''; }, 3000);
+  }
+
+  private showError(msg: string): void {
+    this.errorMsg = msg; this.successMsg = '';
+    setTimeout(() => { this.errorMsg = ''; }, 4000);
   }
 }

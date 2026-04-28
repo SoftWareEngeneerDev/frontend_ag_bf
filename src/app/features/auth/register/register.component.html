@@ -1,10 +1,10 @@
 <div class="auth-page">
 
-  <div class="auth-left">
+  <!-- <div class="auth-left">
     <div class="al-logo"><app-logo [size]="20"></app-logo></div>
     <div class="al-body">
       <div class="al-icon"><i class="fa-solid fa-gift"></i></div>
-      <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté</span> Djula Market</h2>
+      <h2 class="al-title">Rejoignez la <span class="al-highlight">communauté Djula Market</span> </h2>
       <div class="al-features">
         <div class="al-feature" *ngFor="let f of ['Inscription gratuite et rapide','Première économie dès votre 1er groupe','Support client disponible 7j/7','Paiement sécurisé via mobile money']">
           <span class="af-icon"><i class="fa-solid fa-circle-check"></i></span>
@@ -12,8 +12,8 @@
         </div>
       </div>
     </div>
-    <p class="al-footer">© 2026 Djula Market</p>
-  </div>
+    <p class="al-footer">© 2026 Djula Market · Ouagadougou</p>
+  </div> -->
 
   <div class="auth-right">
     <div class="auth-form-wrap">
@@ -72,7 +72,9 @@
         </div>
 
         <div class="auth-switch">
-          Déjà inscrit ? <a routerLink="/auth/login">Se connecter</a>
+          <!-- Déjà inscrit ? <a routerLink="/auth/login">Se connecter</a> -->
+          Déjà inscrit ? 
+          <a class="auth-link" role="button" tabindex="0" (click)="goToLogin()">Se connecter</a>
         </div>
       </ng-container>
 

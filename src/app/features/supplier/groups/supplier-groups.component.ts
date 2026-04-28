@@ -1,36 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { GroupService }    from '../../../core/services/group.service';
-import { ProductService }  from '../../../core/services/product.service';
-import { FormatService }   from '../../../core/services/format.service';
+import { Subject, takeUntil } from 'rxjs';
+import { GroupService }   from '../../../core/services/group.service';
+import { FormatService }  from '../../../core/services/format.service';
 import { Group, Product } from '../../../core/models';
 
 const API = 'http://localhost:3000/api/v1';
+
+const TAB_STATUS_MAP: Record<string, string> = {
+  'Ouverts'       : 'OPEN',
+  'Seuil atteint' : 'THRESHOLD_REACHED',
+  'En traitement' : 'PROCESSING',
+  'Terminés'      : 'COMPLETED',
+};
 
 @Component({
   selector: 'app-supplier-groups',
   templateUrl: './supplier-groups.component.html',
   styleUrls:  ['./supplier-groups.component.scss']
 })
-export class SupplierGroupsComponent implements OnInit {
-  groups:   Group[] = [];
-  filtered: Group[] = [];
-  myProducts: Product[] = [];
+export class SupplierGroupsComponent implements OnInit, OnDestroy {
+  groups     : Group[]   = [];
+  filtered   : Group[]   = [];
+  myProducts : Product[] = [];
   loading         = true;
   creating        = false;
   activeTab       = 'Tous';
-  tabs            = ['Tous', 'Ouverts', 'Seuil atteint', 'Terminés'];
   showCreateModal = false;
+  successMsg      = '';
+  errorMsg        = '';
 
-  // ── Formulaire création groupe ────────────────────────────────
+  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'En traitement', 'Terminés'];
+
+  private destroy$ = new Subject<void>();
+
+  // ── Formulaire création groupe ────────────────────────────
   newGroup = {
-    productId:       '',
-    minParticipants: 10,
-    maxParticipants: 100,
-    durationDays:    7,
-    depositPercent:  0.10,
-    pricingTiers:    [
+    productId       : '',
+    minParticipants : 10,
+    maxParticipants : 100,
+    durationDays    : 7,
+    depositPercent  : 0.10,
+    pricingTiers    : [
       { participantCount: 5,  discountPercent: 10 },
       { participantCount: 10, discountPercent: 20 },
       { participantCount: 20, discountPercent: 30 },
@@ -38,11 +50,10 @@ export class SupplierGroupsComponent implements OnInit {
   };
 
   constructor(
-    private http:           HttpClient,
-    private groupService:   GroupService,
-    private productService: ProductService,
-    public  fmt:            FormatService,
-    private router:         Router,
+    private http        : HttpClient,
+    private groupService: GroupService,
+    public  fmt         : FormatService,
+    private router      : Router,
   ) {}
 
   ngOnInit(): void {
@@ -50,76 +61,108 @@ export class SupplierGroupsComponent implements OnInit {
     this.loadMyProducts();
   }
 
-  // ── GET /supplier/groups ──────────────────────────────────────
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ── Charger les groupes ───────────────────────────────────
   private loadGroups(): void {
     this.loading = true;
-    this.http.get<any>(`${API}/supplier/groups`, { params: { limit: 100 } }).subscribe({
-      next: (res) => {
-        const data     = res.data?.groups ?? res.data ?? [];
-        this.groups    = data.map((g: any) => this.groupService.mapGroup(g));
-        this.filtered  = this.groups;
-        this.loading   = false;
-      },
-      error: () => { this.loading = false; }
-    });
+    this.http.get<any>(`${API}/supplier/groups`, { params: { limit: '100' } })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          const data    = res.data ?? [];
+          this.groups   = data.map((g: any) => this.groupService.mapGroup(g));
+          this.applyFilter();
+          this.loading  = false;
+        },
+        error: () => { this.loading = false; }
+      });
   }
 
-  // ── GET /supplier/products → pour le select du modal ─────────
+  // ── Charger mes produits approuvés ────────────────────────
   private loadMyProducts(): void {
-    this.http.get<any>(`${API}/supplier/products`, { params: { status: 'APPROVED', limit: 50 } }).subscribe({
-      next: (res) => {
-        this.myProducts = res.data?.products ?? res.data ?? [];
-        if (this.myProducts.length > 0) {
-          this.newGroup.productId = (this.myProducts[0] as any).id ?? '';
-        }
-      },
-      error: () => {}
-    });
+    this.http.get<any>(`${API}/supplier/products`, { params: { status: 'ACTIVE', limit: '50' } })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.myProducts = res.data ?? [];
+          if (this.myProducts.length > 0) {
+            this.newGroup.productId = (this.myProducts[0] as any).id ?? '';
+          }
+        },
+        error: () => {}
+      });
   }
 
-  // ── POST /supplier/groups ─────────────────────────────────────
+  // ── Créer un groupe ───────────────────────────────────────
   createGroup(): void {
     if (!this.newGroup.productId || this.creating) return;
-
     this.creating = true;
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + this.newGroup.durationDays);
 
-    const payload = {
-      productId:       this.newGroup.productId,
+    this.http.post<any>(`${API}/supplier/groups`, {
+      productId      : this.newGroup.productId,
       minParticipants: this.newGroup.minParticipants,
       maxParticipants: this.newGroup.maxParticipants,
-      depositPercent:  this.newGroup.depositPercent,
-      expiresAt:       expiresAt.toISOString(),
-      pricingTiers:    this.newGroup.pricingTiers,
-    };
-
-    this.http.post<any>(`${API}/supplier/groups`, payload).subscribe({
+      depositPercent : this.newGroup.depositPercent,
+      expiresAt      : expiresAt.toISOString(),
+      pricingTiers   : this.newGroup.pricingTiers,
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (res) => {
         const newG = this.groupService.mapGroup(res.data);
         this.groups.unshift(newG);
-        this.filtered = this.groups;
+        this.applyFilter();
         this.showCreateModal = false;
-        this.creating = false;
+        this.creating        = false;
+        this.showSuccess('Groupe créé avec succès !');
       },
-      error: () => { this.creating = false; }
+      error: (err) => {
+        this.creating = false;
+        this.showError(err?.error?.error?.message ?? 'Erreur lors de la création du groupe');
+      }
     });
   }
 
-  setTab(t: string): void {
-    this.activeTab = t;
-    const map: Record<string, string> = {
-      'Ouverts':       'OPEN',
-      'Seuil atteint': 'THRESHOLD_REACHED',
-      'Terminés':      'COMPLETED',
-    };
-    this.filtered = t === 'Tous'
-      ? this.groups
-      : this.groups.filter(g => g.status === map[t]);
+  // ── Filtre ────────────────────────────────────────────────
+  private applyFilter(): void {
+    if (this.activeTab === 'Tous') {
+      this.filtered = this.groups;
+    } else {
+      const status  = TAB_STATUS_MAP[this.activeTab];
+      this.filtered = this.groups.filter(g => g.status === status);
+    }
   }
 
-  pct(g: Group): number     { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
-  isHot(g: Group): boolean  { return g.status === 'THRESHOLD_REACHED'; }
+  setTab(t: string): void { this.activeTab = t; this.applyFilter(); }
 
-  goDetail(g: Group): void  { this.router.navigate(['/supplier/groups', g.id]); }
+  // ── Compteurs par onglet ──────────────────────────────────
+  tabCount(t: string): number {
+    if (t === 'Tous') return this.groups.length;
+    const status = TAB_STATUS_MAP[t];
+    return this.groups.filter(g => g.status === status).length;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  pct(g: Group)    : number  { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
+  isHot(g: Group)  : boolean { return g.status === 'THRESHOLD_REACHED'; }
+  trackById(_: number, g: Group): string { return g.id; }
+
+  goDetail(g: Group): void { this.router.navigate(['/supplier/orders']); }
+
+  private showSuccess(msg: string): void {
+    this.successMsg = msg; this.errorMsg = '';
+    setTimeout(() => { this.successMsg = ''; }, 3000);
+  }
+
+  private showError(msg: string): void {
+    this.errorMsg = msg; this.successMsg = '';
+    setTimeout(() => { this.errorMsg = ''; }, 4000);
+  }
 }

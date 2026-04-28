@@ -1,6 +1,217 @@
-@use '../auth-shared';
+// @use '../auth-shared';
 
 .auth-wave {
   font-size: 36px; margin-bottom: 12px; color: var(--primary);
 }
 
+
+
+
+/* ── Container global ───────────────────────────────────── */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* ── Zone droite (formulaire) ───────────────────────────── */
+.auth-right {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── Wrapper du formulaire ─────────────────────────────── */
+.auth-form-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-wave {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.auth-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--txt);
+  margin-bottom: 6px;
+}
+
+.auth-sub {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ── Form ─────────────────────────────────────────────── */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Input group ───────────────────────────────────────── */
+.inp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inp-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ── Input avec icône ─────────────────────────────────── */
+.inp-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inp-icon {
+  position: absolute;
+  left: 12px;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.inp {
+  width: 100%;
+  padding: 12px 12px 12px 38px;
+  border-radius: 10px;
+  border: 1.5px solid #E5E7EB;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.inp:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 164, 135, 0.15);
+}
+
+/* ── Eye toggle ───────────────────────────────────────── */
+.inp-eye {
+  position: absolute;
+  right: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+/* ── Erreur ───────────────────────────────────────────── */
+.error-msg {
+  font-size: 12px;
+  color: #DC2626;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Forgot password ─────────────────────────────────── */
+.auth-forgot {
+  text-align: right;
+}
+
+.auth-forgot a {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ── Alert ───────────────────────────────────────────── */
+.alert {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-red {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FCA5A5;
+}
+
+/* ── Button ─────────────────────────────────────────── */
+.btn-primary.btn-blk {
+  width: 100%;
+}
+
+.btn-round {
+  border-radius: 12px;
+}
+
+.btn-lg {
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ── Switch register ───────────────────────────────── */
+.auth-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.auth-switch a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-link {
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .2s ease;
+}
+
+/* effet “cliquable” */
+.auth-link:hover {
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
+/* petit point/indication */
+.auth-link::after {
+  content: "→";
+  opacity: .7;
+  transition: transform .2s ease;
+}
+
+.auth-link:hover::after {
+  transform: translateX(3px);
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .auth-form-wrap {
+    max-width: 100%;
+  }
+}

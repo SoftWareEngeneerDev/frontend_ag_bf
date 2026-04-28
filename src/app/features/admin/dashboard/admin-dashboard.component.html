@@ -1,5 +1,10 @@
 <div class="adm-page">
 
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <ng-container *ngIf="!loading">
+
   <!-- ══ BARRE SANTÉ PLATEFORME ════════════════════════════════════ -->
   <div class="adm-status-bar">
     <div class="asb-left">
@@ -13,7 +18,8 @@
         <span class="asb-metric-val" [style.color]="m.color">{{ m.val }}</span>
       </div>
       <div class="asb-date">
-        <i class="fa-regular fa-calendar"></i> Mar 2026
+        <i class="fa-regular fa-calendar"></i>
+        {{ today | date:'MMMM yyyy' }}
       </div>
     </div>
   </div>
@@ -26,30 +32,40 @@
           <i [class]="k.icon"></i>
         </div>
         <div class="adm-kpi-data">
-          <div class="adm-kpi-val">{{ k.val }}</div>
+          <div class="adm-kpi-val" [style.color]="k.alert ? '#FF4D6A' : 'inherit'">{{ k.val }}</div>
           <div class="adm-kpi-label">{{ k.label }}</div>
         </div>
       </div>
       <div class="adm-kpi-trend" [class.up]="k.up" [class.down]="k.alert">
-        <i [class]="k.alert ? 'fa-solid fa-triangle-exclamation' : (k.up ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-minus')"></i>
+        <i [class]="k.alert
+          ? 'fa-solid fa-triangle-exclamation'
+          : (k.up ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-minus')">
+        </i>
         {{ k.sub }}
       </div>
     </div>
   </div>
 
   <!-- ══ ALERTES PRIORITAIRES ══════════════════════════════════════ -->
-  <div class="adm-alerts-row" *ngIf="stats.openDisputes > 0 || stats.pendingSuppliers > 0">
-    <div class="adm-alert-pill adm-alert-red">
+  <div class="adm-alerts-row"
+       *ngIf="stats.openDisputes > 0 || stats.pendingSuppliers > 0 || stats.pendingProducts > 0">
+    <div class="adm-alert-pill adm-alert-red" *ngIf="stats.openDisputes > 0">
       <i class="fa-solid fa-gavel"></i>
-      <strong>{{ stats.openDisputes }} litiges ouverts</strong>
-      — dont 3 urgents en attente de résolution
+      <strong>{{ stats.openDisputes }} litige{{ stats.openDisputes > 1 ? 's' : '' }} ouvert{{ stats.openDisputes > 1 ? 's' : '' }}</strong>
+      — nécessite{{ stats.openDisputes > 1 ? 'nt' : '' }} résolution
       <a routerLink="/admin/disputes" class="adm-alert-link">Traiter →</a>
     </div>
-    <div class="adm-alert-pill adm-alert-orange">
+    <div class="adm-alert-pill adm-alert-orange" *ngIf="stats.pendingSuppliers > 0">
       <i class="fa-solid fa-store"></i>
-      <strong>{{ stats.pendingSuppliers }} fournisseurs</strong>
+      <strong>{{ stats.pendingSuppliers }} fournisseur{{ stats.pendingSuppliers > 1 ? 's' : '' }}</strong>
       en attente de validation
       <a routerLink="/admin/suppliers" class="adm-alert-link">Valider →</a>
+    </div>
+    <div class="adm-alert-pill adm-alert-gold" *ngIf="stats.pendingProducts > 0">
+      <i class="fa-solid fa-box"></i>
+      <strong>{{ stats.pendingProducts }} produit{{ stats.pendingProducts > 1 ? 's' : '' }}</strong>
+      en attente d'approbation
+      <a routerLink="/admin/products" class="adm-alert-link">Approuver →</a>
     </div>
   </div>
 
@@ -67,18 +83,29 @@
           <span class="adm-legend-dot" style="background:#F4A902; margin-left:12px"></span> Commissions
         </div>
       </div>
-      <div class="adm-rev-chart">
+
+      <!-- État vide graphique -->
+      <div class="adm-chart-empty" *ngIf="revMax === 1">
+        <i class="fa-solid fa-chart-line text-muted"></i>
+        <p class="text-muted">Aucune donnée de revenus disponible</p>
+      </div>
+
+      <div class="adm-rev-chart" *ngIf="revMax > 1">
         <div class="arc-col" *ngFor="let r of revData; let i = index">
           <div class="arc-vals">
-            <span class="arc-rev-val">{{ (r.revenue/1000000).toFixed(1) }}M</span>
+            <span class="arc-rev-val">
+              {{ r.revenue >= 1000000 ? (r.revenue/1000000).toFixed(1) + 'M' : (r.revenue/1000).toFixed(0) + 'k' }}
+            </span>
           </div>
           <div class="arc-bars">
             <div class="arc-bar arc-bar-rev"
                  [class.active]="i === revData.length - 1"
-                 [style.height.%]="(r.revenue / revMax) * 100">
+                 [style.height.%]="(r.revenue / revMax) * 100"
+                 [title]="r.revenue | number:'1.0-0'">
             </div>
             <div class="arc-bar arc-bar-com"
-                 [style.height.%]="(r.commissions / revMax) * 100">
+                 [style.height.%]="(r.commissions / revMax) * 100"
+                 [title]="r.commissions | number:'1.0-0'">
             </div>
           </div>
           <div class="arc-lbl">{{ r.month }}</div>
@@ -96,7 +123,9 @@
       <div class="adm-pm-list">
         <div class="adm-pm-item" *ngFor="let p of paymentMethods">
           <div class="adm-pm-left">
-            <div class="adm-pm-icon" [style.background]="p.color + '18'" [style.color]="p.color">
+            <div class="adm-pm-icon"
+                 [style.background]="p.color + '18'"
+                 [style.color]="p.color">
               <i [class]="p.icon"></i>
             </div>
             <div>
@@ -107,7 +136,10 @@
           <div class="adm-pm-right">
             <div class="adm-pm-amount">{{ p.amount }}</div>
             <div class="adm-pm-bar-wrap">
-              <div class="adm-pm-bar" [style.width.%]="p.pct" [style.background]="p.color"></div>
+              <div class="adm-pm-bar"
+                   [style.width.%]="p.pct"
+                   [style.background]="p.color">
+              </div>
             </div>
           </div>
         </div>
@@ -120,12 +152,16 @@
     <div class="adm-pending-col" *ngFor="let col of pending">
       <div class="adm-pending-head" [style.border-left]="'4px solid ' + col.color">
         <div class="aph-left">
-          <div class="aph-icon" [style.background]="col.color + '18'" [style.color]="col.color">
+          <div class="aph-icon"
+               [style.background]="col.color + '18'"
+               [style.color]="col.color">
             <i [class]="col.faIcon"></i>
           </div>
           <div>
             <div class="aph-title">{{ col.title }}</div>
-            <div class="aph-count" [style.color]="col.color">{{ col.badge }} en attente</div>
+            <div class="aph-count" [style.color]="col.color">
+              {{ col.badge }} en attente
+            </div>
           </div>
         </div>
         <a [routerLink]="col.route" class="aph-link" [style.color]="col.color">
@@ -133,7 +169,13 @@
         </a>
       </div>
 
-      <div class="adm-pending-items">
+      <!-- État vide -->
+      <div class="adm-pending-empty" *ngIf="col.items.length === 0">
+        <i class="fa-solid fa-circle-check" style="color:#10D98B"></i>
+        <span class="text-muted">Aucun élément en attente</span>
+      </div>
+
+      <div class="adm-pending-items" *ngIf="col.items.length > 0">
         <div class="api-item" *ngFor="let item of col.items">
           <div class="api-dot" [style.background]="col.color"></div>
           <div class="api-body">
@@ -162,26 +204,33 @@
       </a>
     </div>
 
-    <div class="adm-audit-list">
+    <!-- État vide audit -->
+    <div class="adm-chart-empty" *ngIf="auditLog.length === 0">
+      <i class="fa-solid fa-scroll text-muted"></i>
+      <p class="text-muted">Aucune action enregistrée</p>
+    </div>
+
+    <div class="adm-audit-list" *ngIf="auditLog.length > 0">
       <div class="aal-item" *ngFor="let l of auditLog">
-        <div class="aal-icon" [class]="actionIconClass(l.action)" [style.background]="actionBg(l.action)">
-          <i [class]="actionIcon(l.action)"></i>
+        <div class="aal-icon" [style.background]="actionBg(l.action)">
+          <i [class]="actionIcon(l.action)" [style.color]="actionColor(l.action)"></i>
         </div>
         <div class="aal-body">
           <div class="aal-text">
             <span class="aal-action" [style.color]="actionColor(l.action)">{{ l.action }}</span>
-            <span class="aal-entity">{{ l.entity }}</span>
+            <span class="aal-entity text-muted">{{ l.entity }}</span>
           </div>
           <div class="aal-meta">
             <span class="aal-user"><i class="fa-solid fa-user"></i> {{ l.user }}</span>
             <span class="aal-time"><i class="fa-regular fa-clock"></i> {{ l.time }}</span>
           </div>
         </div>
-        <span class="aal-status">
+        <span class="aal-status badge-ok">
           <i class="fa-solid fa-circle-check"></i> Succès
         </span>
       </div>
     </div>
   </div>
 
+  </ng-container>
 </div>

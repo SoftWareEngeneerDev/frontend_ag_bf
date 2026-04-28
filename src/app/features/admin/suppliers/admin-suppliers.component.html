@@ -1,83 +1,213 @@
-<div>
+<div class="as-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
   <div class="flex-between mb-20">
-    <h2 class="font-display" style="font-size:20px;font-weight:700">Fournisseurs</h2>
-    <span class="badge-warn">{{ pendingCount }} en attente de validation</span>
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-store"></i> Fournisseurs
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ suppliers.length }} fournisseur{{ suppliers.length !== 1 ? 's' : '' }} au total
+      </p>
+    </div>
+    <span class="badge-warn" *ngIf="pendingCount > 0">
+      <i class="fa-solid fa-clock"></i>
+      {{ pendingCount }} en attente de validation
+    </span>
   </div>
 
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
   <div class="tab-nav mb-24">
-    <button class="tab-btn" *ngFor="let t of tabs"
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
             [class.active]="activeTab === t"
-            (click)="activeTab = t">{{ t }}</button>
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
   </div>
 
-  <!-- Loader -->
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
   <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
-  <!-- Empty -->
-  <app-empty-state *ngIf="!loading && filtered.length === 0"
-    icon="fa-solid fa-store" title="Aucun fournisseur"
-    description="Aucun fournisseur dans cette catégorie.">
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-store"
+    [title]="activeTab === 'Tous' ? 'Aucun fournisseur' : 'Aucun fournisseur dans cette catégorie'"
+    description="Les fournisseurs apparaîtront ici après inscription.">
   </app-empty-state>
 
-  <div class="sup-grid" *ngIf="!loading">
-    <div class="glass sup-card" *ngFor="let s of filtered">
+  <!-- ══ GRILLE FOURNISSEURS ════════════════════════════════════════ -->
+  <div class="sup-grid" *ngIf="!loading && filtered.length > 0">
+    <div class="glass sup-card"
+         *ngFor="let s of filtered; trackBy: trackById"
+         [class.sup-card-pending]="s.status === 'PENDING'">
+
+      <!-- En-tête carte -->
       <div class="sup-head">
-        <div class="sup-icon"><i class="fa-solid fa-store"></i></div>
+        <div class="sup-icon">
+          <i class="fa-solid fa-store"></i>
+        </div>
         <div class="sup-info">
-          <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">{{ s.companyName }}</div>
-          <div class="text-muted" style="font-size:12px">{{ s.contactName }} · {{ s.city }}</div>
+          <div class="font-display" style="font-weight:700;font-size:15px;margin-bottom:3px">
+            {{ s.companyName }}
+          </div>
+          <div class="text-muted" style="font-size:12px">
+            {{ s.contactName }} · {{ s.city }}
+          </div>
         </div>
         <span [class]="statusClass(s.status)">{{ statusLabel(s.status) }}</span>
       </div>
 
+      <!-- Stats (approuvés seulement) -->
       <div class="sup-stats" *ngIf="s.status === 'APPROVED'">
-        <div class="ss-item" *ngFor="let st of [
-          {v:s.totalGroups.toString(), l:'Groupes'},
-          {v:s.successRate+'%',         l:'Succès'},
-          {v:s.rating.toString()+'/5',  l:'Note'},
-          {v:s.reviewCount.toString(),  l:'Avis'}
-        ]">
-          <div class="font-mono ss-val">{{ st.v }}</div>
-          <div class="text-muted ss-lbl">{{ st.l }}</div>
+        <div class="ss-item">
+          <div class="font-mono ss-val">{{ s.totalGroups }}</div>
+          <div class="text-muted ss-lbl">Groupes</div>
+        </div>
+        <div class="ss-item">
+          <div class="font-mono ss-val">{{ s.successRate }}%</div>
+          <div class="text-muted ss-lbl">Succès</div>
+        </div>
+        <div class="ss-item">
+          <div class="font-mono ss-val">{{ s.rating }}/5</div>
+          <div class="text-muted ss-lbl">Note</div>
+        </div>
+        <div class="ss-item">
+          <div class="font-mono ss-val">{{ s.reviewCount }}</div>
+          <div class="text-muted ss-lbl">Avis</div>
         </div>
       </div>
 
-      <div class="sup-contact text-muted">
-        <span><i class="fa-solid fa-envelope"></i> {{ s.email }}</span>
-        <span><i class="fa-solid fa-phone"></i> {{ s.phone }}</span>
+      <!-- Alerte en attente -->
+      <div class="sup-pending-info" *ngIf="s.status === 'PENDING'">
+        <i class="fa-solid fa-clock" style="color:#F4A902"></i>
+        <span class="text-muted" style="font-size:12px">
+          Dossier soumis — en attente de validation
+        </span>
       </div>
 
+      <!-- Contact -->
+      <div class="sup-contact text-muted">
+        <span *ngIf="s.email">
+          <i class="fa-solid fa-envelope"></i> {{ s.email }}
+        </span>
+        <span *ngIf="s.phone">
+          <i class="fa-solid fa-phone"></i> {{ s.phone }}
+        </span>
+      </div>
+
+      <!-- Actions -->
       <div class="sup-actions">
-        <!-- ── En attente → Approuver / Rejeter ── -->
+
+        <!-- En attente → Approuver / Rejeter -->
         <ng-container *ngIf="s.status === 'PENDING'">
-          <button class="btn-gold btn-sm" style="flex:1;justify-content:center"
+          <button class="btn-gold btn-sm btn-round"
+                  style="flex:1;justify-content:center"
+                  [disabled]="processing"
                   (click)="approve(s)">
             <i class="fa-solid fa-circle-check"></i> Approuver
           </button>
-          <button class="btn-err btn-sm" style="flex:1;justify-content:center"
-                  (click)="reject(s)">
+          <button class="btn-err btn-sm btn-round"
+                  style="flex:1;justify-content:center"
+                  [disabled]="processing"
+                  (click)="openRejectModal(s)">
             <i class="fa-solid fa-xmark"></i> Rejeter
           </button>
         </ng-container>
 
-        <!-- ── Approuvé → Voir profil / Suspendre ── -->
+        <!-- Approuvé → Voir / Suspendre -->
         <ng-container *ngIf="s.status === 'APPROVED'">
-          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center">
-            Voir profil
+          <button class="btn-ghost btn-sm btn-round"
+                  style="flex:1;justify-content:center">
+            <i class="fa-solid fa-eye"></i> Voir profil
           </button>
-          <button class="btn-err btn-sm" (click)="suspend(s)">
-            Suspendre
+          <button class="btn-err btn-sm btn-round"
+                  [disabled]="processing"
+                  (click)="suspend(s)">
+            <i class="fa-solid fa-ban"></i> Suspendre
           </button>
         </ng-container>
 
-        <!-- ── Suspendu ── -->
+        <!-- Suspendu → Réactiver -->
         <ng-container *ngIf="s.status === 'SUSPENDED'">
-          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
-                  (click)="approve(s)">
+          <button class="btn-ghost btn-sm btn-round"
+                  style="flex:1;justify-content:center"
+                  [disabled]="processing"
+                  (click)="reactivate(s)">
             <i class="fa-solid fa-rotate-left"></i> Réactiver
           </button>
         </ng-container>
+
       </div>
     </div>
   </div>
+
+  <!-- ══ MODAL — REJETER FOURNISSEUR ═══════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showRejectModal" (click)="showRejectModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-xmark" style="color:#FF4D6A"></i> Rejeter le fournisseur
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showRejectModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedSupplier">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #F4A902">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px">
+            {{ selectedSupplier.companyName }}
+          </div>
+          <div class="text-muted" style="font-size:12px">
+            {{ selectedSupplier.contactName }} · {{ selectedSupplier.city }}
+          </div>
+        </div>
+
+        <div class="inp-group">
+          <label>
+            Motif du rejet <span style="color:var(--err)">*</span>
+          </label>
+          <textarea
+            class="inp"
+            rows="4"
+            [(ngModel)]="rejectReason"
+            placeholder="Ex: Dossier incomplet — RCCM non fourni. Merci de soumettre à nouveau avec les documents requis."
+            style="resize:vertical">
+          </textarea>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-bell"></i>
+          Le fournisseur sera notifié par SMS et email avec le motif du rejet.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showRejectModal = false"
+                  [disabled]="processing">
+            Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmReject()"
+                  [disabled]="!rejectReason.trim() || processing">
+            <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-xmark"></i>
+            {{ processing ? 'Rejet en cours...' : 'Confirmer le rejet' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

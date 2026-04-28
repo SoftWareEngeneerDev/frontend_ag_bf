@@ -1,0 +1,140 @@
+<app-navbar></app-navbar>
+
+<div class="del-page">
+
+  <!-- Hero -->
+  <div class="del-hero">
+    <div class="container text-center">
+      <div class="del-hero-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <h1 class="font-display del-hero-title">Livraison & <span style="color:#F4A902">Expédition</span></h1>
+      <p class="del-hero-sub">Livraison dans tout le Burkina Faso · Suivi en temps réel</p>
+    </div>
+  </div>
+
+  <div class="container del-body">
+
+    <!-- KPIs livraison -->
+    <div class="del-kpi-row">
+      <div class="del-kpi glass">
+        <div class="del-kpi-icon" style="background:#E6F7F4;color:var(--primary)"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="del-kpi-val font-display">9+</div>
+        <div class="del-kpi-label">Villes desservies</div>
+      </div>
+      <div class="del-kpi glass">
+        <div class="del-kpi-icon" style="background:#FFF8E6;color:var(--gold)"><i class="fa-solid fa-clock"></i></div>
+        <div class="del-kpi-val font-display">2–14</div>
+        <div class="del-kpi-label">Jours ouvrés</div>
+      </div>
+      <div class="del-kpi glass">
+        <div class="del-kpi-icon" style="background:#E0FAFE;color:var(--cyan)"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="del-kpi-val font-display">100%</div>
+        <div class="del-kpi-label">Commandes assurées</div>
+      </div>
+      <div class="del-kpi glass">
+        <div class="del-kpi-icon" style="background:#F3EAFF;color:var(--purple)"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <div class="del-kpi-val font-display">Live</div>
+        <div class="del-kpi-label">Suivi en temps réel</div>
+      </div>
+    </div>
+
+    <!-- Tableau des zones -->
+    <div class="glass del-section">
+      <div class="del-section-head">
+        <div class="del-section-icon" style="background:#E6F7F4;color:var(--primary)"><i class="fa-solid fa-map-location-dot"></i></div>
+        <h2 class="font-display del-section-title">Zones de livraison & tarifs</h2>
+      </div>
+      <div class="del-table-wrap">
+        <table class="del-table">
+          <thead>
+            <tr>
+              <th><i class="fa-solid fa-city"></i> Ville / Zone</th>
+              <th><i class="fa-solid fa-clock"></i> Délai estimé</th>
+              <th><i class="fa-solid fa-tag"></i> Frais de livraison</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let z of zones">
+              <td class="del-city"><strong>{{ z.city }}</strong></td>
+              <td>{{ z.delay }}</td>
+              <td>
+                <span [class]="z.price === 'Gratuit' ? 'badge-ok' : 'badge-grey'">{{ z.price }}</span>
+              </td>
+              <td class="del-note text-muted">{{ z.note }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Comment ça marche -->
+    <div class="glass del-section">
+      <div class="del-section-head">
+        <div class="del-section-icon" style="background:#FFF3E0;color:var(--orange)"><i class="fa-solid fa-route"></i></div>
+        <h2 class="font-display del-section-title">Comment se déroule la livraison ?</h2>
+      </div>
+      <div class="del-steps">
+        <div class="del-step" *ngFor="let s of [
+          {icon:'fa-solid fa-check-circle',   color:'var(--ok)',     title:'Paiement confirmé',       desc:'Votre commande est transmise au fournisseur dès la confirmation du paiement final.'},
+          {icon:'fa-solid fa-box-open',        color:'var(--orange)', title:'Préparation de la commande', desc:'Le fournisseur prépare et emballe votre commande. Délai de préparation : 1–2 jours.'},
+          {icon:'fa-solid fa-truck',           color:'var(--cyan)',   title:'Expédition',              desc:'Votre commande est remise au transporteur. Vous recevez un SMS de confirmation avec numéro de suivi.'},
+          {icon:'fa-solid fa-box',             color:'var(--primary)','title':'Livraison',             desc:'Le livreur vous contacte avant la livraison. Assurez-vous d\'être joignable sur votre numéro.'},
+        ]">
+          <div class="del-step-icon" [style.color]="s.color"><i [class]="s.icon"></i></div>
+          <div class="del-step-body">
+            <div class="del-step-title font-display">{{ s.title }}</div>
+            <div class="del-step-desc text-muted">{{ s.desc }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partenaires -->
+    <div class="glass del-section">
+      <div class="del-section-head">
+        <div class="del-section-icon" style="background:#F3EAFF;color:var(--purple)"><i class="fa-solid fa-handshake"></i></div>
+        <h2 class="font-display del-section-title">Nos partenaires de livraison</h2>
+      </div>
+      <div class="del-partners">
+        <div class="del-partner" *ngFor="let p of [
+          {name:'Rapid Express BF', cover:'Ouagadougou & périphérie', icon:'fa-solid fa-bolt'},
+          {name:'Trans Sahel',      cover:'Tout le Burkina Faso',     icon:'fa-solid fa-truck-moving'},
+          {name:'Moto Livraison BF',cover:'Ouagadougou centre',       icon:'fa-solid fa-motorcycle'},
+        ]">
+          <div class="del-partner-icon"><i [class]="p.icon"></i></div>
+          <div class="del-partner-name font-display">{{ p.name }}</div>
+          <div class="del-partner-cover text-muted">{{ p.cover }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="glass del-section">
+      <div class="del-section-head">
+        <div class="del-section-icon" style="background:#E6F7F4;color:var(--primary)"><i class="fa-solid fa-circle-question"></i></div>
+        <h2 class="font-display del-section-title">Questions fréquentes</h2>
+      </div>
+      <div class="del-faq-list">
+        <div class="del-faq-item" *ngFor="let f of faqs; let i = index">
+          <div class="del-faq-q" (click)="toggleFaq(i)">
+            <span class="font-display">{{ f.q }}</span>
+            <i class="fa-solid fa-chevron-down del-faq-arr" [class.open]="openFaq === i"></i>
+          </div>
+          <div class="del-faq-a text-muted" *ngIf="openFaq === i">{{ f.a }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="del-cta glass text-center">
+      <i class="fa-solid fa-headset del-cta-icon"></i>
+      <p class="text-muted" style="margin-bottom:16px">Un problème avec votre livraison ? Notre support répond en moins de 2h.</p>
+      <button class="btn-primary btn-round" (click)="goContact()">
+        <i class="fa-solid fa-envelope"></i> Contacter le support
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>
