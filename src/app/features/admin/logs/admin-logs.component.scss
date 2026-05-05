@@ -1,11 +1,70 @@
-// Table scroll handled globally via .glass + .tbl in main.scss
-// Tab nav scroll handled globally
+// ── Rows colorées par niveau ──────────────────────────────────
+.al-row-warn { background: rgba(244,169,2,.04); }
+.al-row-err  { background: rgba(255,77,106,.04); }
 
-@media (max-width: 600px) {
-  // Toolbar: input + export button → column
-  .flex-between > .flex.gap-10 {
-    flex-direction: column;
-    width: 100%;
-    .btn-ghost { width: 100%; justify-content: center; }
-  }
+// ── Action ────────────────────────────────────────────────────
+.al-action {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+// ── Métadonnées ───────────────────────────────────────────────
+.al-metadata {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+  color: var(--txt);
+  line-height: 1.6;
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+:host ::ng-deep .modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+:host ::ng-deep .modal-box {
+  width: 100%; max-width: 520px;
+  border-radius: 18px; overflow: hidden;
+  animation: modalIn .2s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.95) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)  translateY(0); }
+}
+
+:host ::ng-deep .modal-head {
+  padding: 20px 24px 0;
+  position: sticky; top: 0;
+  background: var(--bg-white, #fff);
+  z-index: 1;
+}
+
+:host ::ng-deep .modal-body {
+  padding: 20px 24px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+// ── Responsive ────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .tbl { min-width: 600px; }
+  .glass { overflow-x: auto; }
+  .flex-between { flex-wrap: wrap; gap: 10px; }
+}
+
+@media (max-width: 480px) {
+  :host ::ng-deep .modal-box { max-width: 100%; border-radius: 14px; }
 }
