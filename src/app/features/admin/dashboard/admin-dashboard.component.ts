@@ -43,12 +43,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── KPIs ──────────────────────────────────────────────────────
   kpis = [
-    { icon: 'fa-solid fa-users',        label: 'Membres actifs',  val: '0',  sub: '',          color: '#00D4FF', bg: '#E0F9FF', up: true,  alert: false },
-    { icon: 'fa-solid fa-fire',         label: 'Groupes actifs',  val: '0',  sub: '',          color: '#F4A902', bg: '#FFF8E1', up: true,  alert: false },
-    { icon: 'fa-solid fa-circle-check', label: 'Taux de succès',  val: '0%', sub: 'Ce mois',   color: '#10D98B', bg: '#E8FDF2', up: true,  alert: false },
-    { icon: 'fa-solid fa-coins',        label: 'Commissions',     val: '0',  sub: '',          color: '#F4A902', bg: '#FFF8E1', up: true,  alert: false },
-    { icon: 'fa-solid fa-vault',        label: 'En escrow',       val: '0',  sub: 'Sécurisé',  color: '#FFB347', bg: '#FFF4E5', up: false, alert: false },
-    { icon: 'fa-solid fa-gavel',        label: 'Litiges ouverts', val: '0',  sub: '',          color: '#FF4D6A', bg: '#FFE8EC', up: false, alert: false },
+    { icon: 'fa-solid fa-users',        label: 'Membres actifs',  val: '0',  sub: '',         color: '#00D4FF', bg: '#E0F9FF', up: true,  alert: false },
+    { icon: 'fa-solid fa-fire',         label: 'Groupes actifs',  val: '0',  sub: '',         color: '#F4A902', bg: '#FFF8E1', up: true,  alert: false },
+    { icon: 'fa-solid fa-circle-check', label: 'Taux de succès',  val: '0%', sub: 'Ce mois',  color: '#10D98B', bg: '#E8FDF2', up: true,  alert: false },
+    { icon: 'fa-solid fa-coins',        label: 'Commissions',     val: '0',  sub: '',         color: '#F4A902', bg: '#FFF8E1', up: true,  alert: false },
+    { icon: 'fa-solid fa-vault',        label: 'En escrow',       val: '0',  sub: 'Sécurisé', color: '#FFB347', bg: '#FFF4E5', up: false, alert: false },
+    { icon: 'fa-solid fa-gavel',        label: 'Litiges ouverts', val: '0',  sub: '',         color: '#FF4D6A', bg: '#FFE8EC', up: false, alert: false },
   ];
 
   // ── Méthodes de paiement ──────────────────────────────────────
@@ -93,12 +93,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // ── Charger tout en parallèle ─────────────────────────────────
   private loadAll(): void {
     forkJoin({
-      dashboard  : this.adminService.getDashboard().pipe(catchError(() => of(null))),
-      payments   : this.adminService.getPaymentsAnalytics().pipe(catchError(() => of(null))),
-      suppliers  : this.adminService.getSuppliers('PENDING', 4).pipe(catchError(() => of([]))),
-      products   : this.adminService.getPendingProducts(3).pipe(catchError(() => of([]))),
-      disputes   : this.adminService.getDisputes('OPEN', 3).pipe(catchError(() => of([]))),
-      auditLogs  : this.adminService.getAuditLogs({ limit: 5 }).pipe(catchError(() => of(null))),
+      dashboard: this.adminService.getDashboard().pipe(catchError(() => of(null))),
+      payments : this.adminService.getPaymentsAnalytics().pipe(catchError(() => of(null))),
+      suppliers: this.adminService.getSuppliers('PENDING', 4).pipe(catchError(() => of([]))),
+      products : this.adminService.getPendingProducts(3).pipe(catchError(() => of([]))),
+      disputes : this.adminService.getDisputes('OPEN', 3).pipe(catchError(() => of([]))),
+      auditLogs: this.adminService.getAuditLogs({ limit: 5 }).pipe(catchError(() => of([]))),
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe(({ dashboard, payments, suppliers, products, disputes, auditLogs }) => {
@@ -175,29 +175,30 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── Traitement items en attente ───────────────────────────────
   private processPendingItems(suppliers: any[], products: any[], disputes: any[]): void {
-    this.pending[0].items = suppliers.map((s: any) => ({
+    this.pending[0].items = (suppliers ?? []).map((s: any) => ({
       name : s.companyName ?? s.user?.name ?? 'Fournisseur',
       delay: `En attente depuis ${this.relativeTime(s.createdAt)}`,
     }));
-    if (suppliers.length) this.pending[0].badge = suppliers.length;
+    this.pending[0].badge = suppliers?.length ?? 0;
 
-    this.pending[1].items = products.map((p: any) => ({
+    this.pending[1].items = (products ?? []).map((p: any) => ({
       name : p.name ?? 'Produit',
       delay: `Soumis par ${p.supplier?.companyName ?? 'fournisseur'}`,
     }));
-    if (products.length) this.pending[1].badge = products.length;
+    this.pending[1].badge = products?.length ?? 0;
 
-    this.pending[2].items = disputes.map((d: any) => ({
+    this.pending[2].items = (disputes ?? []).map((d: any) => ({
       name : d.subject ?? 'Litige',
       delay: `Ouvert par ${d.user?.name ?? 'membre'}`,
     }));
-    if (disputes.length) this.pending[2].badge = disputes.length;
+    this.pending[2].badge = disputes?.length ?? 0;
   }
 
   // ── Traitement audit logs ─────────────────────────────────────
-  private processAuditLogs(res: any): void {
-    const logs = res?.data?.logs ?? res?.data ?? [];
-    this.auditLog = logs.map((l: any) => ({
+  // getAuditLogs() retourne déjà res.data = tableau direct
+  private processAuditLogs(logs: any): void {
+    const list = Array.isArray(logs) ? logs : [];
+    this.auditLog = list.map((l: any) => ({
       time  : new Date(l.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       user  : l.user?.name ?? 'Admin',
       action: l.action,
@@ -225,18 +226,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   actionIcon(a: string): string {
-    if (['SUSPENSION', 'FERMETURE', 'REJET'].includes(a)) return 'fa-solid fa-ban';
-    if (a === 'REMBOURSEMENT') return 'fa-solid fa-rotate-left';
-    if (a === 'APPROBATION')   return 'fa-solid fa-circle-check';
+    if (['USER_SUSPENDED', 'GROUP_CANCELLED', 'SUPPLIER_REJECTED', 'PRODUCT_REJECTED'].some(k => a.includes(k))) return 'fa-solid fa-ban';
+    if (a.includes('REFUND')) return 'fa-solid fa-rotate-left';
+    if (a.includes('APPROVED') || a.includes('RESOLVED')) return 'fa-solid fa-circle-check';
     return 'fa-solid fa-shield-check';
   }
 
   actionColor(a: string): string {
-    if (['SUSPENSION', 'FERMETURE', 'REJET'].includes(a)) return '#FF4D6A';
-    if (a === 'REMBOURSEMENT') return '#F4A902';
+    if (['SUSPENDED', 'CANCELLED', 'REJECTED'].some(k => a.includes(k))) return '#FF4D6A';
+    if (a.includes('REFUND')) return '#F4A902';
     return '#0DA487';
   }
 
   actionBg(a: string): string { return this.actionColor(a) + '18'; }
-  actionIconClass(_a: string): string { return ''; }
 }

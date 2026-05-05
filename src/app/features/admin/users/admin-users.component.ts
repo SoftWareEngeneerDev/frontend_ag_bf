@@ -30,6 +30,11 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
   successMsg = '';
   errorMsg   = '';
 
+  // ── Popup confirmation suspension ────────────────────────────
+  showSuspendModal  = false;
+  selectedUser      : any = null;
+  processing        = false;
+
   private destroy$ = new Subject<void>();
 
   constructor(private adminService: AdminService) {}
@@ -43,7 +48,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
   private loadUsers(): void {
     this.loading = true;
-    this.adminService.getUsers({ page: 1, limit: 100 })
+    this.adminService.getUsers({ page: 1, limit: 200 })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: any) => {
@@ -51,10 +56,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
           this.users   = list.map((u: any) => this.mapUser(u));
           this.loading = false;
         },
-        error: (err: any) => {
-          console.error('Erreur chargement users:', err);
-          this.loading = false;
-        }
+        error: () => { this.loading = false; }
       });
   }
 
@@ -86,12 +88,30 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  suspend(u: any): void {
-    this.adminService.updateUserStatus(u.id, 'SUSPENDED')
+  // ── Ouvrir popup confirmation ─────────────────────────────────
+  openSuspendModal(u: any): void {
+    this.selectedUser    = u;
+    this.showSuspendModal = true;
+  }
+
+  // ── Confirmer suspension ──────────────────────────────────────
+  confirmSuspend(): void {
+    if (!this.selectedUser || this.processing) return;
+    this.processing = true;
+    this.adminService.updateUserStatus(this.selectedUser.id, 'SUSPENDED')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { u.status = 'SUSPENDED'; this.showSuccess(`${u.name} suspendu`); },
-        error: (err: any) => this.showError(err?.error?.error?.message ?? 'Erreur')
+        next: () => {
+          this.selectedUser.status = 'SUSPENDED';
+          this.showSuspendModal    = false;
+          this.processing          = false;
+          this.showSuccess(`${this.selectedUser.name} suspendu`);
+          this.selectedUser        = null;
+        },
+        error: (err: any) => {
+          this.processing = false;
+          this.showError(err?.error?.error?.message ?? 'Erreur');
+        }
       });
   }
 
@@ -129,8 +149,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       status       : u.status,
       score        : u.trustScore   ?? 100,
       groups       : u._count?.groupMembers ?? 0,
-      ordersCount  : u._count?.orders ?? 0,
-      paymentsTotal: u.paymentsTotal ?? 0,
+      paymentsTotal: u._count?.payments ?? 0,
       totalSaved   : u.totalSaved   ?? 0,
       referralCount: u.referralCount ?? 0,
       city         : u.city         ?? 'Ouagadougou',

@@ -1,3 +1,32 @@
+// ── Stats grid ────────────────────────────────────────────────
+.ap-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+.ap-stat {
+  padding: 16px;
+  text-align: center;
+}
+
+.ap-stat-val {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ap-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+// ── Icône produit ─────────────────────────────────────────────
 .ap-prod-icon {
   width: 34px; height: 34px; border-radius: 8px;
   background: var(--primary-l); color: var(--primary);
@@ -5,10 +34,18 @@
   font-size: 15px; flex-shrink: 0;
 }
 
+.ap-prod-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--txt);
+}
+
+// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .tbl { min-width: 580px; }
+  .tbl  { min-width: 580px; }
   .glass { overflow-x: auto; }
 }
+
 @media (max-width: 480px) {
   .flex-between { flex-direction: column; align-items: stretch; }
   .flex-between .btn { width: 100%; justify-content: center; }

@@ -9,7 +9,7 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  // ── Analytics ─────────────────────────────────────────────────
+  // ── Dashboard & Analytics ─────────────────────────────────────
 
   getDashboard(): Observable<any> {
     return this.http.get<any>(`${API}/admin/analytics/dashboard`).pipe(
@@ -35,20 +35,37 @@ export class AdminService {
     );
   }
 
-  // ── Audit logs ────────────────────────────────────────────────
-  // paginated() retourne { success, data: [...], meta: {} }
-  // on retourne data directement = tableau des logs
+  // ── Audit Logs ────────────────────────────────────────────────
 
-  getAuditLogs(params?: { page?: number; limit?: number }): Observable<any> {
+  getAuditLogs(params?: { page?: number; limit?: number; action?: string; entity?: string }): Observable<any> {
     return this.http.get<any>(`${API}/admin/audit-logs`, {
-      params: this.buildParams({ limit: params?.limit ?? 10, page: params?.page ?? 1 })
+      params: this.buildParams({ limit: params?.limit ?? 50, page: params?.page ?? 1, ...params })
     }).pipe(map(res => res.data ?? []));
   }
 
-  // ── Fournisseurs ──────────────────────────────────────────────
-  // paginated() retourne { success, data: [...], meta: {} }
+  // ── Utilisateurs ──────────────────────────────────────────────
 
-  getSuppliers(status = 'PENDING', limit = 20, page = 1): Observable<any[]> {
+  getUsers(params?: { status?: string; role?: string; search?: string; page?: number; limit?: number }): Observable<any[]> {
+    return this.http.get<any>(`${API}/admin/users`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
+  }
+
+  updateUserStatus(id: string, status: string, reason?: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/users/${id}/status`, { status, reason }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  updateUserRole(id: string, role: string): Observable<any> {
+    return this.http.put<any>(`${API}/admin/users/${id}/role`, { role }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // ── Fournisseurs ──────────────────────────────────────────────
+
+  getSuppliers(status = 'ALL', limit = 20, page = 1): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/suppliers`, {
       params: this.buildParams({ status, limit, page })
     }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
@@ -74,18 +91,28 @@ export class AdminService {
     );
   }
 
-  // ── Utilisateurs ──────────────────────────────────────────────
-  // paginated() retourne { success, data: [...], meta: {} }
-  // res.data = tableau des utilisateurs directement
+  // ── Catégories ────────────────────────────────────────────────
 
-  getUsers(params?: { status?: string; role?: string; search?: string; page?: number; limit?: number }): Observable<any[]> {
-    return this.http.get<any>(`${API}/admin/users`, {
-      params: this.buildParams(params)
-    }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
+  getCategories(): Observable<any[]> {
+    return this.http.get<any>(`${API}/categories`).pipe(
+      map(res => Array.isArray(res.data) ? res.data : [])
+    );
   }
 
-  updateUserStatus(id: string, status: string, reason?: string): Observable<any> {
-    return this.http.patch<any>(`${API}/admin/users/${id}/status`, { status, reason }).pipe(
+  createCategory(name: string, parentId?: string): Observable<any> {
+    return this.http.post<any>(`${API}/admin/categories`, { name, parentId }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  updateCategory(id: string, name: string, parentId?: string): Observable<any> {
+    return this.http.put<any>(`${API}/admin/categories/${id}`, { name, parentId }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  deleteCategory(id: string): Observable<any> {
+    return this.http.delete<any>(`${API}/admin/categories/${id}`).pipe(
       map(res => res.data)
     );
   }
@@ -96,8 +123,8 @@ export class AdminService {
     return this.http.get<any>(`${API}/admin/groups`, {
       params: this.buildParams(params)
     }).pipe(map(res => ({
-      data : Array.isArray(res.data) ? res.data : [],
-      meta : res.meta ?? {}
+      data: Array.isArray(res.data) ? res.data : [],
+      meta: res.meta ?? {}
     })));
   }
 
@@ -109,16 +136,10 @@ export class AdminService {
 
   // ── Litiges ───────────────────────────────────────────────────
 
-  getDisputes(status = 'OPEN', limit = 20, page = 1): Observable<any[]> {
+  getDisputes(status = 'ALL', limit = 20, page = 1): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/disputes`, {
       params: this.buildParams({ status, limit, page })
     }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
-  }
-
-  resolveDispute(id: string, resolution: string): Observable<any> {
-    return this.http.patch<any>(`${API}/admin/disputes/${id}/resolve`, { resolution }).pipe(
-      map(res => res.data)
-    );
   }
 
   takeChargeDispute(id: string): Observable<any> {
@@ -127,16 +148,42 @@ export class AdminService {
     );
   }
 
-  // ── Paiements ─────────────────────────────────────────────────
+  resolveDispute(id: string, resolution: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/disputes/${id}/resolve`, { resolution }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // ── Paiements & Remboursements ────────────────────────────────
 
   getPayments(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
-    return this.http.get<any>(`${API}/admin/payments`, {
+    return this.http.get<any>(`${API}/admin/refunds`, {
       params: this.buildParams(params)
-    }).pipe(map(res => res.data ?? []));
+    }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
   }
 
   refundPayment(paymentId: string, reason: string): Observable<any> {
     return this.http.post<any>(`${API}/admin/payments/refund`, { paymentId, reason }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  processRefund(id: string): Observable<any> {
+    return this.http.post<any>(`${API}/admin/refunds/${id}/process`, {}).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // ── Commandes ─────────────────────────────────────────────────
+
+  getOrders(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
+    return this.http.get<any>(`${API}/admin/orders`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
+  }
+
+  updateOrderStatus(id: string, status: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/orders/${id}/status`, { status }).pipe(
       map(res => res.data)
     );
   }

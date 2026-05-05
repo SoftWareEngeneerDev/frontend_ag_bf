@@ -1,7 +1,48 @@
-// Table scroll handled globally via .glass + .tbl in main.scss
-// Responsive toolbar handled globally via .flex-between
+// ── État vide ─────────────────────────────────────────────────
+.au-empty {
+  text-align: center;
+  padding: 48px 0;
+}
 
+// ── Modal — ng-deep pour que position:fixed fonctionne ────────
+:host ::ng-deep .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+:host ::ng-deep .modal-box {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 18px;
+  overflow: hidden;
+  animation: modalIn .2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.95) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)  translateY(0); }
+}
+
+:host ::ng-deep .modal-head {
+  padding: 20px 24px 0;
+}
+
+:host ::ng-deep .modal-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 600px) {
-  // Ensure action buttons in table don't overflow
   .flex.gap-6 { flex-wrap: wrap; }
+  :host ::ng-deep .modal-box { max-width: 100%; border-radius: 14px; }
 }

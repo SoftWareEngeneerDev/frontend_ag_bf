@@ -92,7 +92,7 @@ export class AdminUserDetailComponent implements OnInit, OnDestroy {
   get roleBadge() : string { return this.user?.role === 'SUPPLIER' ? 'badge-cyan'  : this.user?.role === 'ADMIN' ? 'badge-err'  : 'badge-grey'; }
   get statusLabel(): string { return this.user?.status === 'ACTIVE' ? '✅ Actif' : '🔴 Suspendu'; }
   get statusBadge(): string { return this.user?.status === 'ACTIVE' ? 'badge-ok'  : 'badge-err'; }
-  get avatarBg()  : string { return this.user?.role === 'SUPPLIER' ? '#00D4FF' : '#F5A623'; }
+  get avatarBg()  : string  { return this.user?.role === 'SUPPLIER' ? '#00D4FF' : '#F5A623'; }
 
   private showSuccess(msg: string): void {
     this.successMsg = msg; this.errorMsg = '';
@@ -109,16 +109,16 @@ export class AdminUserDetailComponent implements OnInit, OnDestroy {
       id           : u.id,
       name         : u.name,
       phone        : u.phone,
-      email        : u.email         ?? '',
+      email        : u.email          ?? '',
       role         : u.role,
       status       : u.status,
-      score        : u.trustScore    ?? 100,
-      groups       : u._count?.groupMembers ?? 0,
-      ordersCount  : u._count?.orders ?? 0,
-      paymentsTotal: u.paymentsTotal ?? 0,
-      totalSaved   : u.totalSaved    ?? 0,
-      referralCount: u.referralCount ?? 0,
-      city         : u.city          ?? 'Ouagadougou',
+      score        : u.trustScore     ?? 100,
+      groups       : u._count?.groupMembers  ?? 0,  // ✅ groupMembers existe dans le schéma
+      ordersCount  : u._count?.payments      ?? 0,  // ✅ pas d'orders sur User → on utilise payments
+      paymentsTotal: u._count?.payments      ?? 0,
+      totalSaved   : u.totalSaved     ?? 0,
+      referralCount: u.referralCount  ?? 0,
+      city         : u.city           ?? 'Ouagadougou',
       joined       : new Date(u.createdAt).toLocaleDateString('fr-FR', {
         day: 'numeric', month: 'short', year: 'numeric'
       }),
