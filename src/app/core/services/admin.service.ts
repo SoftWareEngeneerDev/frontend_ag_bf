@@ -79,6 +79,13 @@ export class AdminService {
 
   // ── Produits ──────────────────────────────────────────────────
 
+
+  getAllProducts(params?: { status?: string; search?: string; page?: number; limit?: number }): Observable<any[]> {
+    return this.http.get<any>(`${API}/admin/products`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => Array.isArray(res.data) ? res.data : []));
+  }
+
   getPendingProducts(limit = 20, page = 1): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/products/pending`, {
       params: this.buildParams({ limit, page })
