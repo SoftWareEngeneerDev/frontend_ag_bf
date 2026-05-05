@@ -1,0 +1,197 @@
+<div class="mc-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-store"></i> Catalogue des groupes
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ filteredGroups.length }} groupe{{ filteredGroups.length !== 1 ? 's' : '' }} disponible{{ filteredGroups.length !== 1 ? 's' : '' }}
+      </p>
+    </div>
+    <input class="inp" style="width:260px"
+           placeholder="🔍 Produit, fournisseur..."
+           [(ngModel)]="search">
+  </div>
+
+  <!-- ══ ONGLETS ════════════════════════════════════════════════════ -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
+            [class.active]="activeTab === t.key"
+            (click)="setTab(t.key)">
+      {{ t.label }}
+      <span class="tab-count" *ngIf="tabCount(t.key) > 0">{{ tabCount(t.key) }}</span>
+    </button>
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════════ -->
+  <div *ngIf="!loading && filteredGroups.length === 0"
+       style="text-align:center;padding:60px 0">
+    <i class="fa-solid fa-store" style="font-size:48px;color:var(--primary);margin-bottom:16px;display:block"></i>
+    <h3 style="font-weight:600;margin-bottom:8px">Aucun groupe disponible</h3>
+    <p class="text-muted">Les groupes d'achat apparaîtront ici dès leur ouverture.</p>
+  </div>
+
+  <!-- ══ GRILLE GROUPES ════════════════════════════════════════════ -->
+  <div class="mc-grid" *ngIf="!loading && filteredGroups.length > 0">
+    <div class="glass mc-card"
+         *ngFor="let g of filteredGroups; trackBy: trackById"
+         [class.mc-card-hot]="isHot(g)">
+
+      <!-- Image produit ─────────────────────────────────────────── -->
+      <div class="mc-img">
+        <img [src]="g.product.images[0] || 'https://picsum.photos/seed/' + g.id + '/300/180'"
+             [alt]="g.product.name" loading="lazy">
+        <div class="mc-badge-hot" *ngIf="isHot(g)">
+          <i class="fa-solid fa-fire"></i> Seuil atteint !
+        </div>
+        <div class="mc-badge-discount">
+          -{{ g.discountPercent }}%
+        </div>
+      </div>
+
+      <!-- Corps carte ──────────────────────────────────────────── -->
+      <div class="mc-body">
+
+        <!-- Fournisseur -->
+        <div class="mc-supplier">
+          <i class="fa-solid fa-store" style="font-size:11px"></i>
+          {{ g.supplier.companyName || g.product.supplier.companyName }}
+        </div>
+
+        <!-- Nom produit -->
+        <h3 class="mc-name">{{ g.product.name }}</h3>
+
+        <!-- Prix -->
+        <div class="mc-prices">
+          <div class="mc-price-group">
+            <span class="mc-price-val">{{ g.currentPrice | currencyXof }}</span>
+            <span class="text-muted mc-price-lbl">Prix groupe actuel</span>
+          </div>
+          <div class="mc-price-solo text-muted">
+            <span style="text-decoration:line-through">{{ g.product.soloPrice | currencyXof }}</span>
+            <span style="font-size:11px"> solo</span>
+          </div>
+        </div>
+
+        <!-- Progression membres -->
+        <div class="mc-progress">
+          <div class="flex-between mb-4">
+            <span class="text-muted" style="font-size:12px">
+              <i class="fa-solid fa-users"></i>
+              {{ g.currentCount }} / {{ g.minParticipants }} membres
+            </span>
+            <span class="font-mono" style="font-size:12px;font-weight:700"
+                  [style.color]="fillColor(g)">
+              {{ pct(g) }}%
+            </span>
+          </div>
+          <div class="prog-wrap" style="height:6px">
+            <div class="prog-fill"
+                 [style.width.%]="pct(g)"
+                 [style.background]="fillColor(g)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Acompte + expiration -->
+        <div class="mc-meta">
+          <div class="mc-meta-item">
+            <i class="fa-solid fa-coins" style="color:var(--gold)"></i>
+            <span>Acompte : <strong>{{ g.depositAmount | currencyXof }}</strong></span>
+          </div>
+          <div class="mc-meta-item" [style.color]="formatExpiry(g.expiresAt).includes('Expire') ? '#FF4D6A' : 'var(--muted)'">
+            <i class="fa-solid fa-clock"></i>
+            <span>{{ formatExpiry(g.expiresAt) }}</span>
+          </div>
+        </div>
+
+        <!-- Bouton rejoindre -->
+        <button class="btn-primary btn-round mc-btn"
+                [class.btn-gold]="isHot(g)"
+                (click)="openJoinModal(g)"
+                [disabled]="joining === g.id">
+          <i *ngIf="joining === g.id" class="fa-solid fa-spinner fa-spin"></i>
+          <i *ngIf="joining !== g.id && !isHot(g)" class="fa-solid fa-users-plus"></i>
+          <i *ngIf="joining !== g.id && isHot(g)"  class="fa-solid fa-fire"></i>
+          {{ isHot(g) ? 'Rejoindre — Seuil atteint !' : 'Rejoindre ce groupe' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL — CONFIRMER REJOINDRE ═══════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showJoinModal && selectedGroup" (click)="showJoinModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-users-plus" style="color:var(--primary)"></i>
+          Rejoindre le groupe
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showJoinModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Info produit -->
+        <div class="glass" style="padding:14px;border-left:4px solid var(--primary)">
+          <div style="font-weight:600;font-size:15px;margin-bottom:4px">
+            {{ selectedGroup!.product.name }}
+          </div>
+          <div class="text-muted" style="font-size:12px">
+            <i class="fa-solid fa-store"></i> {{ selectedGroup!.supplier.companyName }}
+          </div>
+        </div>
+
+        <!-- Détails -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="glass" style="padding:14px;text-align:center">
+            <div class="font-mono" style="font-size:18px;font-weight:700;color:var(--primary)">
+              {{ selectedGroup!.currentPrice | currencyXof }}
+            </div>
+            <div class="text-muted" style="font-size:11px">Prix actuel/unité</div>
+          </div>
+          <div class="glass" style="padding:14px;text-align:center">
+            <div class="font-mono" style="font-size:18px;font-weight:700;color:var(--gold)">
+              {{ selectedGroup!.depositAmount | currencyXof }}
+            </div>
+            <div class="text-muted" style="font-size:11px">Acompte à payer</div>
+          </div>
+        </div>
+
+        <div class="alert-cyan alert" style="font-size:12px">
+          <i class="fa-solid fa-circle-info"></i>
+          Après confirmation, vous serez redirigé vers la page de paiement pour régler l'acompte.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showJoinModal = false" [disabled]="joining2">
+            <i class="fa-solid fa-xmark"></i> Annuler
+          </button>
+          <button class="btn-primary btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmJoin()" [disabled]="joining2">
+            <i *ngIf="joining2"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!joining2" class="fa-solid fa-users-plus"></i>
+            {{ joining2 ? 'Traitement...' : 'Confirmer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
