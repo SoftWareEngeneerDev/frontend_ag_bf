@@ -80,6 +80,19 @@ export class AdminService {
   // ── Produits ──────────────────────────────────────────────────
 
 
+
+  getProductById(id: string): Observable<any> {
+    return this.http.get<any>(`${API}/admin/products/${id}`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getGroupById(id: string): Observable<any> {
+    return this.http.get<any>(`${API}/admin/groups/${id}`).pipe(
+      map(res => res.data)
+    );
+  }
+
   getAllProducts(params?: { status?: string; search?: string; page?: number; limit?: number }): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/products`, {
       params: this.buildParams(params)

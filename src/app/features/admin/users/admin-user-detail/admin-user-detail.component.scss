@@ -1,17 +1,52 @@
-// Grids (repeat(4,1fr), 1fr 1fr) handled globally via main.scss inline style selectors
+// ── Stats grid ────────────────────────────────────────────────
+.aud-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+.aud-stat {
+  padding: 16px;
+  text-align: center;
+}
+
+.aud-stat-val {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.aud-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+// ── Grille détails 2 colonnes ─────────────────────────────────
+.aud-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+// ── Carte identité ────────────────────────────────────────────
 @media (max-width: 600px) {
-  // Identity card: avatar + info stacks vertically
   .flex.gap-20 { flex-wrap: wrap; }
-
-  // Contact info items wrap
   .flex.gap-24 { flex-wrap: wrap; gap: 10px !important; }
-
-  // Header actions wrap
   .flex-between { flex-wrap: wrap; gap: 10px; }
 }
 
 @media (max-width: 480px) {
-  // Trust score block full width
-  div[style*="min-width:90px"] { min-width: unset !important; width: 100%; text-align: left !important; }
+  div[style*="min-width:90px"] {
+    min-width: unset !important;
+    width: 100%;
+    text-align: left !important;
+  }
 }

@@ -44,12 +44,57 @@ export class AdminProductDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadProduct(id: string): void {
-    this.productService.getById(id)
+    this.adminService.getProductById(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next : (p) => { this.product = p; this.loading = false; },
-        error: ()  => { this.product = null; this.loading = false; }
+        next: (p: any) => {
+          this.product  = this.mapProduct(p);
+          this.loading  = false;
+        },
+        error: () => { this.product = null; this.loading = false; }
       });
+  }
+
+  private mapProduct(p: any): any {
+    return {
+      id              : p.id,
+      name            : p.name          ?? '',
+      description     : p.description   ?? '',
+      images          : p.imagesUrls    ?? [],
+      emoji           : '📦',
+      soloPrice       : p.soloPrice     ?? 0,
+      minGroupPrice   : p.baseGroupPrice ?? 0,
+      stock           : p.stock         ?? 0,
+      rating          : p.rating        ?? 0,
+      reviewCount     : p._count?.reviews ?? 0,
+      activeGroupCount: p._count?.groups  ?? 0,
+      status          : p.status === 'APPROVED' ? 'ACTIVE'
+                      : p.status === 'PENDING_APPROVAL' ? 'PENDING' : p.status,
+      createdAt       : new Date(p.createdAt ?? Date.now()),
+      category: {
+        id  : p.category?.id   ?? '',
+        name: p.category?.name ?? '',
+        icon: p.category?.icon ?? 'fa-solid fa-tag',
+        slug: p.category?.slug ?? '',
+        productCount: 0,
+      },
+      supplier: {
+        id         : p.supplier?.id          ?? '',
+        companyName: p.supplier?.companyName ?? '',
+        contactName: p.supplier?.user?.name  ?? '',
+        phone      : p.supplier?.user?.phone ?? '',
+        email      : p.supplier?.user?.email ?? '',
+        address    : '',
+        city       : p.supplier?.user?.city  ?? 'Ouagadougou',
+        status     : 'APPROVED' as any,
+        rating     : p.supplier?.rating      ?? 0,
+        reviewCount: p.supplier?.reviewCount ?? 0,
+        totalGroups: p.supplier?._count?.groups ?? 0,
+        successRate: p.supplier?.successRate ?? 0,
+        createdAt  : new Date(p.supplier?.createdAt ?? Date.now()),
+        user       : null as any,
+      },
+    };
   }
 
   // ── Approuver ─────────────────────────────────────────────────
