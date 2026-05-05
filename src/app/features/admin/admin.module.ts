@@ -10,6 +10,7 @@ import { AdminSuppliersComponent }      from './suppliers/admin-suppliers.compon
 import { AdminSupplierDetailComponent } from './suppliers/admin-supplier-detail/admin-supplier-detail.component';
 import { AdminProductsComponent }       from './products/admin-products.component';
 import { AdminProductDetailComponent }  from './products/admin-product-detail/admin-product-detail.component';
+import { AdminCategoriesComponent }     from './categories/admin-categories.component';
 import { AdminGroupsComponent }         from './groups/admin-groups.component';
 import { AdminGroupDetailComponent }    from './groups/admin-group-detail/admin-group-detail.component';
 import { AdminPaymentsComponent }       from './payments/admin-payments.component';
@@ -27,6 +28,7 @@ import { AdminLogsComponent }           from './logs/admin-logs.component';
     AdminSupplierDetailComponent,
     AdminProductsComponent,
     AdminProductDetailComponent,
+    AdminCategoriesComponent,
     AdminGroupsComponent,
     AdminGroupDetailComponent,
     AdminPaymentsComponent,
@@ -49,6 +51,7 @@ import { AdminLogsComponent }           from './logs/admin-logs.component';
           { path: 'suppliers/:id', component: AdminSupplierDetailComponent },
           { path: 'products',      component: AdminProductsComponent },
           { path: 'products/:id',  component: AdminProductDetailComponent },
+          { path: 'categories',    component: AdminCategoriesComponent },
           { path: 'groups',        component: AdminGroupsComponent },
           { path: 'groups/:id',    component: AdminGroupDetailComponent },
           { path: 'payments',      component: AdminPaymentsComponent },
