@@ -1,64 +1,200 @@
+// ── Header ────────────────────────────────────────────────────
 .sp-header { margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
 
+// ── Toolbar ───────────────────────────────────────────────────
 .sp-toolbar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
   @media (max-width: 480px) { flex-direction: column; align-items: stretch; }
 }
-.sp-search { width: 260px;
+.sp-search {
+  width: 260px;
   @media (max-width: 480px) { width: 100%; }
 }
 
+// ── Grille produits ───────────────────────────────────────────
 .sp-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 18px;
+
+  @media (max-width: 900px)  { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (max-width: 600px)  { grid-template-columns: 1fr; gap: 12px; }
 }
 
 .sp-card { overflow: hidden; }
 
+// ── Image + galerie ───────────────────────────────────────────
 .sp-img {
   background: var(--bg);
-  height: 180px;
+  height: 200px;
   position: relative;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border-radius: var(--r-lg, 12px) var(--r-lg, 12px) 0 0;
   overflow: hidden;
+
+  @media (max-width: 480px) { height: 180px; }
 }
-.sp-prod-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.sp-prod-img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: opacity .3s;
+}
+
+// ── Miniatures galerie ────────────────────────────────────────
+.sp-thumbs {
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 2;
+}
+
+.sp-thumb {
+  width: 28px; height: 28px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s;
+  flex-shrink: 0;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  &.active { border-color: #fff; transform: scale(1.1); }
+  &:hover  { border-color: rgba(255,255,255,.6); }
+}
+
 .sp-status { position: absolute; top: 10px; right: 10px; font-size: 11px; }
 .sp-active { position: absolute; top: 10px; left:  10px; font-size: 11px; }
 
+// ── Corps carte ───────────────────────────────────────────────
 .sp-body   { padding: 14px 16px 18px; }
 .sp-cat    { font-size: 11px; margin-bottom: 4px; }
 .sp-name   { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
-.sp-desc   { font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+.sp-desc   { font-size: 12px; line-height: 1.5; margin-bottom: 12px; color: var(--muted); }
 
 .sp-stats  { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
 .sp-stat   { background: var(--bg); border-radius: 8px; padding: 8px; text-align: center; }
 .sp-stat-v { font-size: 13px; font-weight: 700; display: block; margin-bottom: 2px; }
-.sp-stat-l { font-size: 10px; }
+.sp-stat-l { font-size: 10px; color: var(--muted); }
 
-.sp-rating { font-size: 13px; margin-bottom: 14px; }
-.sp-actions{ display: flex; gap: 8px; }
+.sp-rating  { font-size: 13px; margin-bottom: 14px; }
+.sp-actions { display: flex; gap: 8px; flex-wrap: wrap;
+  @media (max-width: 480px) { flex-direction: column; }
+}
 
+// ── Image modal ───────────────────────────────────────────────
 .sp-modal-img {
   width: 52px; height: 52px; border-radius: 8px;
   overflow: hidden; flex-shrink: 0; border: 1px solid var(--border);
   img { width: 100%; height: 100%; object-fit: cover; }
 }
 
-@media (max-width: 600px) {
-  .sp-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-  .sp-actions { flex-direction: column; }
-  .sp-actions .btn { width: 100%; justify-content: center; }
-}
-
-/* Modal */
+// ── Modal ─────────────────────────────────────────────────────
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,.5);
   backdrop-filter: blur(4px); z-index: 1000;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  @media (max-width: 480px) { padding: 8px; align-items: flex-end; }
 }
-.modal-box  { width: 100%; max-width: 480px; }
-.modal-head { padding: 20px 24px; border-bottom: 1px solid var(--border); }
-.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+.modal-box {
+  width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto;
+  border-radius: 18px;
+  @media (max-width: 480px) {
+    max-width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 95vh;
+  }
+}
+
+.modal-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: var(--bg-white, #fff);
+  z-index: 1;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+  @media (max-width: 480px) { padding: 16px; }
+}
+
+// ── Zone upload images ────────────────────────────────────────
+.sp-img-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 2px dashed var(--border, #ddd);
+  border-radius: 12px;
+  padding: 28px 20px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  text-align: center;
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-l, #e6faf5);
+  }
+}
+
+.sp-img-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.sp-img-preview {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.sp-img-remove {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  transition: background .15s;
+  &:hover { background: #FF4D6A; }
+}
+
+.sp-img-uploading {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 18px;
+}
+
+.sp-img-add {
+  aspect-ratio: 1;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color .2s, color .2s;
+  font-size: 20px;
+
+  &:hover { border-color: var(--primary); color: var(--primary); }
+}

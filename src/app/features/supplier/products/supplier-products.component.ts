@@ -7,7 +7,6 @@ import { Product, Category } from '../../../core/models';
 
 const API = 'http://localhost:3000/api/v1';
 
-// ── Mapping statuts ───────────────────────────────────────────
 const STATUS_MAP: Record<string, string> = {
   'Approuvés'  : 'ACTIVE',
   'En attente' : 'PENDING',
@@ -21,11 +20,12 @@ const STATUS_MAP: Record<string, string> = {
   styleUrls:  ['./supplier-products.component.scss']
 })
 export class SupplierProductsComponent implements OnInit, OnDestroy {
-  products     : Product[] = [];
-  filtered     : Product[] = [];
+  products     : Product[]  = [];
+  filtered     : Product[]  = [];
   allCategories: Category[] = [];
   loading       = true;
   saving        = false;
+  uploading     = false;
   creatingGroup = false;
   search        = '';
   activeTab     = 'Tous';
@@ -50,7 +50,12 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
     baseGroupPrice: 0,
     stock         : 0,
     categoryId    : '',
+    imagesUrls    : [] as string[],
   };
+
+  // ── Prévisualisation images ───────────────────────────────
+  imagePreviews : string[] = [];
+  imageError    = '';
 
   // ── Formulaire modification ───────────────────────────────
   editForm = {
@@ -90,7 +95,6 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ── Chargement produits ───────────────────────────────────
   private loadProducts(): void {
     this.loading = true;
     this.http.get<any>(`${API}/supplier/products`, { params: { limit: '100' } })
@@ -106,7 +110,6 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ── Chargement catégories ─────────────────────────────────
   private loadCategories(): void {
     this.productService.getCategories()
       .pipe(takeUntil(this.destroy$))
@@ -116,31 +119,108 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ── Filtre et recherche ───────────────────────────────────
   private applyFilter(): void {
     let list = this.products;
-
     if (this.activeTab !== 'Tous') {
       const status = STATUS_MAP[this.activeTab];
       list = list.filter(p => p.status === status);
     }
-
     if (this.search.trim()) {
       const q = this.search.toLowerCase();
       list = list.filter(p => p.name.toLowerCase().includes(q));
     }
-
     this.filtered = list;
   }
 
-  setTab(t: string): void { this.activeTab = t; this.applyFilter(); }
+  setTab(t: string): void   { this.activeTab = t; this.applyFilter(); }
   onSearch(v: string): void { this.search = v; this.applyFilter(); }
+
+  // ── Sélectionner les images ───────────────────────────────
+  onImagesSelected(event: Event): void {
+    const input   = event.target as HTMLInputElement;
+    const files   = Array.from(input.files ?? []);
+    this.imageError = '';
+
+    if (files.length === 0) return;
+
+    // Validation côté client
+    const totalImages = this.imagePreviews.length + files.length;
+    if (totalImages > 4) {
+      this.imageError = `Maximum 4 images. Vous avez déjà ${this.imagePreviews.length} image(s).`;
+      input.value = '';
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxSize      = 5 * 1024 * 1024; // 5MB
+
+    for (const file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        this.imageError = 'Format non supporté. Utilisez JPG, PNG ou WEBP.';
+        input.value = '';
+        return;
+      }
+      if (file.size > maxSize) {
+        this.imageError = `"${file.name}" est trop lourd. Maximum 5MB par image.`;
+        input.value = '';
+        return;
+      }
+    }
+
+    // Aperçu local avant upload
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagePreviews.push(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Upload vers Cloudinary
+    this.uploadImages(files);
+    input.value = '';
+  }
+
+  // ── Upload vers backend → Cloudinary ─────────────────────
+  private uploadImages(files: File[]): void {
+    this.uploading  = true;
+    this.imageError = '';
+
+    const formData = new FormData();
+    files.forEach(f => formData.append('images', f));
+
+    this.http.post<any>(`${API}/supplier/upload/images`, formData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          const urls = res.data?.urls ?? [];
+          this.addForm.imagesUrls.push(...urls);
+          this.uploading = false;
+        },
+        error: (err) => {
+          this.uploading  = false;
+          this.imageError = err?.error?.error?.message ?? 'Erreur upload images';
+          // Retirer les aperçus en cas d'erreur
+          this.imagePreviews = this.imagePreviews.slice(0, this.addForm.imagesUrls.length);
+        }
+      });
+  }
+
+  // ── Supprimer une image ───────────────────────────────────
+  removeImage(index: number): void {
+    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
+    this.addForm.imagesUrls = this.addForm.imagesUrls.filter((_, i) => i !== index);
+  }
 
   // ── Ajouter un produit ────────────────────────────────────
   submitProduct(): void {
     if (!this.addForm.name || this.saving) return;
     if (this.addForm.baseGroupPrice >= this.addForm.soloPrice) {
       this.showError('Le prix groupe doit être inférieur au prix solo');
+      return;
+    }
+    if (this.uploading) {
+      this.showError('Veuillez attendre la fin de l\'upload des images');
       return;
     }
     this.saving = true;
@@ -152,6 +232,7 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
       baseGroupPrice: this.addForm.baseGroupPrice,
       stock         : this.addForm.stock,
       categoryId    : this.addForm.categoryId || this.allCategories[0]?.id,
+      imagesUrls    : this.addForm.imagesUrls,
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -276,50 +357,66 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
   get canSubmit(): boolean {
     return !!(this.addForm.name && this.addForm.soloPrice > 0 &&
               this.addForm.baseGroupPrice > 0 && this.addForm.stock >= 0 &&
-              this.addForm.categoryId);
+              this.addForm.categoryId && !this.uploading);
   }
 
-  // ── Helpers ───────────────────────────────────────────────
   statusClass(s: string): string {
     const map: Record<string, string> = {
-      ACTIVE         : 'badge-ok',
-      PENDING        : 'badge-warn',
-      REJECTED       : 'badge-err',
-      INACTIVE       : 'badge-grey',
+      ACTIVE          : 'badge-ok',
+      APPROVED        : 'badge-ok',
+      PENDING         : 'badge-warn',
+      PENDING_APPROVAL: 'badge-warn',
+      REJECTED        : 'badge-err',
+      INACTIVE        : 'badge-grey',
+      ARCHIVED        : 'badge-grey',
     };
     return map[s] ?? 'badge-grey';
   }
 
   statusLabel(s: string): string {
     const map: Record<string, string> = {
-      ACTIVE         : '✅ Approuvé',
-      PENDING        : '⏳ En attente',
-      REJECTED       : '❌ Rejeté',
-      INACTIVE       : '📦 Inactif',
+      ACTIVE           : '✅ Approuvé',
+      APPROVED         : '✅ Approuvé',
+      PENDING          : '⏳ En attente',
+      PENDING_APPROVAL : '⏳ En attente',
+      REJECTED         : '❌ Rejeté',
+      INACTIVE         : '📦 Inactif',
+      ARCHIVED         : '📦 Archivé',
     };
     return map[s] ?? s;
+  }
+
+  // ── Galerie images ────────────────────────────────────────
+  activeImageIndex: Record<string, number> = {};
+
+  getActiveImage(p: any): string {
+    const idx = this.activeImageIndex[p.id] ?? 0;
+    return p.images?.[idx] || 'https://picsum.photos/seed/' + p.id + '/400/300';
+  }
+
+  setActiveImage(p: any, i: number): void {
+    this.activeImageIndex[p.id] = i;
   }
 
   stars(): number[] { return Array(5).fill(0).map((_, i) => i); }
   trackById(_: number, p: Product): string { return p.id; }
 
   private resetAddForm(): void {
-    this.addForm = { name: '', description: '', soloPrice: 0, baseGroupPrice: 0, stock: 0, categoryId: '' };
+    this.addForm       = { name: '', description: '', soloPrice: 0, baseGroupPrice: 0, stock: 0, categoryId: '', imagesUrls: [] };
+    this.imagePreviews = [];
+    this.imageError    = '';
   }
 
   private showSuccess(msg: string): void {
-    this.successMsg = msg;
-    this.errorMsg   = '';
+    this.successMsg = msg; this.errorMsg = '';
     setTimeout(() => { this.successMsg = ''; }, 3000);
   }
 
   private showError(msg: string): void {
-    this.errorMsg   = msg;
-    this.successMsg = '';
+    this.errorMsg = msg; this.successMsg = '';
     setTimeout(() => { this.errorMsg = ''; }, 4000);
   }
 
-  // ── Mapper produit ────────────────────────────────────────
   private mapProduct(p: any): Product {
     return {
       id              : p.id,
