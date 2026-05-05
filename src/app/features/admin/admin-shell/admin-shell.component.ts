@@ -95,11 +95,12 @@ export class AdminShellComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           if (!data) return;
-          this.navItems[1].badge  = (data.totalMembers    ?? 0).toLocaleString('fr-FR');
-          this.navItems[2].badge  = data.pendingSuppliers ?? 0;
-          this.navItems[3].badge  = data.pendingProducts  ?? 0;
-          this.navItems[7].badge  = data.openDisputes     ?? 0;
-          this.openDisputes       = data.openDisputes     ?? 0;
+          // Badge utilisateurs = TOTAL de tous les utilisateurs (membres + fournisseurs + admins)
+          this.navItems[1].badge = data.totalUsers ?? 0;
+          this.navItems[2].badge = data.pendingSuppliers ?? 0;
+          this.navItems[3].badge = data.pendingProducts  ?? 0;
+          this.navItems[7].badge = data.openDisputes     ?? 0;
+          this.openDisputes      = data.openDisputes     ?? 0;
         },
         error: () => {}
       });

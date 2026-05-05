@@ -15,7 +15,8 @@
         <i class="fa-solid fa-users"></i> Utilisateurs
       </h2>
       <p class="text-muted" style="font-size:13px">
-        {{ filtered.length }} utilisateur{{ filtered.length !== 1 ? 's' : '' }} affiché{{ filtered.length !== 1 ? 's' : '' }}
+        {{ users.length }} utilisateur{{ users.length !== 1 ? 's' : '' }} au total
+        · {{ filtered.length }} affiché{{ filtered.length !== 1 ? 's' : '' }}
       </p>
     </div>
     <input class="inp" style="width:260px"
@@ -77,9 +78,7 @@
           <td class="font-mono text-muted" style="font-size:12px">{{ u.phone }}</td>
 
           <!-- Rôle -->
-          <td>
-            <span [class]="roleBadge(u.role)">{{ roleLabel(u.role) }}</span>
-          </td>
+          <td><span [class]="roleBadge(u.role)">{{ roleLabel(u.role) }}</span></td>
 
           <!-- Statut -->
           <td>
@@ -113,7 +112,7 @@
               </button>
               <button class="btn-err btn-sm btn-round"
                       *ngIf="u.status === 'ACTIVE' && u.role !== 'ADMIN'"
-                      (click)="suspend(u)">
+                      (click)="openSuspendModal(u)">
                 Suspendre
               </button>
               <button class="btn-ok btn-sm btn-round"
@@ -126,6 +125,53 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ══ MODAL — CONFIRMER SUSPENSION ══════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showSuspendModal" (click)="showSuspendModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-ban" style="color:#FF4D6A"></i> Suspendre l'utilisateur
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showSuspendModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedUser">
+        <div class="glass" style="padding:14px;margin-bottom:16px;border-left:4px solid #FF4D6A">
+          <div class="flex gap-10" style="align-items:center">
+            <app-avatar [name]="selectedUser.name" [size]="40" [bg]="avatarBg(selectedUser.role)"></app-avatar>
+            <div>
+              <div style="font-weight:600;font-size:14px">{{ selectedUser.name }}</div>
+              <div class="text-muted" style="font-size:12px">{{ selectedUser.phone }} · {{ roleLabel(selectedUser.role) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-red alert" style="font-size:13px;margin-bottom:16px">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          L'utilisateur sera notifié par SMS et ne pourra plus accéder à la plateforme.
+        </div>
+
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showSuspendModal = false"
+                  [disabled]="processing">
+            <i class="fa-solid fa-xmark"></i> Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmSuspend()"
+                  [disabled]="processing">
+            <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-ban"></i>
+            {{ processing ? 'Suspension...' : 'Confirmer la suspension' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

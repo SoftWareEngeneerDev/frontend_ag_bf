@@ -24,10 +24,16 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
   successMsg = '';
   errorMsg   = '';
 
-  showRejectModal   = false;
-  selectedSupplier  : Supplier | null = null;
-  rejectReason      = '';
-  processing        = false;
+  // ── Modal rejet ───────────────────────────────────────────────
+  showRejectModal  = false;
+  selectedSupplier : Supplier | null = null;
+  rejectReason     = '';
+
+  // ── Modal suspension ──────────────────────────────────────────
+  showSuspendModal    = false;
+  selectedForSuspend  : Supplier | null = null;
+
+  processing = false;
 
   private destroy$ = new Subject<void>();
 
@@ -93,7 +99,7 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          s.status      = 'APPROVED' as any;
+          s.status        = 'APPROVED' as any;
           this.processing = false;
           this.showSuccess(`${s.companyName} approuvé`);
         },
@@ -104,6 +110,7 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ── Ouvrir modal rejet ────────────────────────────────────────
   openRejectModal(s: Supplier): void {
     this.selectedSupplier = s;
     this.rejectReason     = '';
@@ -113,7 +120,6 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
   confirmReject(): void {
     if (!this.selectedSupplier || !this.rejectReason.trim() || this.processing) return;
     this.processing = true;
-
     this.adminService.validateSupplier(this.selectedSupplier.id, false, this.rejectReason)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -131,16 +137,26 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
       });
   }
 
-  suspend(s: Supplier): void {
-    if (this.processing) return;
+  // ── Ouvrir modal suspension ───────────────────────────────────
+  openSuspendModal(s: Supplier): void {
+    this.selectedForSuspend = s;
+    this.showSuspendModal   = true;
+  }
+
+  // ── Confirmer suspension ──────────────────────────────────────
+  confirmSuspend(): void {
+    if (!this.selectedForSuspend || this.processing) return;
     this.processing = true;
+    const s = this.selectedForSuspend;
     this.adminService.updateUserStatus((s as any).user?.id ?? s.id, 'SUSPENDED')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          s.status      = 'SUSPENDED' as any;
-          this.processing = false;
+          s.status             = 'SUSPENDED' as any;
+          this.showSuspendModal = false;
+          this.processing       = false;
           this.showSuccess(`${s.companyName} suspendu`);
+          this.selectedForSuspend = null;
         },
         error: (err: any) => {
           this.processing = false;
@@ -177,18 +193,18 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
     return {
       id          : s.id,
       companyName : s.companyName,
-      contactName : s.user?.name    ?? '',
-      phone       : s.user?.phone   ?? s.phone ?? '',
-      email       : s.user?.email   ?? s.email ?? '',
-      address     : s.address       ?? '',
-      city        : s.user?.city    ?? s.city ?? 'Ouagadougou',
-      description : s.description   ?? '',
+      contactName : s.user?.name  ?? '',
+      phone       : s.user?.phone ?? s.phone ?? '',
+      email       : s.user?.email ?? s.email ?? '',
+      address     : s.address     ?? '',
+      city        : s.user?.city  ?? s.city ?? 'Ouagadougou',
+      description : s.description ?? '',
       status      : s.status,
       verifiedAt  : s.validatedAt ? new Date(s.validatedAt) : undefined,
-      rating      : s.rating        ?? 0,
-      reviewCount : s.reviewCount   ?? 0,
+      rating      : s.rating       ?? 0,
+      reviewCount : s.reviewCount  ?? 0,
       totalGroups : s._count?.groups ?? 0,
-      successRate : s.successRate   ?? 0,
+      successRate : s.successRate  ?? 0,
       createdAt   : new Date(s.createdAt ?? Date.now()),
       user        : s.user,
     };

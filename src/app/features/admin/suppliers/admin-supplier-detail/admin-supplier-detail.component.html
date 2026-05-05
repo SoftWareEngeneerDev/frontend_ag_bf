@@ -1,0 +1,249 @@
+<div *ngIf="!loading && supplier; else notFound">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
+  <div class="flex-between mb-24">
+    <div class="flex gap-12" style="align-items:center">
+      <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left"></i> Retour
+      </button>
+      <div>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:2px">
+          Profil fournisseur
+        </h2>
+        <p class="text-muted font-mono" style="font-size:12px">{{ supplier.id }}</p>
+      </div>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn-gold btn-sm btn-round"
+              *ngIf="supplier.status === 'PENDING'"
+              [disabled]="processing"
+              (click)="approve()">
+        <i class="fa-solid fa-circle-check"></i> Approuver
+      </button>
+      <button class="btn-err btn-sm btn-round"
+              *ngIf="supplier.status === 'APPROVED'"
+              (click)="showSuspendModal = true">
+        <i class="fa-solid fa-ban"></i> Suspendre
+      </button>
+      <button class="btn-ok btn-sm btn-round"
+              *ngIf="supplier.status === 'SUSPENDED'"
+              [disabled]="processing"
+              (click)="reactivate()">
+        <i class="fa-solid fa-rotate-left"></i> Réactiver
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ CARTE IDENTITÉ ════════════════════════════════════════════ -->
+  <div class="glass mb-20" style="padding:24px">
+    <div class="flex gap-20" style="align-items:center;flex-wrap:wrap">
+      <div class="sup-icon-lg">
+        <i class="fa-solid fa-store"></i>
+      </div>
+      <div style="flex:1">
+        <div class="flex gap-10 mb-6" style="align-items:center;flex-wrap:wrap">
+          <span style="font-size:20px;font-weight:700">{{ supplier.companyName }}</span>
+          <span [class]="statusBadge">{{ statusLabel }}</span>
+        </div>
+        <div class="flex gap-20 text-muted" style="font-size:13px;flex-wrap:wrap">
+          <span><i class="fa-solid fa-user"></i> {{ supplier.contactName }}</span>
+          <span *ngIf="supplier.phone"><i class="fa-solid fa-phone"></i> {{ supplier.phone }}</span>
+          <span *ngIf="supplier.email"><i class="fa-solid fa-envelope"></i> {{ supplier.email }}</span>
+          <span><i class="fa-solid fa-location-dot"></i> {{ supplier.city }}</span>
+          <span><i class="fa-solid fa-calendar"></i> Inscrit le {{ supplier.createdAt }}</span>
+        </div>
+      </div>
+
+      <!-- Commission -->
+      <div style="text-align:center;min-width:90px">
+        <div style="font-size:26px;font-weight:700;color:var(--primary)">
+          {{ (supplier.commissionRate * 100).toFixed(0) }}%
+        </div>
+        <div class="text-muted" style="font-size:11px">Commission plateforme</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATS ══════════════════════════════════════════════════════ -->
+  <div class="ssd-stats-grid mb-20">
+    <div class="glass ssd-stat">
+      <div class="ssd-stat-val" style="color:var(--primary)">{{ supplier.totalGroups }}</div>
+      <div class="text-muted ssd-stat-label">Groupes créés</div>
+    </div>
+    <div class="glass ssd-stat">
+      <div class="ssd-stat-val" style="color:#10D98B">{{ supplier.totalProducts }}</div>
+      <div class="text-muted ssd-stat-label">Produits</div>
+    </div>
+    <div class="glass ssd-stat">
+      <div class="ssd-stat-val" style="color:var(--gold)">{{ supplier.successRate }}%</div>
+      <div class="text-muted ssd-stat-label">Taux de succès</div>
+    </div>
+    <div class="glass ssd-stat">
+      <div class="ssd-stat-val" style="color:#F5A623">{{ supplier.rating }}/5</div>
+      <div class="text-muted ssd-stat-label">Note moyenne</div>
+    </div>
+    <div class="glass ssd-stat">
+      <div class="ssd-stat-val" style="color:#7B2FBE">{{ supplier.reviewCount }}</div>
+      <div class="text-muted ssd-stat-label">Avis reçus</div>
+    </div>
+  </div>
+
+  <!-- ══ DÉTAILS ════════════════════════════════════════════════════ -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <!-- Informations entreprise -->
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-store"></i> Informations entreprise
+      </h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:40%">ID</td>
+            <td class="font-mono" style="font-size:11px">{{ supplier.id }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Entreprise</td>
+            <td style="font-weight:600;font-size:13px">{{ supplier.companyName }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Contact</td>
+            <td style="font-size:13px">{{ supplier.contactName }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Téléphone</td>
+            <td class="font-mono" style="font-size:12px">{{ supplier.phone || '—' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Email</td>
+            <td style="font-size:12px">{{ supplier.email || '—' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Ville</td>
+            <td style="font-size:13px">{{ supplier.city }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Statut</td>
+            <td><span [class]="statusBadge">{{ statusLabel }}</span></td>
+          </tr>
+          <tr *ngIf="supplier.validatedAt">
+            <td class="text-muted" style="font-size:12px">Validé le</td>
+            <td style="font-size:12px">{{ supplier.validatedAt }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activité -->
+    <div class="glass" style="padding:20px">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+        <i class="fa-solid fa-chart-bar"></i> Activité & performance
+      </h3>
+      <table class="tbl">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="font-size:12px;width:50%">Groupes créés</td>
+            <td class="font-mono" style="font-size:13px;color:var(--primary)">{{ supplier.totalGroups }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Produits</td>
+            <td class="font-mono" style="font-size:13px;color:#10D98B">{{ supplier.totalProducts }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Taux de succès</td>
+            <td class="font-mono" style="font-size:13px;color:var(--gold)">{{ supplier.successRate }}%</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Note moyenne</td>
+            <td>
+              <div class="flex gap-6" style="align-items:center">
+                <span class="font-mono" style="font-size:13px;color:#F5A623">{{ supplier.rating }}/5</span>
+                <span class="text-muted" style="font-size:11px">({{ supplier.reviewCount }} avis)</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Commission</td>
+            <td class="font-mono" style="font-size:13px">{{ (supplier.commissionRate * 100).toFixed(0) }}%</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="font-size:12px">Inscrit le</td>
+            <td style="font-size:12px">{{ supplier.createdAt }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ DOCUMENTS ══════════════════════════════════════════════════ -->
+  <div class="glass" style="padding:20px" *ngIf="supplier.docsUrls?.length > 0">
+    <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">
+      <i class="fa-solid fa-file-lines"></i> Documents fournis
+    </h3>
+    <div class="flex gap-10" style="flex-wrap:wrap">
+      <a *ngFor="let doc of supplier.docsUrls; let i = index"
+         [href]="doc" target="_blank"
+         class="btn-ghost btn-sm btn-round">
+        <i class="fa-solid fa-file-arrow-down"></i> Document {{ i + 1 }}
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ MODAL — CONFIRMER SUSPENSION ══════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showSuspendModal" (click)="showSuspendModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-ban" style="color:#FF4D6A"></i> Suspendre le fournisseur
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showSuspendModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #FF4D6A">
+          <div style="font-weight:600;font-size:14px">{{ supplier.companyName }}</div>
+          <div class="text-muted" style="font-size:12px">{{ supplier.contactName }} · {{ supplier.city }}</div>
+        </div>
+        <div class="alert-red alert" style="font-size:13px;margin-bottom:16px">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Le fournisseur sera notifié et ne pourra plus accéder à la plateforme.
+        </div>
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showSuspendModal = false" [disabled]="processing">
+            <i class="fa-solid fa-xmark"></i> Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="suspend()" [disabled]="processing">
+            <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-ban"></i>
+            {{ processing ? 'Suspension...' : 'Confirmer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ NOT FOUND ══════════════════════════════════════════════════ -->
+<ng-template #notFound>
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+  <div *ngIf="!loading" style="text-align:center;padding:60px 0">
+    <i class="fa-solid fa-store" style="font-size:48px;color:var(--primary);margin-bottom:16px;display:block"></i>
+    <h3 style="font-weight:600;margin-bottom:8px">Fournisseur introuvable</h3>
+    <p class="text-muted" style="margin-bottom:24px">Cet identifiant ne correspond à aucun fournisseur.</p>
+    <button class="btn-ghost btn-sm btn-round" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+    </button>
+  </div>
+</ng-template>

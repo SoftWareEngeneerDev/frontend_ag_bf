@@ -125,23 +125,28 @@
           </button>
         </ng-container>
 
-        <!-- Approuvé → Voir / Suspendre -->
+        <!-- Approuvé → Voir profil / Suspendre -->
         <ng-container *ngIf="s.status === 'APPROVED'">
           <button class="btn-ghost btn-sm btn-round"
-                  style="flex:1;justify-content:center">
+                  style="flex:1;justify-content:center"
+                  [routerLink]="['/admin/suppliers', s.id]">
             <i class="fa-solid fa-eye"></i> Voir profil
           </button>
           <button class="btn-err btn-sm btn-round"
                   [disabled]="processing"
-                  (click)="suspend(s)">
+                  (click)="openSuspendModal(s)">
             <i class="fa-solid fa-ban"></i> Suspendre
           </button>
         </ng-container>
 
-        <!-- Suspendu → Réactiver -->
+        <!-- Suspendu → Voir profil / Réactiver -->
         <ng-container *ngIf="s.status === 'SUSPENDED'">
           <button class="btn-ghost btn-sm btn-round"
                   style="flex:1;justify-content:center"
+                  [routerLink]="['/admin/suppliers', s.id]">
+            <i class="fa-solid fa-eye"></i> Voir profil
+          </button>
+          <button class="btn-ok btn-sm btn-round"
                   [disabled]="processing"
                   (click)="reactivate(s)">
             <i class="fa-solid fa-rotate-left"></i> Réactiver
@@ -167,22 +172,17 @@
       <div class="modal-body" *ngIf="selectedSupplier">
         <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #F4A902">
           <div style="font-weight:600;font-size:14px;margin-bottom:4px">
-            {{ selectedSupplier.companyName }}
+            {{ selectedSupplier!.companyName }}
           </div>
           <div class="text-muted" style="font-size:12px">
-            {{ selectedSupplier.contactName }} · {{ selectedSupplier.city }}
+            {{ selectedSupplier!.contactName }} · {{ selectedSupplier!.city }}
           </div>
         </div>
 
         <div class="inp-group">
-          <label>
-            Motif du rejet <span style="color:var(--err)">*</span>
-          </label>
-          <textarea
-            class="inp"
-            rows="4"
-            [(ngModel)]="rejectReason"
-            placeholder="Ex: Dossier incomplet — RCCM non fourni. Merci de soumettre à nouveau avec les documents requis."
+          <label>Motif du rejet <span style="color:var(--err)">*</span></label>
+          <textarea class="inp" rows="4" [(ngModel)]="rejectReason"
+            placeholder="Ex: Dossier incomplet — RCCM non fourni."
             style="resize:vertical">
           </textarea>
         </div>
@@ -194,8 +194,7 @@
 
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center"
-                  (click)="showRejectModal = false"
-                  [disabled]="processing">
+                  (click)="showRejectModal = false" [disabled]="processing">
             Annuler
           </button>
           <button class="btn-err btn-round" style="flex:1;justify-content:center"
@@ -204,6 +203,42 @@
             <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
             <i *ngIf="!processing" class="fa-solid fa-xmark"></i>
             {{ processing ? 'Rejet en cours...' : 'Confirmer le rejet' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL — CONFIRMER SUSPENSION ══════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showSuspendModal" (click)="showSuspendModal = false">
+    <div class="modal-box glass" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <h3 class="font-display" style="font-size:17px;font-weight:700">
+          <i class="fa-solid fa-ban" style="color:#FF4D6A"></i> Suspendre le fournisseur
+        </h3>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showSuspendModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedForSuspend">
+        <div class="glass" style="padding:14px;margin-bottom:4px;border-left:4px solid #FF4D6A">
+          <div style="font-weight:600;font-size:14px">{{ selectedForSuspend!.companyName }}</div>
+          <div class="text-muted" style="font-size:12px">{{ selectedForSuspend!.contactName }} · {{ selectedForSuspend!.city }}</div>
+        </div>
+        <div class="alert-red alert" style="font-size:13px">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Le fournisseur sera notifié par SMS et ne pourra plus accéder à la plateforme.
+        </div>
+        <div class="flex gap-10">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showSuspendModal = false" [disabled]="processing">
+            <i class="fa-solid fa-xmark"></i> Annuler
+          </button>
+          <button class="btn-err btn-round" style="flex:1;justify-content:center"
+                  (click)="confirmSuspend()" [disabled]="processing">
+            <i *ngIf="processing"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!processing" class="fa-solid fa-ban"></i>
+            {{ processing ? 'Suspension...' : 'Confirmer la suspension' }}
           </button>
         </div>
       </div>
