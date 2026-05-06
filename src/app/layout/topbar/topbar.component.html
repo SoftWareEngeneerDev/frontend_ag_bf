@@ -5,15 +5,70 @@
     </button>
     <h1 class="topbar-title font-display">{{ title }}</h1>
   </div>
+
   <div class="tb-actions">
     <div *ngIf="showSearch" class="tb-search-wrap">
       <i class="fa-solid fa-magnifying-glass tb-s-icon"></i>
       <input class="inp tb-search" placeholder="Rechercher...">
     </div>
-    <a routerLink="/member/notifications" class="tb-notif">
+
+    <a [routerLink]="notifRoute" class="tb-notif">
       <i class="fa-solid fa-bell"></i>
       <span class="nb-dot" *ngIf="notifs.unreadCount() > 0">{{ notifs.unreadCount() }}</span>
     </a>
-    <app-avatar [name]="auth.currentUser()?.fullName || 'U'" [size]="34" [bg]="userBg"></app-avatar>
+
+    <!-- ── Avatar + Dropdown ──────────────────────────────── -->
+    <div class="tb-user-wrap">
+
+      <!-- Bouton avatar -->
+      <div class="tb-avatar-btn" (click)="toggleDropdown()">
+        <img *ngIf="auth.currentUser()?.avatarUrl"
+             [src]="auth.currentUser()?.avatarUrl"
+             class="tb-avatar-img" alt="Avatar">
+        <app-avatar *ngIf="!auth.currentUser()?.avatarUrl"
+                    [name]="auth.currentUser()?.fullName || 'U'"
+                    [size]="34" [bg]="userBg">
+        </app-avatar>
+        <i class="fa-solid fa-chevron-down tb-chevron" [class.open]="showDropdown"></i>
+      </div>
+
+      <!-- Dropdown -->
+      <div class="tb-dropdown" *ngIf="showDropdown">
+
+        <!-- Header -->
+        <div class="tb-dd-header">
+          <div class="tb-dd-av">
+            <img *ngIf="auth.currentUser()?.avatarUrl"
+                 [src]="auth.currentUser()?.avatarUrl"
+                 class="tb-dd-av-img" alt="Avatar">
+            <app-avatar *ngIf="!auth.currentUser()?.avatarUrl"
+                        [name]="auth.currentUser()?.fullName || 'U'"
+                        [size]="38" [bg]="userBg">
+            </app-avatar>
+          </div>
+          <div>
+            <div class="tb-dd-name">{{ auth.currentUser()?.fullName }}</div>
+            <div class="tb-dd-role">{{ roleLabel }}</div>
+          </div>
+        </div>
+
+        <div class="tb-dd-sep"></div>
+
+        <!-- Mon profil — utilise (click) avec navigate -->
+        <button class="tb-dd-item" (click)="goToProfile()">
+          <i class="fa-solid fa-user"></i>
+          <span>Mon profil</span>
+        </button>
+
+        <div class="tb-dd-sep"></div>
+
+        <!-- Déconnexion -->
+        <button class="tb-dd-item tb-dd-logout" (click)="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Déconnexion</span>
+        </button>
+
+      </div>
+    </div>
   </div>
 </div>

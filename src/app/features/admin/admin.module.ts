@@ -17,6 +17,7 @@ import { AdminPaymentsComponent }       from './payments/admin-payments.componen
 import { AdminDisputesComponent }       from './disputes/admin-disputes.component';
 import { AdminAnalyticsComponent }      from './analytics/admin-analytics.component';
 import { AdminLogsComponent }           from './logs/admin-logs.component';
+import { AdminProfileComponent } from './profile/admin-profile.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AdminLogsComponent }           from './logs/admin-logs.component';
     AdminDisputesComponent,
     AdminAnalyticsComponent,
     AdminLogsComponent,
+    AdminProfileComponent,
   ],
   imports: [
     SharedModule,
@@ -58,6 +60,7 @@ import { AdminLogsComponent }           from './logs/admin-logs.component';
           { path: 'disputes',      component: AdminDisputesComponent },
           { path: 'analytics',     component: AdminAnalyticsComponent },
           { path: 'logs',          component: AdminLogsComponent },
+          { path: 'profile', component: AdminProfileComponent },
         ]
       }
     ]),
