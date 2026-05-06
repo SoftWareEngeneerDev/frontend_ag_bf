@@ -60,11 +60,14 @@ export class AdminGroupDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadGroup(id: string): void {
-    this.groupService.getById(id)
+    this.adminService.getGroupById(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next : (g) => { this.group = g; this.loading = false; },
-        error: ()  => { this.group = null; this.loading = false; }
+        next: (g: any) => {
+          this.group   = this.groupService.mapGroup(g);
+          this.loading = false;
+        },
+        error: () => { this.group = null; this.loading = false; }
       });
   }
 

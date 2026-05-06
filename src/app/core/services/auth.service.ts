@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Observable, tap, map, throwError, catchError } from 'rxjs';
 import { User, LoginDto, RegisterDto, AuthResponse, OtpDto } from '../models';
 import { MockDataService } from './mock-data.service';
-import Swal from 'sweetalert2';
 
 const API          = 'http://localhost:3000/api/v1';
 const KEY_USER     = 'agbf_user';
@@ -200,37 +199,11 @@ export class AuthService {
   // ══════════════════════════════════════════════════════════════
   // LOGOUT
   // ══════════════════════════════════════════════════════════════
-  // logout(): void {
-  //   const refreshToken = localStorage.getItem(KEY_REFRESH);
-  //   this.http.post(`${API}/auth/logout`, { refreshToken }).subscribe({ error: () => {} });
-  //   this.clearSession();
-  //   this.router.navigate(['/']);
-  // }
-
   logout(): void {
-
-    Swal.fire({
-      title: 'Déconnexion',
-      text: 'Voulez-vous vraiment vous déconnecter ?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, me déconnecter',
-      cancelButtonText: 'Non, Annuler'
-    }).then((result: import('sweetalert2').SweetAlertResult) => {
-
-      if (result.isConfirmed) {
-
-        const refreshToken = localStorage.getItem(KEY_REFRESH);
-
-        this.http.post(`${API}/auth/logout`, { refreshToken }).subscribe({
-          error: () => {}
-        });
-
-        this.clearSession();
-        this.router.navigate(['/']);
-      }
-
-    });
+    const refreshToken = localStorage.getItem(KEY_REFRESH);
+    this.http.post(`${API}/auth/logout`, { refreshToken }).subscribe({ error: () => {} });
+    this.clearSession();
+    this.router.navigate(['/']);
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -293,6 +266,15 @@ export class AuthService {
   }
 
   // ── Utilitaires ────────────────────────────────────────────────
+  // ── Mettre à jour les infos du user courant ───────────────────
+  updateCurrentUser(partial: Partial<any>): void {
+    const current = this._user();
+    if (!current) return;
+    const updated = { ...current, ...partial };
+    this._user.set(updated);
+    localStorage.setItem(KEY_USER, JSON.stringify(updated));
+  }
+
   getToken(): string | null { return localStorage.getItem(KEY_TOKEN); }
   isRole(role: string): boolean { return this._user()?.role === role; }
 

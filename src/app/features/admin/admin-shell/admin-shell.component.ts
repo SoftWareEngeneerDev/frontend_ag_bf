@@ -15,8 +15,6 @@ import { AdminService } from '../../../core/services/admin.service';
       </app-sidebar>
 
       <div class="shell-main">
-
-        <!-- Alerte litiges ouverts -->
         <div class="admin-alert" *ngIf="openDisputes > 0">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <span>
@@ -72,17 +70,18 @@ export class AdminShellComponent implements OnInit, OnDestroy {
   openDisputes = 0;
 
   navItems: NavItem[] = [
-    { route: '/admin',           icon: 'fa-solid fa-gauge-high',   label: "Vue d'ensemble", exact: true },
-    { route: '/admin/users',     icon: 'fa-solid fa-users',        label: 'Utilisateurs',   badge: 0 },
-    { route: '/admin/suppliers', icon: 'fa-solid fa-store',        label: 'Fournisseurs',   badge: 0, badgeColor: '#F4A902' },
-    { route: '/admin/products',  icon: 'fa-solid fa-box',          label: 'Produits',       badge: 0, badgeColor: '#F4A902' },
-    { route: '/admin/groups',    icon: 'fa-solid fa-layer-group',  label: 'Groupes' },
+    { route: '/admin',              icon: 'fa-solid fa-gauge-high',   label: "Vue d'ensemble", exact: true },
+    { route: '/admin/users',        icon: 'fa-solid fa-users',        label: 'Utilisateurs',   badge: 0 },
+    { route: '/admin/suppliers',    icon: 'fa-solid fa-store',        label: 'Fournisseurs',   badge: 0, badgeColor: '#F4A902' },
+    { route: '/admin/products',     icon: 'fa-solid fa-box',          label: 'Produits',       badge: 0, badgeColor: '#F4A902' },
+    { route: '/admin/categories',   icon: 'fa-solid fa-tags',         label: 'Catégories' },
+    { route: '/admin/groups',       icon: 'fa-solid fa-layer-group',  label: 'Groupes' },
     { separator: true, route: '', icon: '', label: '' },
-    { route: '/admin/payments',  icon: 'fa-solid fa-credit-card',  label: 'Paiements' },
-    { route: '/admin/disputes',  icon: 'fa-solid fa-gavel',        label: 'Litiges',        badge: 0, badgeColor: '#E63946' },
+    { route: '/admin/payments',     icon: 'fa-solid fa-credit-card',  label: 'Paiements' },
+    { route: '/admin/disputes',     icon: 'fa-solid fa-gavel',        label: 'Litiges',        badge: 0, badgeColor: '#E63946' },
     { separator: true, route: '', icon: '', label: '' },
-    { route: '/admin/analytics', icon: 'fa-solid fa-chart-line',   label: 'Analytics' },
-    { route: '/admin/logs',      icon: 'fa-solid fa-scroll',       label: 'Logs système' },
+    { route: '/admin/analytics',    icon: 'fa-solid fa-chart-line',   label: 'Analytics' },
+    { route: '/admin/logs',         icon: 'fa-solid fa-scroll',       label: 'Logs système' },
   ];
 
   private destroy$ = new Subject<void>();
@@ -95,11 +94,10 @@ export class AdminShellComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           if (!data) return;
-          // Badge utilisateurs = TOTAL de tous les utilisateurs (membres + fournisseurs + admins)
-          this.navItems[1].badge = data.totalUsers ?? 0;
+          this.navItems[1].badge = data.totalUsers      ?? 0;
           this.navItems[2].badge = data.pendingSuppliers ?? 0;
           this.navItems[3].badge = data.pendingProducts  ?? 0;
-          this.navItems[7].badge = data.openDisputes     ?? 0;
+          this.navItems[8].badge = data.openDisputes     ?? 0;
           this.openDisputes      = data.openDisputes     ?? 0;
         },
         error: () => {}

@@ -60,8 +60,19 @@
     <div class="glass sp-card" *ngFor="let p of filtered; trackBy: trackById">
 
       <div class="sp-img">
-        <img [src]="p.images[0] || 'https://picsum.photos/seed/' + p.id + '/200/200'"
+        <img [src]="getActiveImage(p)"
              [alt]="p.name" loading="lazy" class="sp-prod-img">
+
+        <!-- Miniatures galerie si plusieurs images -->
+        <div class="sp-thumbs" *ngIf="p.images && p.images.length > 1">
+          <div class="sp-thumb"
+               *ngFor="let img of p.images; let i = index"
+               [class.active]="activeImageIndex[p.id] === i || (!activeImageIndex[p.id] && i === 0)"
+               (click)="setActiveImage(p, i); $event.stopPropagation()">
+            <img [src]="img" [alt]="'Photo ' + (i+1)">
+          </div>
+        </div>
+
         <span [class]="statusClass(p.status) + ' sp-status'">
           {{ statusLabel(p.status) }}
         </span>
@@ -115,7 +126,7 @@
           </button>
           <button class="btn-cyan btn-sm" style="flex:1;justify-content:center"
                   (click)="openCreateGroup(p)"
-                  [disabled]="p.status !== 'ACTIVE' || p.stock === 0">
+                  [disabled]="!['ACTIVE','APPROVED'].includes(p.status) || p.stock === 0">
             <i class="fa-solid fa-users-plus"></i> Créer un groupe
           </button>
         </div>
@@ -136,6 +147,59 @@
       </div>
 
       <div class="modal-body">
+
+        <!-- ── Zone upload images ──────────────────────────────── -->
+        <div class="inp-group">
+          <label>
+            Photos du produit
+            <span class="text-muted" style="font-size:11px;font-weight:400">
+              (1 à 4 photos — JPG, PNG, WEBP — max 5MB)
+            </span>
+          </label>
+
+          <!-- Prévisualisations -->
+          <div class="sp-img-grid" *ngIf="imagePreviews.length > 0">
+            <div class="sp-img-preview" *ngFor="let img of imagePreviews; let i = index">
+              <img [src]="img" alt="Preview">
+              <button class="sp-img-remove" type="button" (click)="removeImage(i)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="sp-img-uploading" *ngIf="uploading && i >= addForm.imagesUrls.length">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+              </div>
+            </div>
+
+            <!-- Ajouter plus si < 4 -->
+            <label class="sp-img-add" *ngIf="imagePreviews.length < 4 && !uploading">
+              <input type="file" accept="image/jpeg,image/png,image/webp"
+                     multiple style="display:none"
+                     (change)="onImagesSelected($event)">
+              <i class="fa-solid fa-plus"></i>
+              <span style="font-size:11px">Ajouter</span>
+            </label>
+          </div>
+
+          <!-- Zone drop initiale -->
+          <label class="sp-img-drop" *ngIf="imagePreviews.length === 0">
+            <input type="file" accept="image/jpeg,image/png,image/webp"
+                   multiple style="display:none"
+                   (change)="onImagesSelected($event)">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px;color:var(--primary);margin-bottom:8px"></i>
+            <span style="font-weight:600;font-size:13px">Cliquez pour ajouter des photos</span>
+            <span class="text-muted" style="font-size:11px">JPG, PNG, WEBP — max 5MB chacune</span>
+          </label>
+
+          <!-- Erreur -->
+          <div class="alert-red alert" style="font-size:12px;margin-top:8px" *ngIf="imageError">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ imageError }}
+          </div>
+
+          <!-- Upload en cours -->
+          <div class="alert-cyan alert" style="font-size:12px;margin-top:8px" *ngIf="uploading">
+            <i class="fa-solid fa-spinner fa-spin"></i> Upload en cours...
+          </div>
+        </div>
+
         <div class="inp-group">
           <label>Nom du produit <span style="color:var(--err)">*</span></label>
           <input class="inp" [(ngModel)]="addForm.name" placeholder="Ex: Smartphone Samsung Galaxy A55">
@@ -216,12 +280,10 @@
           <label>Nom du produit</label>
           <input class="inp" [(ngModel)]="editForm.name">
         </div>
-
         <div class="inp-group">
           <label>Description</label>
           <textarea class="inp" rows="3" [(ngModel)]="editForm.description" style="resize:vertical"></textarea>
         </div>
-
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="inp-group">
             <label>Prix solo (XOF)</label>
@@ -232,17 +294,14 @@
             <input class="inp" type="number" [(ngModel)]="editForm.minGroupPrice">
           </div>
         </div>
-
         <div class="inp-group">
           <label>Stock disponible</label>
           <input class="inp" type="number" [(ngModel)]="editForm.stock">
         </div>
-
         <div class="alert-cyan alert" style="font-size:12px">
           <i class="fa-solid fa-circle-info"></i>
           Les modifications seront soumises à validation avant publication.
         </div>
-
         <div class="flex gap-10">
           <button class="btn-ghost" style="flex:1;justify-content:center"
                   (click)="showEditModal = false">Annuler</button>
@@ -295,7 +354,6 @@
           </div>
         </div>
 
-        <!-- Paliers de réduction -->
         <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">
           <i class="fa-solid fa-tags"></i> Paliers de réduction
         </label>
@@ -322,7 +380,6 @@
           </div>
         </div>
 
-        <!-- Aperçu -->
         <div class="glass" style="padding:14px;display:flex;justify-content:space-between;align-items:center;margin-top:12px">
           <div>
             <div class="text-muted" style="font-size:11px;margin-bottom:3px">MEILLEUR PRIX GROUPE</div>

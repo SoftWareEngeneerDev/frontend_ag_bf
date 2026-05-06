@@ -12,6 +12,13 @@ const STATUS_MAP: Record<string, string> = {
   'Inactifs'  : 'INACTIVE',
 };
 
+// Statuts backend → statuts frontend
+const normalizeStatus = (s: string): string => {
+  if (s === 'PENDING_APPROVAL') return 'PENDING';
+  if (s === 'APPROVED')         return 'ACTIVE';
+  return s;
+};
+
 @Component({
   selector   : 'app-admin-products',
   templateUrl: './admin-products.component.html',
@@ -52,18 +59,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   // ── Charger tous les produits en parallèle ────────────────────
   private loadProducts(): void {
     this.loading = true;
-    forkJoin({
-      pending : this.adminService.getPendingProducts(100).pipe(catchError(() => of([]))),
-      all     : this.productService.getAll({ page: 1, limit: 100 }).pipe(catchError(() => of([]))),
-    })
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(({ pending, all }) => {
-      const pendingMapped = pending.map((p: any) => this.mapProduct(p));
-      const pendingIds    = new Set(pendingMapped.map((p: Product) => p.id));
-      const allFiltered   = (all as Product[]).filter(p => !pendingIds.has(p.id));
-      this.products = [...pendingMapped, ...allFiltered];
-      this.loading  = false;
-    });
+    this.adminService.getAllProducts({ limit: 200 })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: any[]) => {
+          this.products = data.map((p: any) => this.mapProduct(p));
+          this.loading  = false;
+        },
+        error: () => { this.loading = false; }
+      });
   }
 
   // ── Filtre ────────────────────────────────────────────────────
@@ -207,7 +211,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       rating          : p.rating        ?? 0,
       reviewCount     : p._count?.reviews ?? 0,
       activeGroupCount: p._count?.groups  ?? 0,
-      status          : ['PENDING_APPROVAL'].includes(p.status) ? 'PENDING' as any : p.status,
+      status          : normalizeStatus(p.status) as any,
       createdAt       : new Date(p.createdAt ?? Date.now()),
       category: {
         id          : p.category?.id   ?? '',

@@ -23,7 +23,7 @@ const TAB_STATUS_MAP: Record<string, string> = {
 export class SupplierGroupsComponent implements OnInit, OnDestroy {
   groups     : Group[]   = [];
   filtered   : Group[]   = [];
-  myProducts : Product[] = [];
+  myProducts : any[]     = [];
   loading         = true;
   creating        = false;
   activeTab       = 'Tous';
@@ -35,7 +35,6 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  // ── Formulaire création groupe ────────────────────────────
   newGroup = {
     productId       : '',
     minParticipants : 10,
@@ -66,38 +65,40 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ── Charger les groupes ───────────────────────────────────
   private loadGroups(): void {
     this.loading = true;
     this.http.get<any>(`${API}/supplier/groups`, { params: { limit: '100' } })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          const data    = res.data ?? [];
-          this.groups   = data.map((g: any) => this.groupService.mapGroup(g));
+          const data  = res.data ?? [];
+          this.groups = data.map((g: any) => this.groupService.mapGroup(g));
           this.applyFilter();
-          this.loading  = false;
+          this.loading = false;
         },
         error: () => { this.loading = false; }
       });
   }
 
-  // ── Charger mes produits approuvés ────────────────────────
+  // ✅ CORRIGÉ : charge les produits avec statut APPROVED (pas ACTIVE)
   private loadMyProducts(): void {
-    this.http.get<any>(`${API}/supplier/products`, { params: { status: 'ACTIVE', limit: '50' } })
+    this.http.get<any>(`${API}/supplier/products`, { params: { limit: '100' } })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.myProducts = res.data ?? [];
+          const all = res.data ?? [];
+          // Filtrer côté client pour accepter APPROVED et ACTIVE
+          this.myProducts = all.filter((p: any) =>
+            ['APPROVED', 'ACTIVE'].includes(p.status) && p.stock > 0
+          );
           if (this.myProducts.length > 0) {
-            this.newGroup.productId = (this.myProducts[0] as any).id ?? '';
+            this.newGroup.productId = this.myProducts[0].id ?? '';
           }
         },
         error: () => {}
       });
   }
 
-  // ── Créer un groupe ───────────────────────────────────────
   createGroup(): void {
     if (!this.newGroup.productId || this.creating) return;
     this.creating = true;
@@ -130,7 +131,6 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Filtre ────────────────────────────────────────────────
   private applyFilter(): void {
     if (this.activeTab === 'Tous') {
       this.filtered = this.groups;
@@ -142,18 +142,31 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
 
   setTab(t: string): void { this.activeTab = t; this.applyFilter(); }
 
-  // ── Compteurs par onglet ──────────────────────────────────
   tabCount(t: string): number {
     if (t === 'Tous') return this.groups.length;
     const status = TAB_STATUS_MAP[t];
     return this.groups.filter(g => g.status === status).length;
   }
 
-  // ── Helpers ───────────────────────────────────────────────
+  // Nom du produit sélectionné pour affichage
+  get selectedProductName(): string {
+    const p = this.myProducts.find(p => p.id === this.newGroup.productId);
+    return p?.name ?? '';
+  }
+
+  get selectedProductPrice(): number {
+    const p = this.myProducts.find(p => p.id === this.newGroup.productId);
+    return p?.soloPrice ?? 0;
+  }
+
+  get groupPricePreview(): number {
+    const best = Math.max(...this.newGroup.pricingTiers.map(t => t.discountPercent));
+    return Math.round(this.selectedProductPrice * (1 - best / 100));
+  }
+
   pct(g: Group)    : number  { return this.fmt.progressPercent(g.currentCount, g.minParticipants); }
   isHot(g: Group)  : boolean { return g.status === 'THRESHOLD_REACHED'; }
   trackById(_: number, g: Group): string { return g.id; }
-
   goDetail(g: Group): void { this.router.navigate(['/supplier/orders']); }
 
   private showSuccess(msg: string): void {

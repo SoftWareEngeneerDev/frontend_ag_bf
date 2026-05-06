@@ -31,29 +31,15 @@ const API = 'http://localhost:3000/api/v1';
     </div>
   `,
   styles: [`
-    .shell-wrap {
-      display: flex;
-      min-height: 100vh;
-      background: var(--bg);
+    .shell-wrap  { display:flex; min-height:100vh; background:var(--bg); }
+    .shell-main  { margin-left:var(--sidebar-w); flex:1; min-height:100vh; overflow-x:hidden; display:flex; flex-direction:column; }
+    .shell-content { padding:28px; flex:1; }
+    @media (max-width:768px) {
+      .shell-main    { margin-left:0; }
+      .shell-content { padding:16px; }
     }
-    .shell-main {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      min-height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .shell-content {
-      padding: 28px;
-      flex: 1;
-    }
-    @media (max-width: 768px) {
-      .shell-main    { margin-left: 0; }
-      .shell-content { padding: 16px; }
-    }
-    @media (max-width: 480px) {
-      .shell-content { padding: 12px; }
+    @media (max-width:480px) {
+      .shell-content { padding:12px; }
     }
   `]
 })
@@ -63,6 +49,7 @@ export class MemberShellComponent implements OnInit {
 
   navItems: NavItem[] = [
     { route: '/member',               icon: 'fa-solid fa-house',       label: 'Tableau de bord', exact: true },
+    { route: '/member/catalogue',     icon: 'fa-solid fa-store',       label: 'Catalogue',       badge: 0, badgeColor: '#10D98B' },
     { route: '/member/groups',        icon: 'fa-solid fa-layer-group', label: 'Mes Groupes',     badge: 0 },
     { route: '/member/payment',       icon: 'fa-solid fa-credit-card', label: 'Paiement' },
     { route: '/member/orders',        icon: 'fa-solid fa-box',         label: 'Mes Commandes',   badge: 0 },
@@ -72,40 +59,48 @@ export class MemberShellComponent implements OnInit {
 
   constructor(
     public  notifs: NotificationService,
-    private http:   HttpClient,
-    private auth:   AuthService,
+    private http  : HttpClient,
+    private auth  : AuthService,
   ) {
-    // ── Sync badge notifications en temps réel via signal ──────
     effect(() => {
-      this.navItems[4].badge = this.notifs.unreadCount();
+      this.navItems[5].badge = this.notifs.unreadCount();
     });
   }
 
-  ngOnInit(): void {
-    this.loadBadges();
-  }
+  ngOnInit(): void { this.loadBadges(); }
 
   private loadBadges(): void {
-    // ── Badge groupes actifs ───────────────────────────────────
+    // Badge catalogue — groupes disponibles
+    this.http.get<any>(`${API}/groups`, { params: { limit: '100' } }).subscribe({
+      next: (res) => {
+        const open = (res.data ?? []).filter((g: any) =>
+          ['OPEN', 'THRESHOLD_REACHED'].includes(g.status)
+        ).length;
+        this.navItems[1].badge = open || 0;
+      },
+      error: () => {}
+    });
+
+    // Badge mes groupes actifs
     this.http.get<any>(`${API}/users/me/groups`).subscribe({
       next: (res) => {
         const active = res.data?.active ?? [];
-        this.navItems[1].badge = active.length || 0;
+        this.navItems[2].badge = active.length || 0;
       },
-      error: () => { this.navItems[1].badge = 0; }
+      error: () => { this.navItems[2].badge = 0; }
     });
 
-    // ── Badge commandes en cours ───────────────────────────────
+    // Badge commandes en cours
     this.http.get<any>(`${API}/orders/me`).subscribe({
       next: (res) => {
         const orders  = res.data ?? [];
         const pending = orders.filter((o: any) =>
           ['CREATED', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(o.status)
         ).length;
-        this.navItems[3].badge      = pending;
-        this.navItems[3].badgeColor = pending > 0 ? '#00D4FF' : undefined;
+        this.navItems[4].badge      = pending;
+        this.navItems[4].badgeColor = pending > 0 ? '#00D4FF' : undefined;
       },
-      error: () => { this.navItems[3].badge = 0; }
+      error: () => { this.navItems[4].badge = 0; }
     });
   }
 }

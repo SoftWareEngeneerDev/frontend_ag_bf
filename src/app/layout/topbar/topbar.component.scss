@@ -1,35 +1,156 @@
 .topbar {
-  height: var(--topbar-h); background: var(--bg-white);
-  border-bottom: 1px solid var(--border); box-shadow: var(--shadow-xs);
-  padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 50;
+  height         : var(--topbar-h);
+  background     : var(--bg-white);
+  border-bottom  : 1px solid var(--border);
+  box-shadow     : var(--shadow-xs);
+  padding        : 0 28px;
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  position       : sticky;
+  top            : 0;
+  z-index        : 100;
 }
-.tb-left        { display: flex; align-items: center; gap: 12px; }
-.topbar-title   { font-size: 18px; font-weight: 700; color: var(--txt); }
-.tb-actions     { display: flex; align-items: center; gap: 14px; }
-.tb-search-wrap { position: relative; }
-.tb-s-icon      { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; }
-.tb-search      { width: 220px; padding-left: 36px; padding-top: 8px; padding-bottom: 8px; }
-.tb-notif       { position: relative; cursor: pointer; font-size: 16px; color: var(--txt2); text-decoration: none; padding: 8px; border-radius: var(--r); transition: background var(--t); &:hover { background: var(--bg2); color: var(--txt); } }
-.nb-dot         { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; background: var(--red); color: #fff; border-radius: var(--r-full); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
 
-// Hamburger — visible uniquement sur mobile
+.tb-left         { display: flex; align-items: center; gap: 12px; }
+.topbar-title    { font-size: 18px; font-weight: 700; color: var(--txt); }
+.tb-actions      { display: flex; align-items: center; gap: 14px; }
+.tb-search-wrap  { position: relative; }
+.tb-s-icon       { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+.tb-search       { width: 220px; padding-left: 36px; padding-top: 8px; padding-bottom: 8px; }
+
+.tb-notif {
+  position: relative; cursor: pointer; font-size: 16px;
+  color: var(--txt2); text-decoration: none; padding: 8px;
+  border-radius: var(--r); transition: background var(--t);
+  &:hover { background: var(--bg2); color: var(--txt); }
+}
+.nb-dot {
+  position: absolute; top: 2px; right: 2px;
+  min-width: 16px; height: 16px;
+  background: var(--red); color: #fff;
+  border-radius: var(--r-full); font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; padding: 0 3px;
+}
+
+// ── Wrapper avatar ────────────────────────────────────────────
+.tb-user-wrap { position: relative; }
+
+.tb-avatar-btn {
+  display    : flex;
+  align-items: center;
+  gap        : 6px;
+  padding    : 4px 8px 4px 4px;
+  border-radius: 99px;
+  cursor     : pointer;
+  transition : background .15s;
+  &:hover    { background: var(--bg2); }
+}
+
+.tb-avatar-img {
+  width: 34px; height: 34px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.tb-chevron {
+  font-size: 10px; color: var(--muted);
+  transition: transform .2s;
+  &.open { transform: rotate(180deg); }
+}
+
+// ── Dropdown ──────────────────────────────────────────────────
+.tb-dropdown {
+  position     : absolute;
+  top          : calc(100% + 10px);
+  right        : 0;
+  min-width    : 230px;
+  background   : #fff;
+  border       : 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow   : 0 10px 40px rgba(0,0,0,.15);
+  z-index      : 9999;
+  animation    : ddIn .15s ease;
+}
+
+@keyframes ddIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Header dropdown ───────────────────────────────────────────
+.tb-dd-header {
+  display    : flex;
+  align-items: center;
+  gap        : 10px;
+  padding    : 14px 16px;
+}
+
+.tb-dd-av-img {
+  width: 38px; height: 38px;
+  border-radius: 50%; object-fit: cover;
+}
+
+.tb-dd-name {
+  font-size  : 14px;
+  font-weight: 700;
+  color      : #111;
+  margin-bottom: 2px;
+}
+
+.tb-dd-role {
+  font-size: 11px;
+  color    : #888;
+}
+
+.tb-dd-sep {
+  height    : 1px;
+  background: #f0f0f0;
+  margin    : 2px 0;
+}
+
+// ── Items ─────────────────────────────────────────────────────
+.tb-dd-item {
+  display    : flex;
+  align-items: center;
+  gap        : 10px;
+  width      : 100%;
+  padding    : 11px 16px;
+  font-size  : 13px;
+  font-weight: 500;
+  color      : #222;
+  background : none;
+  border     : none;
+  cursor     : pointer;
+  text-align : left;
+  transition : background .12s;
+
+  i { width: 16px; color: var(--primary, #10D98B); font-size: 13px; }
+
+  &:hover { background: #f5f5f5; }
+}
+
+.tb-dd-logout {
+  color: #FF4D6A !important;
+  i    { color: #FF4D6A !important; }
+}
+
+// ── Hamburger ─────────────────────────────────────────────────
 .tb-hamburger {
   display: none;
   flex-direction: column; justify-content: center; gap: 5px;
   width: 36px; height: 36px; padding: 6px;
   background: var(--bg2); border: none; border-radius: var(--r-sm); cursor: pointer;
-  span {
-    display: block; height: 2px; background: var(--txt);
-    border-radius: 2px; transition: all var(--t);
-  }
+  span { display: block; height: 2px; background: var(--txt); border-radius: 2px; }
   &:hover { background: var(--bg3); }
 }
 
+// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 768px) {
   .topbar         { padding: 0 16px; }
   .topbar-title   { font-size: 15px; }
   .tb-hamburger   { display: flex; }
   .tb-search-wrap { display: none; }
   .tb-actions     { gap: 8px; }
+  .tb-dropdown    { right: -4px; min-width: 200px; }
 }
