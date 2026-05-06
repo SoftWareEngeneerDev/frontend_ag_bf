@@ -30,10 +30,11 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
   successMsg = '';
   errorMsg   = '';
 
-  // ── Popup confirmation suspension ────────────────────────────
-  showSuspendModal  = false;
-  selectedUser      : any = null;
-  processing        = false;
+  // ── Popup suspension ──────────────────────────────────────────
+  showSuspendModal = false;
+  selectedUser     : any = null;
+  suspendReason    = '';    // ✅ Raison de suspension
+  processing       = false;
 
   private destroy$ = new Subject<void>();
 
@@ -88,9 +89,10 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  // ── Ouvrir popup confirmation ─────────────────────────────────
+  // ── Ouvrir popup suspension ───────────────────────────────────
   openSuspendModal(u: any): void {
-    this.selectedUser    = u;
+    this.selectedUser     = u;
+    this.suspendReason    = '';   // ✅ Réinitialiser la raison
     this.showSuspendModal = true;
   }
 
@@ -98,21 +100,27 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
   confirmSuspend(): void {
     if (!this.selectedUser || this.processing) return;
     this.processing = true;
-    this.adminService.updateUserStatus(this.selectedUser.id, 'SUSPENDED')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.selectedUser.status = 'SUSPENDED';
-          this.showSuspendModal    = false;
-          this.processing          = false;
-          this.showSuccess(`${this.selectedUser.name} suspendu`);
-          this.selectedUser        = null;
-        },
-        error: (err: any) => {
-          this.processing = false;
-          this.showError(err?.error?.error?.message ?? 'Erreur');
-        }
-      });
+
+    // ✅ Passer la raison au backend
+    this.adminService.updateUserStatus(
+      this.selectedUser.id,
+      'SUSPENDED',
+      this.suspendReason.trim() || undefined
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.selectedUser.status = 'SUSPENDED';
+        this.showSuspendModal    = false;
+        this.processing          = false;
+        this.showSuccess(`${this.selectedUser.name} suspendu`);
+        this.selectedUser        = null;
+      },
+      error: (err: any) => {
+        this.processing = false;
+        this.showError(err?.error?.error?.message ?? 'Erreur');
+      }
+    });
   }
 
   reactivate(u: any): void {

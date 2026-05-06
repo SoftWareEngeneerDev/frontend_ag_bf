@@ -1,0 +1,87 @@
+<div class="an-page">
+
+  <!-- ══ MESSAGE ═══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════════ -->
+  <div class="flex-between mb-24">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-bell" style="color:var(--primary)"></i> Notifications
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ total }} notification{{ total !== 1 ? 's' : '' }}
+        <span *ngIf="unread > 0" style="color:#FF4D6A;font-weight:600">
+          · {{ unread }} non lue{{ unread !== 1 ? 's' : '' }}
+        </span>
+      </p>
+    </div>
+    <button class="btn-ghost btn-round"
+            *ngIf="unread > 0"
+            (click)="markAllRead()"
+            [disabled]="markingAll">
+      <i *ngIf="markingAll"  class="fa-solid fa-spinner fa-spin"></i>
+      <i *ngIf="!markingAll" class="fa-solid fa-check-double"></i>
+      Tout marquer comme lu
+    </button>
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════════ -->
+  <div *ngIf="!loading && notifications.length === 0"
+       style="text-align:center;padding:60px 0">
+    <i class="fa-solid fa-bell-slash"
+       style="font-size:48px;color:var(--border);margin-bottom:16px;display:block"></i>
+    <h3 style="font-weight:600;margin-bottom:8px">Aucune notification</h3>
+    <p class="text-muted">Les notifications système apparaîtront ici.</p>
+  </div>
+
+  <!-- ══ LISTE NOTIFICATIONS ═══════════════════════════════════════ -->
+  <div class="glass an-list" *ngIf="!loading && notifications.length > 0">
+    <div class="an-item"
+         *ngFor="let n of notifications; trackBy: trackById"
+         [class.an-unread]="!n.isRead"
+         (click)="markRead(n)">
+
+      <!-- Icône type -->
+      <div class="an-icon" [style.background]="typeColor(n.type) + '20'">
+        <i [class]="typeIcon(n.type)" [style.color]="typeColor(n.type)"></i>
+      </div>
+
+      <!-- Contenu -->
+      <div class="an-content">
+        <div class="an-top">
+          <span class="an-title">{{ n.title }}</span>
+          <span class="an-date text-muted">{{ formatDate(n.date) }}</span>
+        </div>
+        <p class="an-body text-muted">{{ n.body }}</p>
+
+        <!-- Canaux d'envoi -->
+        <div class="an-channels" *ngIf="n.sentVia?.length > 0">
+          <span class="an-channel" *ngFor="let c of n.sentVia">
+            <i [class]="c === 'sms' ? 'fa-solid fa-mobile' : c === 'email' ? 'fa-solid fa-envelope' : 'fa-solid fa-bell'"></i>
+            {{ c }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Point non-lu -->
+      <div class="an-dot" *ngIf="!n.isRead"></div>
+
+    </div>
+
+    <!-- Charger plus -->
+    <div class="an-load-more" *ngIf="hasMore">
+      <button class="btn-ghost btn-round" (click)="loadMore()" [disabled]="loadingMore">
+        <i *ngIf="loadingMore"  class="fa-solid fa-spinner fa-spin"></i>
+        <i *ngIf="!loadingMore" class="fa-solid fa-arrow-down"></i>
+        {{ loadingMore ? 'Chargement...' : 'Charger plus' }}
+      </button>
+    </div>
+  </div>
+
+</div>
