@@ -11,29 +11,17 @@ const API = 'http://localhost:3000/api/v1';
   styleUrls  : ['./admin-profile.component.scss']
 })
 export class AdminProfileComponent implements OnInit, OnDestroy {
-  loading      = true;
-  saving       = false;
+  loading         = true;
+  saving          = false;
   uploadingAvatar = false;
 
   successMsg = '';
   errorMsg   = '';
-
   profile: any = null;
 
-  // Formulaire infos
-  form = {
-    name : '',
-    email: '',
-    city : '',
-    phone: '',
-  };
+  form = { name: '', email: '', city: '', phone: '' };
 
-  // Formulaire mot de passe
-  pwForm = {
-    currentPassword : '',
-    newPassword     : '',
-    confirmPassword : '',
-  };
+  pwForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
   showPwForm    = false;
   savingPw      = false;
   showCurrentPw = false;
@@ -42,10 +30,7 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private http: HttpClient,
-    public  auth: AuthService,
-  ) {}
+  constructor(private http: HttpClient, public auth: AuthService) {}
 
   ngOnInit(): void { this.loadProfile(); }
 
@@ -78,30 +63,31 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
     const file  = input.files?.[0];
     if (!file) return;
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       this.showError('Format non supporté. Utilisez JPG, PNG ou WEBP.');
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      this.showError('Image trop lourde. Maximum 2MB pour la photo de profil.');
+      this.showError('Image trop lourde. Maximum 2MB.');
       return;
     }
 
     this.uploadingAvatar = true;
     const formData = new FormData();
-    formData.append('images', file);
+    formData.append('avatar', file);  // ← clé 'avatar' pour la route /users/me/avatar
 
-    this.http.post<any>(`${API}/supplier/upload/images`, formData)
+    this.http.post<any>(`${API}/users/me/avatar`, formData)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          const url = res.data?.urls?.[0];
-          if (url) this.saveAvatar(url);
-          else {
-            this.uploadingAvatar = false;
-            this.showError('Erreur upload avatar');
+          const url = res.data?.avatarUrl;
+          if (url && this.profile) {
+            this.profile.avatarUrl = url;
+            // ✅ Mettre à jour topbar et sidebar
+            this.auth.updateCurrentUser({ avatarUrl: url });
           }
+          this.uploadingAvatar = false;
+          this.showSuccess('Photo de profil mise à jour !');
           input.value = '';
         },
         error: () => {
@@ -112,37 +98,23 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
       });
   }
 
-  private saveAvatar(avatarUrl: string): void {
-    this.http.patch<any>(`${API}/users/me`, { avatarUrl })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          if (this.profile) this.profile.avatarUrl = avatarUrl;
-          this.uploadingAvatar = false;
-          this.showSuccess('Photo de profil mise à jour !');
-        },
-        error: () => {
-          this.uploadingAvatar = false;
-          this.showError('Erreur mise à jour avatar');
-        }
-      });
-  }
-
   // ── Sauvegarder les infos ─────────────────────────────────────
   saveProfile(): void {
     if (this.saving || !this.form.name.trim()) return;
     this.saving = true;
 
-    this.http.patch<any>(`${API}/users/me`, {
+    this.http.put<any>(`${API}/users/me`, {
       name : this.form.name.trim(),
       email: this.form.email.trim() || undefined,
       city : this.form.city.trim()  || undefined,
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: (res) => {
+      next: () => {
         this.profile = { ...this.profile, ...this.form };
         this.saving  = false;
+        // ✅ Mettre à jour topbar et sidebar
+        this.auth.updateCurrentUser({ fullName: this.form.name });
         this.showSuccess('Profil mis à jour avec succès');
       },
       error: (err) => {
@@ -155,23 +127,19 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
   // ── Changer mot de passe ──────────────────────────────────────
   changePassword(): void {
     if (this.savingPw) return;
-
     if (!this.pwForm.currentPassword || !this.pwForm.newPassword) {
-      this.showError('Remplissez tous les champs');
-      return;
+      this.showError('Remplissez tous les champs'); return;
     }
     if (this.pwForm.newPassword.length < 8) {
-      this.showError('Le nouveau mot de passe doit contenir au moins 8 caractères');
-      return;
+      this.showError('Minimum 8 caractères'); return;
     }
     if (this.pwForm.newPassword !== this.pwForm.confirmPassword) {
-      this.showError('Les mots de passe ne correspondent pas');
-      return;
+      this.showError('Les mots de passe ne correspondent pas'); return;
     }
-
     this.savingPw = true;
 
-    this.http.patch<any>(`${API}/users/me/password`, {
+    // Utilise PUT /users/me avec les champs password
+    this.http.put<any>(`${API}/users/me`, {
       currentPassword: this.pwForm.currentPassword,
       newPassword    : this.pwForm.newPassword,
     })
@@ -190,10 +158,8 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Getters ───────────────────────────────────────────────────
   get initials(): string {
-    return (this.form.name || 'A').split(' ')
-      .map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return (this.form.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
   get memberSince(): string {
@@ -203,16 +169,15 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Force mot de passe ───────────────────────────────────────
   get pwStrengthPct(): number {
     const pw = this.pwForm.newPassword;
     if (!pw) return 0;
     let score = 0;
-    if (pw.length >= 8)               score += 25;
-    if (pw.length >= 12)              score += 15;
-    if (/[A-Z]/.test(pw))            score += 20;
-    if (/[0-9]/.test(pw))            score += 20;
-    if (/[^A-Za-z0-9]/.test(pw))    score += 20;
+    if (pw.length >= 8)            score += 25;
+    if (pw.length >= 12)           score += 15;
+    if (/[A-Z]/.test(pw))         score += 20;
+    if (/[0-9]/.test(pw))         score += 20;
+    if (/[^A-Za-z0-9]/.test(pw)) score += 20;
     return Math.min(100, score);
   }
 

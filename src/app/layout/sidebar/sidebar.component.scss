@@ -53,6 +53,15 @@
   flex-shrink: 0;
 }
 
+// ✅ Style photo de profil dans la sidebar
+.sb-user-av-img {
+  width        : 40px;
+  height       : 40px;
+  border-radius: 50%;
+  object-fit   : cover;
+  border       : 2px solid rgba(255,255,255,.3);
+}
+
 .sb-online-dot {
   position: absolute;
   bottom: 1px; right: 1px;

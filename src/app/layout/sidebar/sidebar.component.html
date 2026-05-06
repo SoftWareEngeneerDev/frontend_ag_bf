@@ -12,7 +12,14 @@
     <!-- User card -->
     <div class="sb-user">
       <div class="sb-user-av">
-        <app-avatar [name]="user?.fullName || 'U'" [size]="40" [bg]="userBg"></app-avatar>
+        <!-- ✅ Photo si disponible, sinon initiales -->
+        <img *ngIf="user?.avatarUrl"
+             [src]="user?.avatarUrl"
+             class="sb-user-av-img" alt="Avatar">
+        <app-avatar *ngIf="!user?.avatarUrl"
+                    [name]="user?.fullName || 'U'"
+                    [size]="40" [bg]="userBg">
+        </app-avatar>
         <span class="sb-online-dot"></span>
       </div>
       <div class="sb-user-info">
@@ -26,11 +33,7 @@
     <!-- Navigation -->
     <nav class="sb-nav">
       <ng-container *ngFor="let item of items">
-
-        <!-- Séparateur -->
         <div *ngIf="item.separator" class="sb-sep"></div>
-
-        <!-- Lien -->
         <a *ngIf="!item.separator"
            class="nav-item"
            [routerLink]="item.route"
@@ -48,7 +51,6 @@
             {{ item.badge }}
           </span>
         </a>
-
       </ng-container>
     </nav>
 
