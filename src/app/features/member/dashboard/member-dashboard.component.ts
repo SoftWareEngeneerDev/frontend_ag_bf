@@ -25,7 +25,7 @@ export class MemberDashboardComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-users',      label: 'Groupes actifs',     val: '0',       sub: 'En cours',      color: '#0DA487', bg: '#E6FAF5' },
     { icon: 'fa-solid fa-piggy-bank', label: 'Total économisé',    val: '0 XOF',   sub: 'Cumulé',        color: '#10D98B', bg: '#E8FDF2' },
     { icon: 'fa-solid fa-box',        label: 'Commandes en cours', val: '0',       sub: 'En expédition', color: '#00D4FF', bg: '#E0F9FF' },
-    { icon: 'fa-solid fa-star',       label: 'Score de confiance', val: '100/100', sub: 'Excellent',     color: '#7B2FBE', bg: '#F0E8FD' },
+    // { icon: 'fa-solid fa-star',       label: 'Score de confiance', val: '100/100', sub: 'Excellent',     color: '#7B2FBE', bg: '#F0E8FD' },
   ];
 
   timeline: {
@@ -85,7 +85,7 @@ export class MemberDashboardComponent implements OnInit, OnDestroy {
 
     this.kpis[0].val = this.myGroups.length.toString();
     this.kpis[0].sub = `${this.myGroups.length} en cours`;
-    this.kpis[3].val = `${this.auth.currentUser()?.trustScore ?? 100}/100`;
+    // this.kpis[3].val = `${this.auth.currentUser()?.trustScore ?? 100}/100`;
   }
 
   // ── Traitement des commandes ──────────────────────────────────
@@ -202,7 +202,7 @@ export class MemberDashboardComponent implements OnInit, OnDestroy {
   // ── Navigation ────────────────────────────────────────────────
   goGroups()              : void { this.router.navigate(['/member/groups']); }
   goPayment()             : void { this.router.navigate(['/member/payment']); }
-  goBrowse()              : void { this.router.navigate(['/groups']); }
+  goBrowse()              : void { this.router.navigate(['//member/catalogue']); }
   goOrders()              : void { this.router.navigate(['/member/orders']); }
   goNotifications()       : void { this.router.navigate(['/member/notifications']); }
   goGroupDetail(g: Group) : void { this.router.navigate(['/groups', g.id]); }

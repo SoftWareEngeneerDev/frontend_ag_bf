@@ -13,6 +13,7 @@ export class NavbarComponent  {
 
   showLoginModal = false;
   showRegisterModal = false;
+  showForgotPassword = false;
 
   auth     = inject(AuthService);
   notifs   = inject(NotificationService);
@@ -32,19 +33,25 @@ export class NavbarComponent  {
   openLogin() {
     this.showLoginModal = true;
     this.showRegisterModal = false;
+    this.showForgotPassword = false;
   }
 
   openRegister() {
     this.showRegisterModal = true;
     this.showLoginModal = false;
+    this.showForgotPassword = false;
+  }
+
+  openForgotPassword() {
+    this.showForgotPassword = true;
+    this.showLoginModal = false;
+    this.showRegisterModal = false;
   }
 
   closeModal() {
     this.showLoginModal = false;
     this.showRegisterModal = false;
+    this.showForgotPassword = false;
   }
 }
-// function private(target: NavbarComponent, propertyKey: 'router'): void {
-//   throw new Error('Function not implemented.');
-// }
 

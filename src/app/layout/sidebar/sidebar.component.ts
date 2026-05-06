@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
-
 export interface NavItem {
   route:       string;
   /** Classe Font Awesome complète ex: 'fa-solid fa-house' */
@@ -22,6 +21,8 @@ export class SidebarComponent {
   @Input() userBg = '#F5A623';
   @Input() open   = false;
   @Output() closeRequest = new EventEmitter<void>();
+
+  openLogoutModal = false;
 
   constructor(public auth: AuthService) {}
 
