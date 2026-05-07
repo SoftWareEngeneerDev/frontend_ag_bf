@@ -56,25 +56,75 @@
           </div>
         </div>
 
-        <!-- Visuel droite -->
+        <!-- Visuel droite : carte du groupe avec la plus grande réduction -->
         <div class="hs-visual">
-          <div class="hs-emoji-wrap">
-            <div class="hs-emoji">{{ slide.emoji }}</div>
-            <div class="hs-discount-badge">{{ slide.discount }}</div>
+
+          <!-- Carte produit (données chargées) -->
+          <div class="hs-product-card"
+               *ngIf="featuredGroups[i]"
+               (click)="onJoinGroup(featuredGroups[i])">
+
+            <div class="hsp-img-wrap">
+              <img *ngIf="featuredGroups[i].product.images?.length"
+                   [src]="featuredGroups[i].product.images[0]"
+                   [alt]="featuredGroups[i].product.name"
+                   class="hsp-img">
+              <div *ngIf="!featuredGroups[i].product.images?.length" class="hsp-emoji">
+                {{ featuredGroups[i].product.emoji }}
+              </div>
+              <div class="hsp-discount-badge">-{{ featuredGroups[i].discountPercent }}%</div>
+            </div>
+
+            <div class="hsp-info">
+              <div class="hsp-category">{{ featuredGroups[i].product.category.name }}</div>
+              <div class="hsp-name">{{ featuredGroups[i].product.name }}</div>
+
+              <div class="hsp-prices">
+                <span class="hsp-price-old">{{ featuredGroups[i].product.soloPrice | number:'1.0-0' }} XOF</span>
+                <span class="hsp-price-new" [style.color]="slide.accent">
+                  {{ featuredGroups[i].currentPrice | number:'1.0-0' }} XOF
+                </span>
+              </div>
+
+              <div class="hsp-meta">
+                <span><i class="fa-solid fa-users"></i> {{ featuredGroups[i].currentCount }} / {{ featuredGroups[i].minParticipants }}</span>
+                <span *ngIf="featuredGroups[i].product.rating">
+                  <i class="fa-solid fa-star"></i> {{ featuredGroups[i].product.rating | number:'1.1-1' }}
+                </span>
+              </div>
+
+              <div class="hsp-progress-track">
+                <div class="hsp-progress-fill"
+                     [style.width.%]="progressPct(featuredGroups[i])"
+                     [style.background]="slide.accent">
+                </div>
+              </div>
+
+              <div class="hsp-join-btn">
+                Rejoindre <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
           </div>
 
-          <!-- Stats mini -->
-          <div class="hs-mini-stats">
-            <div class="hs-stat">
-              <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat1Val }}</div>
-              <div class="hs-stat-lbl">{{ slide.stat1Lbl }}</div>
+          <!-- Fallback pendant le chargement -->
+          <ng-container *ngIf="!featuredGroups[i]">
+            <div class="hs-emoji-wrap">
+              <div class="hs-emoji">{{ slide.emoji }}</div>
+              <div class="hs-discount-badge">{{ slide.discount }}</div>
             </div>
-            <div class="hs-stat-sep"></div>
-            <div class="hs-stat">
-              <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat2Val }}</div>
-              <div class="hs-stat-lbl">{{ slide.stat2Lbl }}</div>
+            <div class="hs-mini-stats">
+              <div class="hs-stat">
+                <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat1Val }}</div>
+                <div class="hs-stat-lbl">{{ slide.stat1Lbl }}</div>
+              </div>
+              <div class="hs-stat-sep"></div>
+              <div class="hs-stat">
+                <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat2Val }}</div>
+                <div class="hs-stat-lbl">{{ slide.stat2Lbl }}</div>
+              </div>
             </div>
-          </div>
+          </ng-container>
+
         </div>
 
       </div>

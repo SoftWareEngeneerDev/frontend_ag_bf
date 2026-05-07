@@ -329,6 +329,114 @@
 .hs-stat-lbl { font-size: 10px; color: rgba(255,255,255,.7); font-weight: 600; }
 .hs-stat-sep { width: 1px; background: rgba(255,255,255,.18); flex-shrink: 0; }
 
+/* ── Carte produit dans le hero ─────────────────────────────── */
+.hs-product-card {
+  width: 100%;
+  background: rgba(255,255,255,.13);
+  border: 1.5px solid rgba(255,255,255,.22);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+
+  &:hover {
+    background: rgba(255,255,255,.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+  }
+}
+
+.hsp-img-wrap {
+  position: relative;
+  height: 150px;
+  background: rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hsp-img { width: 100%; height: 100%; object-fit: cover; }
+
+.hsp-emoji { font-size: 72px; line-height: 1; }
+
+.hsp-discount-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: #E63946;
+  color: #fff;
+  font-size: 13px; font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(230,57,70,.45);
+  letter-spacing: .3px;
+}
+
+.hsp-info { padding: 14px 16px; }
+
+.hsp-category {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,.55);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+
+.hsp-name {
+  font-size: 14px; font-weight: 800; color: #fff;
+  margin-bottom: 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.hsp-prices {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.hsp-price-old {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,.45);
+  text-decoration: line-through;
+}
+
+.hsp-price-new {
+  font-size: 17px; font-weight: 900; line-height: 1; letter-spacing: -.3px;
+}
+
+.hsp-meta {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,.72);
+  margin-bottom: 8px;
+  i { margin-right: 3px; font-size: 10px; }
+}
+
+.hsp-progress-track {
+  height: 4px;
+  background: rgba(255,255,255,.18);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.hsp-progress-fill {
+  height: 100%; border-radius: 99px;
+  transition: width .6s ease;
+  min-width: 4px;
+}
+
+.hsp-join-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 0;
+  background: rgba(255,255,255,.15);
+  border-radius: 10px;
+  font-size: 13px; font-weight: 800; color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  transition: background .2s;
+
+  &:hover { background: rgba(255,255,255,.25); }
+}
+
 /* ── Flèches ────────────────────────────────────────────────── */
 .hs-arrow {
   position: absolute;

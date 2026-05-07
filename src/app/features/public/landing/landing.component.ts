@@ -27,7 +27,8 @@ export interface Slide {
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnInit, OnDestroy {
-  groups:  Group[] = [];
+  groups:         Group[] = [];
+  featuredGroups: Group[] = [];
   loading  = true;
 
   // Slider
@@ -111,9 +112,12 @@ export class LandingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.groupService.getAll({ status: 'OPEN' }).subscribe({
       next: (g: Group[]) => {
-        this.allGroups = g;
-        this.groups    = g.slice(0, 3);
-        this.loading   = false;
+        this.allGroups      = g;
+        this.groups         = g.slice(0, 3);
+        this.featuredGroups = [...g]
+          .sort((a, b) => b.discountPercent - a.discountPercent)
+          .slice(0, 3);
+        this.loading = false;
       },
       error: () => { this.loading = false; }
     });
@@ -197,5 +201,10 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   formatSaved(): string {
     return (this.savedAmount / 1_000_000).toFixed(1) + 'M';
+  }
+
+  progressPct(group: Group): number {
+    if (!group.minParticipants) return 0;
+    return Math.min(100, Math.round((group.currentCount / group.minParticipants) * 100));
   }
 }
