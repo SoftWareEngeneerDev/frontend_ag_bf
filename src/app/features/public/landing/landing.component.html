@@ -1,114 +1,41 @@
 <app-navbar></app-navbar>
 
-<!-- ══ HERO SLIDER ═══════════════════════════════════════════════ -->
-<section class="hero-slider">
+<!-- ══ HERO ════════════════════════════════════════════════════════ -->
+<section class="hero-premium">
 
-  <!-- Slides -->
-  <div class="hs-track">
-    <div class="hs-slide"
-         *ngFor="let slide of slides; let i = index"
-         [class.active]="i === currentSlide"
-         [style.background]="slide.bg">
+  <div class="hp-deco">
+    <div class="hp-circle hp-c1"></div>
+    <div class="hp-circle hp-c2"></div>
+    <div class="hp-net"></div>
+  </div>
 
-      <!-- Formes décoratives -->
-      <div class="hs-deco hs-deco-1"></div>
-      <div class="hs-deco hs-deco-2"></div>
-      <div class="hs-deco hs-deco-3"></div>
+  <div class="container">
+    <div class="hp-content">
 
-      <div class="container hs-inner">
+      <h1 class="hp-title font-display">
+        Achetez ensemble,<br>
+        économisez jusqu'à 40%.
+      </h1>
 
-        <!-- Contenu texte -->
-        <div class="hs-content">
+      <p class="hp-sub">
+        Rejoint par plus de <strong>5 200 membres</strong> et entreprises
+        de confiance au Burkina Faso
+      </p>
 
-          <!-- Flash badge (Back Market style) -->
-          <div class="hs-flash-row">
-            <span class="hs-flash-badge">
-              <i class="fa-solid fa-bolt"></i> {{ slide.badge }}
-            </span>
-            <span class="hs-slide-counter">{{ currentSlide + 1 }} / {{ slides.length }}</span>
-          </div>
-
-          <!-- Titre XXL Apple style -->
-          <h1 class="hs-title font-display">
-            {{ slide.title }}<br>
-            <span class="hs-highlight" [style.color]="slide.accent">{{ slide.highlight }}</span>
-          </h1>
-
-          <p class="hs-sub">{{ slide.sub }}</p>
-
-          <!-- Pricing "À partir de" (Back Market style) -->
-          <div class="hs-pricing">
-            <span class="hs-pricing-from">À partir de</span>
-            <span class="hs-pricing-val" [style.color]="slide.accent">{{ slide.stat1Val }}</span>
-            <span class="hs-pricing-sep">·</span>
-            <span class="hs-pricing-tag">{{ slide.tag }}</span>
-            <span class="hs-discount-chip">{{ slide.discount }}</span>
-          </div>
-
-          <!-- CTAs dual Apple style -->
-          <div class="hs-ctas">
-            <button class="hs-btn-main" (click)="onSlideAction(slide)">
-              {{ slide.cta }} <i class="fa-solid fa-arrow-right"></i>
-            </button>
-            <button class="hs-btn-sec" (click)="onSlideSecAction(slide)">
-              {{ slide.ctaSec }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Visuel droite -->
-        <div class="hs-visual">
-          <div class="hs-emoji-wrap">
-            <div class="hs-emoji">{{ slide.emoji }}</div>
-            <div class="hs-discount-badge">{{ slide.discount }}</div>
-          </div>
-
-          <!-- Stats mini -->
-          <div class="hs-mini-stats">
-            <div class="hs-stat">
-              <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat1Val }}</div>
-              <div class="hs-stat-lbl">{{ slide.stat1Lbl }}</div>
-            </div>
-            <div class="hs-stat-sep"></div>
-            <div class="hs-stat">
-              <div class="hs-stat-val" [style.color]="slide.accent">{{ slide.stat2Val }}</div>
-              <div class="hs-stat-lbl">{{ slide.stat2Lbl }}</div>
-            </div>
-          </div>
-        </div>
-
+      <div class="hp-ctas">
+        <button class="hp-btn-main" (click)="goToGroups()">
+          Voir les groupes <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button class="hp-btn-sec" (click)="goToHowItWorks()">
+          Comment ça marche ?
+        </button>
       </div>
+
     </div>
   </div>
-
-  <!-- Flèche gauche -->
-  <button class="hs-arrow hs-arrow-left" (click)="prevSlide()" aria-label="Précédent">
-    <i class="fa-solid fa-chevron-left"></i>
-  </button>
-
-  <!-- Flèche droite -->
-  <button class="hs-arrow hs-arrow-right" (click)="nextSlide()" aria-label="Suivant">
-    <i class="fa-solid fa-chevron-right"></i>
-  </button>
-
-  <!-- Dots de navigation -->
-  <div class="hs-dots">
-    <button *ngFor="let s of slides; let i = index"
-            class="hs-dot"
-            [class.active]="i === currentSlide"
-            (click)="goToSlide(i)"
-            [attr.aria-label]="'Slide ' + (i+1)">
-    </button>
-  </div>
-
-  <!-- Barre de progression auto-play -->
-  <div class="hs-progress">
-    <div class="hs-progress-bar"></div>
-  </div>
-
 </section>
 
-<!-- ══ BANNERS PROMO ════════════════════════════════════════════ -->
+<!-- ══ BANNERS PROMO ════════════════════════════════════════════════ -->
 <section class="promo-strip">
   <div class="container">
     <div class="promo-grid">
@@ -125,11 +52,10 @@
   </div>
 </section>
 
-<!-- ══ CATALOGUE PRODUITS ════════════════════════════════════════ -->
+<!-- ══ CATALOGUE PRODUITS ════════════════════════════════════════════ -->
 <section class="products-section">
   <div class="container">
 
-    <!-- En-tête + filtres -->
     <div class="ps-header">
       <div class="ps-title-block">
         <div class="sh-label"><i class="fa-solid fa-fire"></i> Groupes en cours</div>
@@ -146,7 +72,6 @@
       </div>
     </div>
 
-    <!-- Grille -->
     <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
 
     <div class="products-grid" *ngIf="!loading">
@@ -176,6 +101,33 @@
   </div>
 </section>
 
+<!-- ══ TRUST BAR ════════════════════════════════════════════════════ -->
+<section class="trust-bar">
+  <div class="container">
+    <div class="tb-logos">
+      <div class="tb-logo tb-orange">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>Orange Money</span>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-logo tb-moov">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>Moov Money</span>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-logo tb-cinetpay">
+        <i class="fa-solid fa-credit-card"></i>
+        <span>CinetPay</span>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-logo tb-secure">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Verified Secure</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══ CATÉGORIES ════════════════════════════════════════════════ -->
 <section class="section-sm" style="background:#F8FAFB">
   <div class="container">
@@ -188,31 +140,6 @@
         <span class="cp-icon"><i [class]="c.icon"></i></span>
         <span class="cp-name">{{ c.name }}</span>
         <span class="cp-count">{{ c.productCount }} produits</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ CTA FINAL ════════════════════════════════════════════════ -->
-<section class="compact-cta bg-gradient-primary">
-  <div class="container">
-    <div class="ccta-inner">
-      <div class="ccta-left">
-        <div class="ccta-icon"><i class="fa-solid fa-rocket"></i></div>
-        <div>
-          <div class="ccta-title font-display">Prêt à économiser ?</div>
-          <div class="ccta-sub">Inscription gratuite · Pas de frais cachés · Paiement Mobile Money</div>
-        </div>
-      </div>
-      <div class="ccta-btns">
-        <button class="btn-white btn-round" (click)="goToRegister()">
-          Créer mon compte gratuit →
-        </button>
-        <button class="btn-outline btn-round"
-                style="border-color:rgba(255,255,255,.4);color:#fff"
-                (click)="goToGroups()">
-          Parcourir les groupes
-        </button>
       </div>
     </div>
   </div>

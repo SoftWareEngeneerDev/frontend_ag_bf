@@ -26,12 +26,13 @@ import { WelcomeComponent }            from './welcome/welcome.component';
       { path: 'otp',                 component: OtpComponent },
       { path: 'forgot-password',     component: ForgotPasswordComponent },
       { path: 'welcome',             component: WelcomeComponent },
-      // { path: '', redirectTo: 'login', pathMatch: 'full' },
+      
     ]),
   ],
   exports: [
     LoginComponent,
     RegisterComponent,
+    ForgotPasswordComponent,
   ]
 })
 export class AuthModule {}

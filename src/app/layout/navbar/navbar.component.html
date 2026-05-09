@@ -91,7 +91,10 @@
       <button class="modal-close" (click)="closeModal()">×</button>
 
       <!-- Ton component login -->
-      <app-login (switchToRegister)="openRegister()"></app-login>
+      <app-login 
+        (switchToRegister)="openRegister()"
+        (switchToForgotPassword)="openForgotPassword()">
+      </app-login>
 
     </div>
   </div>
@@ -103,6 +106,17 @@
     <button class="modal-close" (click)="closeModal()">×</button>
 
     <app-register (switchToLogin)="openLogin()"></app-register>
+
+  </div>
+</div>
+
+ <!-- FORGET PASSWORD MODAL -->
+<div class="modal-overlay" *ngIf="showForgotPassword">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+  <!-- bouton fermer -->
+  <button class="modal-close" (click)="closeModal()">×</button>
+  <!-- ton composant -->
+  <app-forgot-password ></app-forgot-password>
 
   </div>
 </div>

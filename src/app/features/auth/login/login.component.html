@@ -63,7 +63,7 @@
         </div>
 
         <div class="auth-forgot">
-          <a routerLink="/auth/forgot-password">Mot de passe oublié ?</a>
+          <a class="auth-link" (click)="openForgotPassword()">Mot de passe oublié ?</a>
         </div>
 
         <div class="alert-red alert" *ngIf="error">
@@ -77,7 +77,6 @@
 
         <div class="auth-switch">
           Pas encore membre ?
-          <!-- <a routerLink="/auth/register">Créer un compte gratuit</a> -->
           <a class="auth-link" role="button" tabindex="0" (click)="goToRegister()">Créer un compte gratuit</a>
         </div>
       </form>

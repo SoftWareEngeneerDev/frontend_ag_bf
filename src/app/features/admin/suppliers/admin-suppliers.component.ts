@@ -30,8 +30,9 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
   rejectReason     = '';
 
   // ── Modal suspension ──────────────────────────────────────────
-  showSuspendModal    = false;
-  selectedForSuspend  : Supplier | null = null;
+  showSuspendModal   = false;
+  selectedForSuspend : Supplier | null = null;
+  suspendReason      = '';    // ✅ Raison de suspension
 
   processing = false;
 
@@ -110,7 +111,7 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ── Ouvrir modal rejet ────────────────────────────────────────
+  // ── Modal rejet ───────────────────────────────────────────────
   openRejectModal(s: Supplier): void {
     this.selectedSupplier = s;
     this.rejectReason     = '';
@@ -137,32 +138,38 @@ export class AdminSuppliersComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ── Ouvrir modal suspension ───────────────────────────────────
+  // ── Modal suspension ──────────────────────────────────────────
   openSuspendModal(s: Supplier): void {
     this.selectedForSuspend = s;
+    this.suspendReason      = '';   // ✅ Réinitialiser la raison
     this.showSuspendModal   = true;
   }
 
-  // ── Confirmer suspension ──────────────────────────────────────
   confirmSuspend(): void {
     if (!this.selectedForSuspend || this.processing) return;
     this.processing = true;
     const s = this.selectedForSuspend;
-    this.adminService.updateUserStatus((s as any).user?.id ?? s.id, 'SUSPENDED')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          s.status             = 'SUSPENDED' as any;
-          this.showSuspendModal = false;
-          this.processing       = false;
-          this.showSuccess(`${s.companyName} suspendu`);
-          this.selectedForSuspend = null;
-        },
-        error: (err: any) => {
-          this.processing = false;
-          this.showError(err?.error?.error?.message ?? 'Erreur');
-        }
-      });
+
+    // ✅ Passer la raison au backend
+    this.adminService.updateUserStatus(
+      (s as any).user?.id ?? s.id,
+      'SUSPENDED',
+      this.suspendReason.trim() || undefined
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        s.status                = 'SUSPENDED' as any;
+        this.showSuspendModal   = false;
+        this.processing         = false;
+        this.showSuccess(`${s.companyName} suspendu`);
+        this.selectedForSuspend = null;
+      },
+      error: (err: any) => {
+        this.processing = false;
+        this.showError(err?.error?.error?.message ?? 'Erreur');
+      }
+    });
   }
 
   reactivate(s: Supplier): void { this.approve(s); }

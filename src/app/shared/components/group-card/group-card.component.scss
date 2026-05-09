@@ -3,18 +3,18 @@
 // ── Carte principale ─────────────────────────────────────────────────
 .gc-card {
   background: #fff;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 16px rgba(0,0,0,.08);
+  box-shadow: 0 2px 14px rgba(0,0,0,.06);
   cursor: pointer;
   transition: box-shadow .28s ease, transform .28s ease;
   display: flex;
   flex-direction: column;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #F0F2F5;
 
   &:hover {
-    box-shadow: 0 12px 40px rgba(0,0,0,.14);
-    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+    transform: translateY(-5px);
 
     .gc-img      { transform: scale(1.04); }
     .gc-actions  { opacity: 1; pointer-events: all; }
@@ -266,26 +266,36 @@
 // ── Prix ─────────────────────────────────────────────────────────────
 .gc-price-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 16px;
   margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
-.gc-prices { display: flex; align-items: baseline; gap: 8px; }
+.gc-price-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gc-price-lbl {
+  font-size: 11px;
+  color: var(--muted, #7E8BA0);
+  font-weight: 600;
+}
 
 .gc-old-price {
-  font-size: 12px;
+  font-size: 14px;
   color: #b0b5be;
   text-decoration: line-through;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .gc-price {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
-  color: #E63946;
-  font-family: var(--font-mono, 'Roboto', monospace);
+  color: var(--primary, #0DA487);
+  font-family: var(--font-display, 'Nunito', sans-serif);
   letter-spacing: -.3px;
 }
 
@@ -294,31 +304,30 @@
   width: 100%;
   font-size: 14px;
   font-weight: 700;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 13px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #FF6B35, #FF8C00);
+  background: #1A4731;
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: all .2s ease;
-  letter-spacing: .2px;
-  box-shadow: 0 4px 16px rgba(255,140,0,.3);
+  transition: all .22s ease;
+  letter-spacing: .15px;
+  box-shadow: 0 3px 12px rgba(26,71,49,.25);
 
   &:hover {
-    background: linear-gradient(135deg, #E55A24, #E67E00);
-    box-shadow: 0 6px 20px rgba(255,140,0,.45);
-    transform: translateY(-1px);
+    background: #163d28;
+    box-shadow: 0 6px 20px rgba(26,71,49,.38);
+    transform: translateY(-2px);
   }
 
   &:active { transform: translateY(0); }
 
   i { font-size: 13px; }
 
-  // Override pour les variantes btn-gold et btn-outline-primary
   &.btn-gold {
     background: linear-gradient(135deg, #F4A902, #E09600);
     box-shadow: 0 4px 16px rgba(244,169,2,.35);
@@ -341,9 +350,9 @@
 // ── Alerte seuil atteint ──────────────────────────────────────────────
 .gc-hot-alert {
   margin-top: 10px;
-  background: #FFF8E1;
-  border: 1px solid #F4A902;
-  border-radius: 8px;
+  background: #FFFBEB;
+  border: 1px solid rgba(244,169,2,.25);
+  border-radius: 10px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;

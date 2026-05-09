@@ -10,7 +10,7 @@
         {{ groups.length }} groupe{{ groups.length !== 1 ? 's' : '' }} au total
       </p>
     </div>
-    <a routerLink="/groups" class="btn-primary btn-round">
+    <a routerLink="/member/catalogue" class="btn-primary btn-round">
       <i class="fa-solid fa-plus"></i> Rejoindre un groupe
     </a>
   </div>
@@ -39,7 +39,7 @@
     [description]="activeTab === 'all'
       ? 'Rejoignez votre premier groupe et commencez à économiser.'
       : 'Changez de filtre pour voir vos autres groupes.'">
-    <a routerLink="/groups" class="btn-gold btn-round">
+    <a routerLink="//member/catalogue" class="btn-gold btn-round">
       <i class="fa-solid fa-compass"></i> Parcourir les groupes
     </a>
   </app-empty-state>

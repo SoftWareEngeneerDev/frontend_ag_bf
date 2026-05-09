@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, output, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -14,6 +14,7 @@ export class LoginComponent {
   showPassword = false;
 
   @Output() switchToRegister = new EventEmitter<void>();
+  @Output() switchToForgotPassword = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -41,14 +42,13 @@ export class LoginComponent {
     });
   }
 
-  // Demo rapide
-  demoLogin(role: 'MEMBER' | 'SUPPLIER' | 'ADMIN'): void {
-    this.auth.loginDemo(role);
-  }
-
   get loading(): boolean { return this.auth.isLoading(); }
 
   goToRegister() {
     this.switchToRegister.emit();
+  }
+
+  openForgotPassword() {
+    this.switchToForgotPassword.emit();
   }
 }

@@ -151,7 +151,14 @@
           </div>
         </div>
 
-        <div class="alert-red alert" style="font-size:13px;margin-bottom:16px">
+        <div class="inp-group">
+          <label>Raison de la suspension <span style="color:var(--muted);font-weight:400;font-size:11px">(optionnel)</span></label>
+          <textarea class="inp" rows="3" [(ngModel)]="suspendReason"
+                    placeholder="Ex: Comportement abusif, violation des CGU..."
+                    style="resize:vertical"></textarea>
+        </div>
+
+        <div class="alert-red alert" style="font-size:13px">
           <i class="fa-solid fa-triangle-exclamation"></i>
           L'utilisateur sera notifié par SMS et ne pourra plus accéder à la plateforme.
         </div>

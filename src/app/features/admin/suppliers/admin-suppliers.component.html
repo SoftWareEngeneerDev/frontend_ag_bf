@@ -225,6 +225,13 @@
           <div style="font-weight:600;font-size:14px">{{ selectedForSuspend!.companyName }}</div>
           <div class="text-muted" style="font-size:12px">{{ selectedForSuspend!.contactName }} · {{ selectedForSuspend!.city }}</div>
         </div>
+        <div class="inp-group">
+          <label>Raison de la suspension <span style="color:var(--muted);font-weight:400;font-size:11px">(optionnel)</span></label>
+          <textarea class="inp" rows="3" [(ngModel)]="suspendReason"
+                    placeholder="Ex: Produits non conformes, plaintes clients..."
+                    style="resize:vertical"></textarea>
+        </div>
+
         <div class="alert-red alert" style="font-size:13px">
           <i class="fa-solid fa-triangle-exclamation"></i>
           Le fournisseur sera notifié par SMS et ne pourra plus accéder à la plateforme.

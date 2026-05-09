@@ -15,6 +15,8 @@
   --primary:   #0DA487;    // Vert émeraude (principal)
   --primary2:  #0B8F75;    // Vert foncé (hover)
   --primary-l: #E6F7F4;    // Vert très clair (fond)
+  --deep-blue: #0D2B5B;    // Bleu profond premium
+  --night-blue:#0A0E1A;    // Bleu nuit (hero)
   --orange:    #FF8C00;    // Orange vif (CTA)
   --orange2:   #E67E00;    // Orange foncé
   --orange-l:  #FFF3E0;    // Orange très clair
@@ -67,8 +69,8 @@
   --r-full:9999px;
 
   // Fonts
-  --font-display:  'Jost', sans-serif;        // Titres, en-têtes
-  --font-body:     'Jost', sans-serif;        // Corps de texte (défaut)
+  --font-display:  'Nunito', sans-serif;      // Titres — ExtraBold arrondi
+  --font-body:     'Inter', sans-serif;       // Corps de texte — lisible et technique
   --font-secondary:'Roboto', sans-serif;      // Éléments secondaires
   --font-cursive:  'Charm', cursive;          // Décoratif cursif 1
   --font-cursive2: 'Oregano', cursive;        // Décoratif cursif 2
@@ -89,7 +91,7 @@
 // ── RESET ────────────────────────────────────────────────────────
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
-  scroll-behavior: smooth; font-size: 14px;
+  scroll-behavior: smooth; font-size: 16px;
   overflow-x: hidden;   // ← empêche le scroll horizontal
 }
 body {
@@ -110,6 +112,15 @@ input, select, textarea { font-family: var(--font-body); }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; opacity: .5; }
+
+// ── HEADINGS ─────────────────────────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  font-family:    var(--font-display);
+  font-weight:    800;
+  letter-spacing: -0.02em;
+  line-height:    1.2;
+  color:          var(--txt);
+}
 
 // ── TYPOGRAPHY ───────────────────────────────────────────────────
 .font-display   { font-family: var(--font-display)   !important; }
@@ -490,7 +501,7 @@ input, select, textarea { font-family: var(--font-body); }
   background: linear-gradient(135deg, var(--orange) 0%, #FFB347 100%);
 }
 .bg-gradient-hero {
-  background: linear-gradient(140deg, #0DA487 0%, #07836C 35%, #065F46 70%, #053D2E 100%);
+  background: linear-gradient(140deg, #0A0E1A 0%, #0D2B5B 55%, #16407A 100%);
 }
 .bg-section { background: var(--bg2); }
 

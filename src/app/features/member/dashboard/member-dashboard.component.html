@@ -11,12 +11,12 @@
       <div class="mdh-info">
         <p class="mdh-greeting">{{ greeting }},</p>
         <h2 class="mdh-name">{{ firstName }} !</h2>
-        <p class="mdh-sub">
+        <!-- <p class="mdh-sub">
           <i class="fa-solid fa-users"></i> {{ myGroups.length }} groupe{{ myGroups.length !== 1 ? 's' : '' }} actif{{ myGroups.length !== 1 ? 's' : '' }}
           &nbsp;·&nbsp;
           <i class="fa-solid fa-star" style="color:#F4A902"></i>
           Score {{ auth.currentUser()?.trustScore ?? 100 }}/100
-        </p>
+        </p> -->
       </div>
     </div>
 
@@ -217,9 +217,9 @@
         <div class="mdr-icon"><i class="fa-solid fa-gift"></i></div>
         <div class="mdr-info">
           <div class="mdr-title">Invitez vos proches</div>
-          <div class="mdr-desc">
+          <!-- <div class="mdr-desc">
             Gagnez <strong>2 500 XOF</strong> par ami inscrit
-          </div>
+          </div> -->
           <div class="mdr-code">
             <span class="mdr-code-val font-mono">{{ referralCode }}</span>
             <button

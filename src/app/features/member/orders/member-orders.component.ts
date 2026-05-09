@@ -21,7 +21,6 @@ export class OrdersComponent implements OnInit, OnDestroy {
   readonly tabList = [
     { key: 'all',       icon: 'fa-solid fa-list',         label: 'Toutes',    count: 0 },
     { key: 'ongoing',   icon: 'fa-solid fa-clock',        label: 'En cours',  count: 0 },
-    { key: 'shipped',   icon: 'fa-solid fa-truck-fast',   label: 'Expédiées', count: 0 },
     { key: 'delivered', icon: 'fa-solid fa-circle-check', label: 'Livrées',   count: 0 },
     { key: 'cancelled', icon: 'fa-solid fa-circle-xmark', label: 'Annulées',  count: 0 },
   ];
@@ -30,7 +29,6 @@ export class OrdersComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-file-circle-check',  label: 'Créée'      },
     { icon: 'fa-solid fa-circle-check',       label: 'Confirmée'  },
     { icon: 'fa-solid fa-box',                label: 'Préparation'},
-    { icon: 'fa-solid fa-truck-fast',         label: 'Expédiée'   },
     { icon: 'fa-solid fa-house-circle-check', label: 'Livrée'     },
   ];
 
