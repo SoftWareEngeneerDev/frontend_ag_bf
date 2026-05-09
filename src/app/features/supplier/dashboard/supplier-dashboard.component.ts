@@ -30,7 +30,7 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
   kpis = [
     { icon: 'fa-solid fa-box-open',             label: 'Produits approuvés',  val: '0', sub: '',              color: '#F4A902', bg: '#FFF8E1', trend: '', up: true  },
     { icon: 'fa-solid fa-users',                label: 'Groupes actifs',      val: '0', sub: '',              color: '#00D4FF', bg: '#E0F9FF', trend: '', up: true  },
-    { icon: 'fa-solid fa-triangle-exclamation', label: 'Commandes urgentes',  val: '0', sub: 'Action requise',color: '#FF4D6A', bg: '#FFE8EC', trend: '', up: false },
+    { icon: 'fa-solid fa-triangle-exclamation', label: 'Commandes',  val: '0',color: '#FF4D6A', bg: '#FFE8EC', trend: '', up: false },
     { icon: 'fa-solid fa-coins',                label: 'Revenu ce mois',      val: '0 XOF', sub: '',          color: '#10D98B', bg: '#E8FDF2', trend: '', up: true  },
   ];
 

@@ -38,23 +38,6 @@
       </div>
     </div>
 
-    <div class="suph-stats">
-      <div class="suph-stat">
-        <div class="suph-stat-val">{{ totalGroups }}</div>
-        <div class="suph-stat-label">Groupes totaux</div>
-      </div>
-      <div class="suph-stat-div"></div>
-      <div class="suph-stat">
-        <div class="suph-stat-val">{{ successRate }}%</div>
-        <div class="suph-stat-label">Taux de succès</div>
-      </div>
-      <div class="suph-stat-div"></div>
-      <div class="suph-stat">
-        <div class="suph-stat-val">{{ totalRevenue }}</div>
-        <div class="suph-stat-label">XOF générés</div>
-      </div>
-    </div>
-
     <div class="suph-actions">
       <button class="suph-btn" (click)="goProducts()">
         <i class="fa-solid fa-box-open"></i> Mes produits
@@ -151,12 +134,12 @@
     </div>
   </div>
 
-  <!-- ══ COMMANDES URGENTES ════════════════════════════════════════ -->
+  <!-- ══ plus de COMMANDES URGENTES mais commandes ════════════════════════════════════════ -->
   <div class="sup-panel">
     <div class="sup-panel-head">
       <div class="sup-panel-title">
         <i class="fa-solid fa-triangle-exclamation" style="color:#FF4D6A"></i>
-        Commandes urgentes
+        Commandes
         <span class="sup-badge-err" *ngIf="urgentOrders.length > 0">
           {{ urgentOrders.length }} en attente
         </span>
@@ -169,7 +152,7 @@
     <app-empty-state
       *ngIf="urgentOrders.length === 0"
       icon="fa-solid fa-circle-check"
-      title="Aucune commande urgente"
+      title="Aucune commande"
       description="Toutes vos commandes sont à jour. 🎉">
     </app-empty-state>
 
