@@ -1,8 +1,8 @@
-.footer { background: #0F1923; }
+.footer { background: #0A0E1A; }
 
 /* ── Top band CTA ──────────────────────────────────────────── */
 .ft-top {
-  padding: 32px 0;
+  padding: 36px 0;
   background: linear-gradient(135deg, #0DA487, #07836C);
   position: relative;
   overflow: hidden;
@@ -43,7 +43,7 @@
 .ft-promo-sub   { font-size: 13px; color: rgba(255,255,255,.82); font-weight: 500; }
 
 /* ── Main footer ───────────────────────────────────────────── */
-.ft-main { padding: 52px 0 40px; }
+.ft-main { padding: 56px 0 44px; }
 
 .ft-grid {
   display: grid;
@@ -59,9 +59,39 @@
 .ft-desc {
   font-size: 13.5px;
   line-height: 1.75;
-  margin: 16px 0 18px;
+  margin: 16px 0 20px;
   max-width: 290px;
-  color: #8899AA;
+  color: #7A8A9A;
+}
+
+/* ── Infos légales ─────────────────────────────────────────── */
+.ft-legal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-top: 4px;
+}
+
+.ft-li-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: #7A8A9A;
+  line-height: 1.5;
+}
+
+.ft-li-lbl {
+  color: #5A6A7A;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ft-li-link {
+  color: #6EE7B7;
+  transition: color .18s;
+  &:hover { color: #34D399; }
 }
 
 .ft-payments {
@@ -113,7 +143,7 @@
 
 /* ── Bottom bar ────────────────────────────────────────────── */
 .ft-bottom {
-  border-top: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.06);
   padding: 18px 0;
 }
 
@@ -124,18 +154,18 @@
   flex-wrap: wrap;
   gap: 10px;
 
-  span { font-size: 13px; color: #5a6a7a; }
+  span { font-size: 13px; color: #4A5A6A; }
 }
 
 .ft-legal {
   display: flex;
   gap: 22px;
+}
 
-  a {
-    font-size: 13px;
-    color: #5a6a7a;
-    transition: color .18s;
-    font-weight: 500;
-    &:hover { color: #6EE7B7; }
-  }
+.ft-legal-link {
+  font-size: 13px;
+  color: #4A5A6A;
+  transition: color .18s;
+  font-weight: 500;
+  &:hover { color: #6EE7B7; }
 }

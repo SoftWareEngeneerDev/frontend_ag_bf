@@ -1,7 +1,7 @@
 <footer class="footer">
 
-  <!-- Top band -->
-  <div class="ft-top bg-gradient-primary">
+  <!-- ── Top band CTA ── -->
+  <div class="ft-top">
     <div class="container">
       <div class="ft-top-inner">
         <div class="ft-promo">
@@ -18,43 +18,39 @@
     </div>
   </div>
 
-  <!-- Main footer -->
-  <div class="ft-main bg-white">
+  <!-- ── Main footer ── -->
+  <div class="ft-main">
     <div class="container">
       <div class="ft-grid">
-        <!-- Brand -->
+
+        <!-- Colonne Brand + infos légales -->
         <div class="ft-brand">
           <app-logo [size]="19"></app-logo>
-          <p class="ft-desc text-muted">
+          <p class="ft-desc">
             La première plateforme d'achats groupés au Burkina Faso.
             Économisez ensemble avec Orange Money et Moov Money.
           </p>
-          <div class="ft-payments">
-            <span *ngFor="let p of ['Orange Money','Moov Money','Ligdicash','Carte bancaire']"
-                  class="ft-pay">{{ p }}</span>
-          </div>
         </div>
 
-        <!-- Links -->
+        <!-- Colonnes de liens -->
         <div class="ft-col" *ngFor="let col of footerLinks">
           <div class="ft-col-title font-display">{{ col.title }}</div>
           <a *ngFor="let l of col.links" [routerLink]="l.route" class="ft-link">{{ l.label }}</a>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- Bottom bar -->
+  <!-- ── Bottom bar ── -->
   <div class="ft-bottom">
     <div class="container">
       <div class="ft-bottom-inner">
-        <span class="text-muted" style="font-size:13px">
-          © {{ year }} AchatGroupéBF — Ouagadougou, Burkina Faso 🇧🇫
-        </span>
+        <span>© {{ year }} AchatGroupéBF — Ouagadougou, Burkina Faso 🇧🇫</span>
         <div class="ft-legal">
-          <a routerLink="/faq"     class="text-muted">CGU</a>
-          <a routerLink="/faq"     class="text-muted">Confidentialité</a>
-          <a routerLink="/contact" class="text-muted">Contact</a>
+          <a routerLink="/faq"     class="ft-legal-link">CGU</a>
+          <a routerLink="/faq"     class="ft-legal-link">Confidentialité</a>
+          <a routerLink="/contact" class="ft-legal-link">Contact</a>
         </div>
       </div>
     </div>

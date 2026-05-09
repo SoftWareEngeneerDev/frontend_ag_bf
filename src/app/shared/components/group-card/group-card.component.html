@@ -81,9 +81,13 @@
 
     <!-- Prix -->
     <div class="gc-price-row">
-      <div class="gc-prices">
-        <span class="gc-price">{{ group.currentPrice | currencyXof }}</span>
+      <div class="gc-price-col">
+        <span class="gc-price-lbl">Prix Solo :</span>
         <span class="gc-old-price">{{ group.product.soloPrice | currencyXof }}</span>
+      </div>
+      <div class="gc-price-col">
+        <span class="gc-price-lbl">Prix Groupe :</span>
+        <span class="gc-price">{{ group.currentPrice | currencyXof }}</span>
       </div>
     </div>
 
