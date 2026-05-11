@@ -63,6 +63,7 @@ export class SupplierShellComponent implements OnInit {
     { route: '/supplier/groups',   icon: 'fa-solid fa-layer-group',   label: 'Mes Groupes',     badge: 0 },
     { route: '/supplier/orders',   icon: 'fa-solid fa-cart-shopping', label: 'Commandes',       badge: 0, badgeColor: '#FF4D6A' },
     { route: '/supplier/revenue',  icon: 'fa-solid fa-sack-dollar',   label: 'Revenus' },
+    { route: '/supplier/profile',  icon: 'fa-solid fa-user',          label: 'Mon Profil' },
   ];
 
   constructor(private http: HttpClient) {}

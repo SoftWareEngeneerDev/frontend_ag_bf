@@ -9,6 +9,7 @@ import { SupplierProductsComponent } from './products/supplier-products.componen
 import { SupplierGroupsComponent }   from './groups/supplier-groups.component';
 import { SupplierOrdersComponent }   from './orders/supplier-orders.component';
 import { SupplierRevenueComponent }  from './revenue/supplier-revenue.component';
+import { ProfileComponent }  from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SupplierRevenueComponent }  from './revenue/supplier-revenue.component'
           { path: 'groups',   component: SupplierGroupsComponent },
           { path: 'orders',   component: SupplierOrdersComponent },
           { path: 'revenue',  component: SupplierRevenueComponent },
+          { path: 'profile',  component: ProfileComponent },
         ]
       }
     ]),
