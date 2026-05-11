@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build:prod",
+  "outputDirectory": "dist/achatgroupe-bf",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
