@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Group, PricingTier } from '../models';
+import { environment } from '../../../environments/environment.prod';
 
-const API = 'http://localhost:3000/api/v1';
+// const API = 'http://localhost:3000/api/v1';
+const API          = environment.apiUrl;
 
 // ── Type retour de joinGroup ──────────────────────────────────────
 export interface JoinGroupResult {
