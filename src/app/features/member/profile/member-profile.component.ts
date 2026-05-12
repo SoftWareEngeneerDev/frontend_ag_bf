@@ -4,8 +4,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthService }  from '../../../core/services/auth.service';
 import { UserService }  from '../../../core/services/user.service';
 import { HttpClient }   from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 @Component({
   selector: 'app-profile',

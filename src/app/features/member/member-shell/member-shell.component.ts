@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { NavItem } from '../../../layout/sidebar/sidebar.component';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 @Component({
   selector: 'app-member-shell',

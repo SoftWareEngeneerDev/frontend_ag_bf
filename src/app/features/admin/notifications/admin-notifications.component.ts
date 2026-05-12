@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../core/services/notification.service';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 const TYPE_CONFIG: Record<string, { icon: string; color: string; label: string }> = {
   SYSTEM        : { icon: 'fa-solid fa-gear',         color: '#6B7280', label: 'Système' },

@@ -5,8 +5,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { GroupService }   from '../../../core/services/group.service';
 import { FormatService }  from '../../../core/services/format.service';
 import { Group, Product } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 const TAB_STATUS_MAP: Record<string, string> = {
   'Ouverts'       : 'OPEN',

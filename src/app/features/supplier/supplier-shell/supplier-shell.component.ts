@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, catchError, of } from 'rxjs';
 import { NavItem } from '../../../layout/sidebar/sidebar.component';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 @Component({
   selector: 'app-supplier-shell',

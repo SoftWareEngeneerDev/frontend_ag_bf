@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 // const API = 'http://localhost:3000/api/v1';
 const API          = environment.apiUrl;

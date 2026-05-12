@@ -61,7 +61,7 @@ export class AuthInterceptor implements HttpInterceptor {
         this.isRefreshing = false;
         this.refreshDone$.next(null);
         this.auth.clearSession();
-        this.router.navigate(['/']);
+        this.router.navigate(['/auth/login']);
         return throwError(() => err);
       })
     );

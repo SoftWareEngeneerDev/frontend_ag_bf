@@ -4,8 +4,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { FormatService }  from '../../../core/services/format.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product, Category } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
 
-const API = 'http://localhost:3000/api/v1';
+const API = environment.apiUrl;
 
 const STATUS_MAP: Record<string, string> = {
   'Approuvés'  : 'ACTIVE',
