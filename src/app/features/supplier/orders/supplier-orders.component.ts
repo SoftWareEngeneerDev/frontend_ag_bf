@@ -7,7 +7,7 @@ const API = 'http://localhost:3000/api/v1';
 
 const TAB_STATUS_MAP: Record<string, string> = {
   'À confirmer'   : 'CREATED',
-  'En préparation': 'PROCESSING',
+  'En cours': 'PROCESSING',
   'Expédiées'     : 'SHIPPED',
   'Livrées'       : 'DELIVERED',
 };
@@ -33,7 +33,7 @@ export class SupplierOrdersComponent implements OnInit, OnDestroy {
   successMsg = '';
   errorMsg   = '';
 
-  readonly tabs = ['Toutes', 'À confirmer', 'En préparation', 'Expédiées', 'Livrées'];
+  readonly tabs = ['Toutes', 'À confirmer', 'En cours', 'Expédiées', 'Livrées'];
 
   private destroy$ = new Subject<void>();
 

@@ -1,1 +1,310 @@
-<p>profile works!</p>
+<div class="ap-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="alert-ok alert" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert-red alert" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <div *ngIf="!loading">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════════ -->
+    <div class="flex-between mb-28">
+      <div>
+        <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+          <i class="fa-solid fa-store" style="color:var(--primary)"></i> Mon Profil Fournisseur
+        </h2>
+        <p class="text-muted" style="font-size:13px">
+          Membre depuis {{ memberSince }}
+        </p>
+      </div>
+      <span [class]="statusBadge" style="font-size:12px">
+        <i class="fa-solid fa-circle"></i> {{ statusLabel }}
+      </span>
+    </div>
+
+    <div class="ap-grid">
+
+      <!-- ══ COLONNE GAUCHE ══════════════════════════════════════ -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Carte logo/avatar -->
+        <div class="glass ap-avatar-card">
+          <div class="ap-avatar-wrap">
+
+            <!-- Logo ou initiales -->
+            <div class="ap-avatar-circle">
+              <img *ngIf="supplier?.logoUrl"
+                   [src]="supplier.logoUrl"
+                   class="ap-avatar-img" alt="Logo">
+              <div *ngIf="!supplier?.logoUrl" class="ap-avatar-initials">
+                {{ initials }}
+              </div>
+
+              <!-- Bouton upload -->
+              <label class="ap-avatar-edit" [class.loading]="uploadingLogo">
+                <input type="file" accept="image/jpeg,image/png,image/webp"
+                       style="display:none"
+                       (change)="onLogoSelected($event)">
+                <i *ngIf="!uploadingLogo" class="fa-solid fa-camera"></i>
+                <i *ngIf="uploadingLogo"  class="fa-solid fa-spinner fa-spin"></i>
+              </label>
+            </div>
+
+            <h3 class="ap-avatar-name">{{ form.companyName }}</h3>
+            <p class="text-muted" style="font-size:12px">{{ form.contactName }}</p>
+            <p class="text-muted" style="font-size:12px" *ngIf="form.phone">{{ form.phone }}</p>
+          </div>
+
+          <div class="ap-avatar-hint text-muted">
+            <i class="fa-solid fa-circle-info"></i>
+            JPG, PNG ou WEBP — max 2MB
+          </div>
+        </div>
+
+        <!-- Carte commission -->
+        <div class="glass" style="padding:16px;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--primary)">
+            {{ commissionPercent }}%
+          </div>
+          <div class="text-muted" style="font-size:11px">Commission plateforme</div>
+        </div>
+
+        <!-- Carte stats rapides -->
+        <div class="glass" style="padding:16px">
+          <div class="ap-info-row">
+            <i class="fa-solid fa-users" style="color:var(--primary)"></i>
+            <div>
+              <div class="text-muted" style="font-size:10px">GROUPES CRÉÉS</div>
+              <div style="font-size:18px;font-weight:600">{{ supplier?.totalGroups || 0 }}</div>
+            </div>
+          </div>
+          <div class="ap-info-row">
+            <i class="fa-solid fa-box" style="color:#10D98B"></i>
+            <div>
+              <div class="text-muted" style="font-size:10px">PRODUITS</div>
+              <div style="font-size:18px;font-weight:600">{{ supplier?.totalProducts || 0 }}</div>
+            </div>
+          </div>
+          <div class="ap-info-row">
+            <i class="fa-solid fa-star" style="color:#F5A623"></i>
+            <div>
+              <div class="text-muted" style="font-size:10px">NOTE MOYENNE</div>
+              <div style="font-size:18px;font-weight:600">{{ supplier?.rating || 0 }}/5</div>
+            </div>
+          </div>
+          <div class="ap-info-row" style="border:none;padding-bottom:0">
+            <i class="fa-solid fa-chart-line" style="color:#7B2FBE"></i>
+            <div>
+              <div class="text-muted" style="font-size:10px">TAUX DE SUCCÈS</div>
+              <div style="font-size:18px;font-weight:600">{{ supplier?.successRate || 0 }}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ COLONNE DROITE — Formulaires ════════════════════════ -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Informations entreprise -->
+        <div class="glass ap-section">
+          <h3 class="ap-section-title">
+            <i class="fa-solid fa-building"></i> Informations entreprise
+          </h3>
+
+          <div class="ap-form-grid">
+            <div class="inp-group">
+              <label>Nom de l'entreprise <span style="color:var(--err)">*</span></label>
+              <input class="inp" [(ngModel)]="form.companyName" placeholder="Nom de votre entreprise">
+            </div>
+            <div class="inp-group">
+              <label>Nom du contact <span style="color:var(--err)">*</span></label>
+              <input class="inp" [(ngModel)]="form.contactName" placeholder="Votre nom">
+            </div>
+            <div class="inp-group">
+              <label>Téléphone</label>
+              <input class="inp" [value]="form.phone" disabled
+                     style="opacity:.6;cursor:not-allowed"
+                     title="Le téléphone ne peut pas être modifié">
+            </div>
+            <div class="inp-group">
+              <label>Email</label>
+              <input class="inp" [(ngModel)]="form.email" type="email" placeholder="email@entreprise.com">
+            </div>
+            <div class="inp-group">
+              <label>Ville</label>
+              <input class="inp" [(ngModel)]="form.city" placeholder="Ouagadougou">
+            </div>
+            <div class="inp-group full-width">
+              <label>Adresse</label>
+              <input class="inp" [(ngModel)]="form.address" placeholder="Adresse complète">
+            </div>
+            <div class="inp-group full-width">
+              <label>Description</label>
+              <textarea class="inp" [(ngModel)]="form.description" rows="3"
+                        placeholder="Présentez votre activité..."></textarea>
+            </div>
+          </div>
+
+          <div class="alert-cyan alert" style="font-size:12px">
+            <i class="fa-solid fa-circle-info"></i>
+            Le numéro de téléphone ne peut pas être modifié pour des raisons de sécurité.
+          </div>
+
+          <button class="btn-primary btn-round"
+                  (click)="saveProfile()" [disabled]="saving || !form.companyName.trim()">
+            <i *ngIf="saving"  class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!saving" class="fa-solid fa-floppy-disk"></i>
+            {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+          </button>
+        </div>
+
+        <!-- Documents légaux -->
+        <div class="glass ap-section">
+          <h3 class="ap-section-title">
+            <i class="fa-solid fa-file-lines"></i> Documents légaux
+          </h3>
+
+          <!-- Documents existants -->
+          <div *ngIf="existingDocs.length > 0" class="ap-docs-list">
+            <div *ngFor="let doc of existingDocs; let i = index" class="ap-doc-item">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span class="font-mono" style="font-size:12px;flex:1">Document {{ i + 1 }}</span>
+              <a [href]="doc" target="_blank" class="btn-ghost btn-sm btn-icon">
+                <i class="fa-solid fa-eye"></i>
+              </a>
+              <button class="btn-err btn-sm btn-icon" (click)="removeDocument(i)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload nouveaux documents -->
+          <div class="ap-docs-upload">
+            <label class="btn-ghost btn-round" style="cursor:pointer">
+              <i class="fa-solid fa-cloud-upload-alt"></i>
+              Sélectionner des documents
+              <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png"
+                     style="display:none" (change)="onDocsSelected($event)">
+            </label>
+            <div *ngIf="newDocs.length > 0" class="ap-docs-preview">
+              <span *ngFor="let doc of newDocs; let i = index" class="ap-doc-preview-item">
+                {{ doc.name }}
+                <button (click)="newDocs.splice(i,1)" class="btn-err btn-sm btn-icon">
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </span>
+              <button class="btn-primary btn-sm btn-round" (click)="uploadDocuments()" [disabled]="uploadingDocs">
+                <i *ngIf="uploadingDocs" class="fa-solid fa-spinner fa-spin"></i>
+                <i *ngIf="!uploadingDocs" class="fa-solid fa-upload"></i>
+                Uploader
+              </button>
+            </div>
+          </div>
+
+          <div class="text-muted" style="font-size:11px;margin-top:12px">
+            <i class="fa-solid fa-shield"></i>
+            Formats acceptés : PDF, JPG, PNG — Max 5MB par document
+          </div>
+        </div>
+
+        <!-- Sécurité -->
+        <div class="glass ap-section">
+          <div class="flex-between" style="margin-bottom:16px">
+            <h3 class="ap-section-title" style="margin-bottom:0">
+              <i class="fa-solid fa-shield"></i> Sécurité
+            </h3>
+            <button class="btn-ghost btn-sm btn-round" (click)="showPwForm = !showPwForm">
+              <i class="fa-solid" [class.fa-chevron-down]="!showPwForm" [class.fa-chevron-up]="showPwForm"></i>
+              {{ showPwForm ? 'Annuler' : 'Changer le mot de passe' }}
+            </button>
+          </div>
+
+          <div *ngIf="!showPwForm" class="ap-security-info">
+            <div class="ap-security-item">
+              <div class="ap-security-dot ok"></div>
+              <span>Mot de passe configuré</span>
+            </div>
+            <div class="ap-security-item">
+              <div class="ap-security-dot ok"></div>
+              <span>Compte vérifié par SMS</span>
+            </div>
+            <div class="ap-security-item">
+              <div class="ap-security-dot" [class.ok]="form.email"></div>
+              <span>{{ form.email ? 'Email configuré' : 'Email non configuré' }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="showPwForm" style="display:flex;flex-direction:column;gap:14px">
+            <div class="inp-group">
+              <label>Mot de passe actuel <span style="color:var(--err)">*</span></label>
+              <div style="position:relative">
+                <input class="inp" [type]="showCurrentPw ? 'text' : 'password'"
+                       [(ngModel)]="pwForm.currentPassword"
+                       placeholder="Votre mot de passe actuel"
+                       style="padding-right:44px">
+                <button class="ap-pw-eye" type="button" (click)="showCurrentPw = !showCurrentPw">
+                  <i class="fa-solid" [class.fa-eye]="!showCurrentPw" [class.fa-eye-slash]="showCurrentPw"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="inp-group">
+              <label>Nouveau mot de passe <span style="color:var(--err)">*</span></label>
+              <div style="position:relative">
+                <input class="inp" [type]="showNewPw ? 'text' : 'password'"
+                       [(ngModel)]="pwForm.newPassword"
+                       placeholder="Min. 8 caractères"
+                       style="padding-right:44px">
+                <button class="ap-pw-eye" type="button" (click)="showNewPw = !showNewPw">
+                  <i class="fa-solid" [class.fa-eye]="!showNewPw" [class.fa-eye-slash]="showNewPw"></i>
+                </button>
+              </div>
+              <div class="ap-pw-strength" *ngIf="pwForm.newPassword">
+                <div class="ap-pw-bar"
+                     [style.width]="pwStrengthPct + '%'"
+                     [style.background]="pwStrengthColor">
+                </div>
+              </div>
+              <div class="text-muted" style="font-size:11px" *ngIf="pwForm.newPassword">
+                {{ pwStrengthLabel }}
+              </div>
+            </div>
+
+            <div class="inp-group">
+              <label>Confirmer le nouveau mot de passe <span style="color:var(--err)">*</span></label>
+              <div style="position:relative">
+                <input class="inp" [type]="showConfirmPw ? 'text' : 'password'"
+                       [(ngModel)]="pwForm.confirmPassword"
+                       placeholder="Répétez le nouveau mot de passe"
+                       style="padding-right:44px"
+                       [class.inp-err]="pwForm.confirmPassword && pwForm.newPassword !== pwForm.confirmPassword">
+                <button class="ap-pw-eye" type="button" (click)="showConfirmPw = !showConfirmPw">
+                  <i class="fa-solid" [class.fa-eye]="!showConfirmPw" [class.fa-eye-slash]="showConfirmPw"></i>
+                </button>
+              </div>
+              <div class="text-muted" style="font-size:11px;color:#FF4D6A"
+                   *ngIf="pwForm.confirmPassword && pwForm.newPassword !== pwForm.confirmPassword">
+                Les mots de passe ne correspondent pas
+              </div>
+            </div>
+
+            <button class="btn-primary btn-round"
+                    (click)="changePassword()"
+                    [disabled]="savingPw || !pwForm.currentPassword || !pwForm.newPassword || pwForm.newPassword !== pwForm.confirmPassword">
+              <i *ngIf="savingPw"  class="fa-solid fa-spinner fa-spin"></i>
+              <i *ngIf="!savingPw" class="fa-solid fa-lock"></i>
+              {{ savingPw ? 'Modification...' : 'Modifier le mot de passe' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

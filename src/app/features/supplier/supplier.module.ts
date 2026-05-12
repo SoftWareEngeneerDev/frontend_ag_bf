@@ -10,6 +10,7 @@ import { SupplierGroupsComponent }   from './groups/supplier-groups.component';
 import { SupplierOrdersComponent }   from './orders/supplier-orders.component';
 import { SupplierRevenueComponent }  from './revenue/supplier-revenue.component';
 import { ProfileComponent }  from './profile/profile.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { ProfileComponent }  from './profile/profile.component';
     SupplierGroupsComponent,
     SupplierOrdersComponent,
     SupplierRevenueComponent,
+    ProfileComponent,
   ],
   imports: [
     SharedModule,
@@ -37,6 +39,6 @@ import { ProfileComponent }  from './profile/profile.component';
         ]
       }
     ]),
-  ],
+     ],
 })
 export class SupplierModule {}
