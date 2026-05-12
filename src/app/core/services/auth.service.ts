@@ -5,8 +5,11 @@ import { Observable, tap, map, throwError, catchError } from 'rxjs';
 import { User, LoginDto, RegisterDto, AuthResponse, OtpDto } from '../models';
 import { MockDataService } from './mock-data.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment';
 
-const API          = 'http://localhost:3000/api/v1';
+// const API          = 'http://localhost:3000/api/v1';
+
+const API          = environment.apiUrl;
 const KEY_USER     = 'agbf_user';
 const KEY_TOKEN    = 'agbf_token';
 const KEY_REFRESH  = 'agbf_refresh';
