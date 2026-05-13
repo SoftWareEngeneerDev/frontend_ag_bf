@@ -1,6 +1,5 @@
-
 {
-  "outputDirectory": "dist/achatgroupe-bf/browser",
+  "outputDirectory": "dist/achatgroupe-bf",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
