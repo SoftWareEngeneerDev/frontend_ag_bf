@@ -5,8 +5,10 @@ import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '..//../../core/services/auth.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { environment } from '../../../../environments/environment.prod';
 
-const API = 'http://localhost:3000/api/v1';
+// const API = 'http://localhost:3000/api/v1';
+const API          = environment.apiUrl;
 
 @Component({
   selector: 'app-profile',
