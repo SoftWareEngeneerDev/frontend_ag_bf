@@ -87,7 +87,7 @@ export class SupplierShellComponent implements OnInit {
       // Badge commandes urgentes
       const orderList = orders?.data ?? [];
       const urgent = orderList.filter((o: any) =>
-        ['CREATED', 'CONFIRMED'].includes(o.status)
+        o.status === 'CREATED'
       ).length;
       this.navItems[3].badge      = urgent;
       this.navItems[3].badgeColor = urgent > 0 ? '#FF4D6A' : undefined;

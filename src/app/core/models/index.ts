@@ -6,23 +6,20 @@
 export type UserRole    = 'MEMBER' | 'SUPPLIER' | 'ADMIN';
 export type UserStatus  = 'ACTIVE' | 'SUSPENDED' | 'PENDING' | 'BANNED';
 
-export type GroupStatus = 'OPEN' | 'THRESHOLD_REACHED' | 'PAYMENT_PENDING'
-                        | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+export type GroupStatus = 'OPEN' | 'THRESHOLD_REACHED' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
 
-export type MemberStatus = 'ACTIVE' | 'DEPOSIT_PAID' | 'PAYMENT_COMPLETE' | 'WITHDRAWN';
+export type MemberStatus = 'ACTIVE' | 'CANCELLED' | 'PAID';
 
 export type SupplierStatus = 'PENDING' | 'APPROVED' | 'SUSPENDED';
 
-export type PaymentType   = 'DEPOSIT' | 'FINAL' | 'REFUND' | 'COMMISSION';
-export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
+export type PaymentType   = 'DEPOSIT' | 'FINAL_PAYMENT' | 'REFUND' | 'COMMISSION';
+export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'ESCROWED';
 export type PaymentMethod = 'ORANGE_MONEY' | 'MOOV_MONEY' | 'LIGDICASH' | 'CARD';
 
-export type OrderStatus = 'CREATED' | 'CONFIRMED' | 'PROCESSING'
-                        | 'SHIPPED'  | 'DELIVERED' | 'DISPUTED' | 'CANCELLED';
+export type OrderStatus = 'CREATED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
-export type NotifType = 'NEW_MEMBER' | 'THRESHOLD_REACHED' | 'PAYMENT_REMINDER'
-                      | 'PAYMENT_SUCCESS' | 'ORDER_SHIPPED' | 'ORDER_DELIVERED'
-                      | 'GROUP_EXPIRED'   | 'PROMO';
+export type NotifType = 'NEW_MEMBER' | 'PRICE_DROP' | 'GROUP_SUCCESS' | 'GROUP_FAILED'
+                      | 'PAYMENT_DUE' | 'DELIVERY_UPDATE' | 'SYSTEM';
 
 export type DisputeStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 export type DisputeReason = 'NOT_RECEIVED' | 'QUALITY_ISSUE' | 'WRONG_PRODUCT'

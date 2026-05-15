@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../core/services/notification.service';
-import { environment } from '../../../../environments/environment';
 
+import { environment } from '../../../../environments/environment';
 const API = environment.apiUrl;
 
 const TYPE_CONFIG: Record<string, { icon: string; color: string; label: string }> = {

@@ -19,9 +19,9 @@ export class OrderService {
     );
   }
 
-  // ── GET /orders/:id/tracking ──────────────────────────────────
+  // ── GET /orders/:id ───────────────────────────────────────────
   getById(id: string): Observable<Order | undefined> {
-    return this.http.get<any>(`${API}/orders/${id}/tracking`).pipe(
+    return this.http.get<any>(`${API}/orders/${id}`).pipe(
       map(res => res.data ? this.mapOrder(res.data) : undefined)
     );
   }

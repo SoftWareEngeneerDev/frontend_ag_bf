@@ -9,8 +9,6 @@ import { Group } from '../../../../core/models';
 const STATUS_LABELS: Record<string, string> = {
   OPEN             : 'Ouvert',
   THRESHOLD_REACHED: 'Seuil atteint',
-  PAYMENT_PENDING  : 'Paiement en attente',
-  PROCESSING       : 'En cours',
   COMPLETED        : 'Terminé',
   CANCELLED        : 'Annulé',
   EXPIRED          : 'Expiré',
@@ -19,8 +17,6 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_CLASSES: Record<string, string> = {
   OPEN             : 'badge-cyan',
   THRESHOLD_REACHED: 'badge-ok',
-  PAYMENT_PENDING  : 'badge-warn',
-  PROCESSING       : 'badge-gold',
   COMPLETED        : 'badge-grey',
   CANCELLED        : 'badge-err',
   EXPIRED          : 'badge-err',

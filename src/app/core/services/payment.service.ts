@@ -9,7 +9,7 @@ const API          = environment.apiUrl;
 
 export interface PaymentInitDto {
   groupId: string;
-  type:    'DEPOSIT' | 'FINAL';
+  type:    'DEPOSIT' | 'FINAL_PAYMENT';
   method:  PaymentMethod;
   phone?:  string;
   amount:  number;

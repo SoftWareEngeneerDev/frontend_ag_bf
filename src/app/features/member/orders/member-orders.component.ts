@@ -26,22 +26,21 @@ export class OrdersComponent implements OnInit, OnDestroy {
   ];
 
   readonly timelineSteps = [
-    { icon: 'fa-solid fa-file-circle-check',  label: 'Créée'      },
-    { icon: 'fa-solid fa-circle-check',       label: 'Confirmée'  },
-    { icon: 'fa-solid fa-box',                label: 'Préparation'},
-    { icon: 'fa-solid fa-house-circle-check', label: 'Livrée'     },
+    { icon: 'fa-solid fa-file-circle-check',  label: 'Créée'       },
+    { icon: 'fa-solid fa-gear',               label: 'Préparation' },
+    { icon: 'fa-solid fa-truck-fast',         label: 'Expédiée'    },
+    { icon: 'fa-solid fa-house-circle-check', label: 'Livrée'      },
   ];
 
   private readonly statusMap: Record<string, number> = {
     CREATED    : 0,
-    CONFIRMED  : 1,
-    PROCESSING : 2,
-    SHIPPED    : 3,
-    DELIVERED  : 4,
+    PROCESSING : 1,
+    SHIPPED    : 2,
+    DELIVERED  : 3,
   };
 
   private readonly filterMap: Record<string, string[]> = {
-    ongoing   : ['CREATED', 'CONFIRMED', 'PROCESSING'],
+    ongoing   : ['CREATED', 'PROCESSING'],
     shipped   : ['SHIPPED'],
     delivered : ['DELIVERED'],
     cancelled : ['CANCELLED'],
@@ -75,10 +74,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
   // ── Compteurs ─────────────────────────────────────────────────
   private updateCounts(): void {
     this.tabList[0].count = this.orders.length;
-    this.tabList[1].count = this.orders.filter(o => ['CREATED','CONFIRMED','PROCESSING'].includes(o.status)).length;
-    this.tabList[2].count = this.orders.filter(o => o.status === 'SHIPPED').length;
-    this.tabList[3].count = this.orders.filter(o => o.status === 'DELIVERED').length;
-    this.tabList[4].count = this.orders.filter(o => o.status === 'CANCELLED').length;
+    this.tabList[1].count = this.orders.filter(o => ['CREATED','PROCESSING'].includes(o.status)).length;
+    this.tabList[2].count = this.orders.filter(o => o.status === 'DELIVERED').length;
+    this.tabList[3].count = this.orders.filter(o => o.status === 'CANCELLED').length;
   }
 
   // ── Filtre ────────────────────────────────────────────────────
@@ -107,7 +105,6 @@ export class OrdersComponent implements OnInit, OnDestroy {
   statusIcon(status: string): string {
     const icons: Record<string, string> = {
       CREATED    : 'fa-solid fa-file-pen',
-      CONFIRMED  : 'fa-solid fa-circle-check',
       PROCESSING : 'fa-solid fa-gear fa-spin',
       SHIPPED    : 'fa-solid fa-truck-fast',
       DELIVERED  : 'fa-solid fa-house-circle-check',
@@ -117,7 +114,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   isOngoing(o: Order): boolean {
-    return ['CREATED', 'CONFIRMED', 'PROCESSING'].includes(o.status);
+    return ['CREATED', 'PROCESSING'].includes(o.status);
   }
 
   trackById(_: number, o: Order): string { return o.id; }

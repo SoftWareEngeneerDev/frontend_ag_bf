@@ -363,19 +363,19 @@ export class MockDataService {
 
   // ── NOTIFICATIONS ─────────────────────────────────────────────────
   readonly notifications: Notification[] = [
-    { id:'n1', type:'NEW_MEMBER',        read:false, title:'Nouveau membre dans votre groupe !',       body:'Samsung Galaxy A55 passe à 8/10. Prix: 188,600 XOF', createdAt: new Date(Date.now()-12*60000) },
-    { id:'n2', type:'THRESHOLD_REACHED', read:false, title:'🎯 Seuil atteint ! Procédez au paiement', body:'Climatiseur 12000 BTU — 6/6 participants. Payez le solde avant le 20 mars.',  createdAt: new Date(Date.now()-80*60000) },
-    { id:'n3', type:'PAYMENT_REMINDER',  read:false, title:'⏰ Rappel : paiement dû dans 48h',         body:'Solde restant : 117,000 XOF pour le Climatiseur 12000 BTU', createdAt: new Date(Date.now()-3*3600000) },
-    { id:'n4', type:'ORDER_SHIPPED',     read:true,  title:'📦 Votre commande est expédiée !',         body:'TV LED 55" — Code suivi: DHL-BF-2024-48291', createdAt: new Date(Date.now()-24*3600000) },
-    { id:'n5', type:'PAYMENT_SUCCESS',   read:true,  title:'✅ Groupe réussi ! Commande créée',        body:'Riz Basmati 50kg — 20/20 membres | CMD-2024-0312', createdAt: new Date(Date.now()-2*86400000) },
-    { id:'n6', type:'PROMO',             read:true,  title:'⭐ Nouveau groupe : Samsung S24 Ultra',    body:'Rejoignez maintenant — 45% de réduction à 15 membres', createdAt: new Date(Date.now()-3*86400000) },
+    { id:'n1', type:'NEW_MEMBER',      read:false, title:'Nouveau membre dans votre groupe !',       body:'Samsung Galaxy A55 passe à 8/10. Prix: 188,600 XOF', createdAt: new Date(Date.now()-12*60000) },
+    { id:'n2', type:'GROUP_SUCCESS',   read:false, title:'🎯 Seuil atteint ! Procédez au paiement', body:'Climatiseur 12000 BTU — 6/6 participants. Payez le solde avant le 20 mars.',  createdAt: new Date(Date.now()-80*60000) },
+    { id:'n3', type:'PAYMENT_DUE',     read:false, title:'⏰ Rappel : paiement dû dans 48h',         body:'Solde restant : 117,000 XOF pour le Climatiseur 12000 BTU', createdAt: new Date(Date.now()-3*3600000) },
+    { id:'n4', type:'DELIVERY_UPDATE', read:true,  title:'📦 Votre commande est expédiée !',         body:'TV LED 55" — Code suivi: DHL-BF-2024-48291', createdAt: new Date(Date.now()-24*3600000) },
+    { id:'n5', type:'GROUP_SUCCESS',   read:true,  title:'✅ Groupe réussi ! Commande créée',        body:'Riz Basmati 50kg — 20/20 membres | CMD-2024-0312', createdAt: new Date(Date.now()-2*86400000) },
+    { id:'n6', type:'SYSTEM',          read:true,  title:'⭐ Nouveau groupe : Samsung S24 Ultra',    body:'Rejoignez maintenant — 45% de réduction à 15 membres', createdAt: new Date(Date.now()-3*86400000) },
   ];
 
   // ── PAYMENTS ──────────────────────────────────────────────────────
   readonly payments: Payment[] = [
-    { id:'pay-001', user:{} as any, group:{} as any, type:'DEPOSIT', status:'SUCCESS', method:'ORANGE_MONEY', amount:18860, reference:'TXN-2024-890123', transactionId:'OM-8912', createdAt: new Date('2024-03-10') },
-    { id:'pay-002', user:{} as any, group:{} as any, type:'DEPOSIT', status:'SUCCESS', method:'MOOV_MONEY',   amount:13000, reference:'TXN-2024-891456', transactionId:'MM-7823', createdAt: new Date('2024-03-08') },
-    { id:'pay-003', user:{} as any, group:{} as any, type:'FINAL',   status:'SUCCESS', method:'ORANGE_MONEY', amount:117000,reference:'TXN-2024-892371', transactionId:'OM-9234', createdAt: new Date('2024-03-15') },
+    { id:'pay-001', user:{} as any, group:{} as any, type:'DEPOSIT',       status:'COMPLETED', method:'ORANGE_MONEY', amount:18860, reference:'TXN-2024-890123', transactionId:'OM-8912', createdAt: new Date('2024-03-10') },
+    { id:'pay-002', user:{} as any, group:{} as any, type:'DEPOSIT',       status:'COMPLETED', method:'MOOV_MONEY',   amount:13000, reference:'TXN-2024-891456', transactionId:'MM-7823', createdAt: new Date('2024-03-08') },
+    { id:'pay-003', user:{} as any, group:{} as any, type:'FINAL_PAYMENT', status:'COMPLETED', method:'ORANGE_MONEY', amount:117000,reference:'TXN-2024-892371', transactionId:'OM-9234', createdAt: new Date('2024-03-15') },
   ];
 
   // ── DISPUTES ──────────────────────────────────────────────────────

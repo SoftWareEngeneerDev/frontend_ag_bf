@@ -96,7 +96,7 @@ export class MemberShellComponent implements OnInit {
       next: (res) => {
         const orders  = res.data ?? [];
         const pending = orders.filter((o: any) =>
-          ['CREATED', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(o.status)
+          ['CREATED', 'PROCESSING', 'SHIPPED'].includes(o.status)
         ).length;
         this.navItems[4].badge      = pending;
         this.navItems[4].badgeColor = pending > 0 ? '#00D4FF' : undefined;

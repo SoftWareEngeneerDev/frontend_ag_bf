@@ -13,7 +13,6 @@ const TYPE_MAP: Record<string, string> = {
 const TYPE_LABELS: Record<string, string> = {
   DEPOSIT      : 'Acompte',
   FINAL_PAYMENT: 'Paiement final',
-  FINAL        : 'Paiement final',
   REFUND       : 'Remboursement',
   COMMISSION   : 'Commission',
 };
@@ -21,7 +20,6 @@ const TYPE_LABELS: Record<string, string> = {
 const TYPE_CLASSES: Record<string, string> = {
   DEPOSIT      : 'badge-cyan',
   FINAL_PAYMENT: 'badge-ok',
-  FINAL        : 'badge-ok',
   REFUND       : 'badge-warn',
   COMMISSION   : 'badge-gold',
 };

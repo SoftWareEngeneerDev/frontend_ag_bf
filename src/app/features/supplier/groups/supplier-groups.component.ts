@@ -12,7 +12,6 @@ const API = environment.apiUrl;
 const TAB_STATUS_MAP: Record<string, string> = {
   'Ouverts'       : 'OPEN',
   'Seuil atteint' : 'THRESHOLD_REACHED',
-  'En traitement' : 'PROCESSING',
   'Terminés'      : 'COMPLETED',
 };
 
@@ -32,7 +31,7 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
   successMsg      = '';
   errorMsg        = '';
 
-  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'En traitement', 'Terminés'];
+  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'Terminés'];
 
   private destroy$ = new Subject<void>();
 

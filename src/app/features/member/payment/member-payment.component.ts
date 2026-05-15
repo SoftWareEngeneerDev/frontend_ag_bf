@@ -25,7 +25,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   groupId       = '';
   depositAmount = 0;
   currentPrice  = 0;
-  paymentType   : 'DEPOSIT' | 'FINAL' = 'FINAL';
+  paymentType   : 'DEPOSIT' | 'FINAL_PAYMENT' = 'FINAL_PAYMENT';
 
   private destroy$ = new Subject<void>();
 
@@ -52,7 +52,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.groupId      = params['groupId']        ?? '';
     this.depositAmount = +(params['depositAmount'] ?? 0);
     this.currentPrice  = +(params['currentPrice']  ?? 0);
-    this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL';
+    this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL_PAYMENT';
 
     if (this.groupId) {
       this.groupService.getById(this.groupId)

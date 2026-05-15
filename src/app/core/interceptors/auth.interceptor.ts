@@ -20,31 +20,38 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const isPublic = this.isPublicRoute(req.url);
-    if (isPublic) return next.handle(req);
+    // Routes publiques : withCredentials pour que le browser envoie les cookies
+    if (isPublic) return next.handle(req.clone({ withCredentials: true }));
 
-    const token   = this.auth.getToken();
-    const authReq = token ? this.addToken(req, token) : req;
+    const authReq = this.buildRequest(req);
 
     return next.handle(authReq).pipe(
       catchError((err: HttpErrorResponse) => {
-        if (err.status === 401) {
-          return this.handle401(req, next);
-        }
+        if (err.status === 401) return this.handle401(req, next);
         return throwError(() => err);
       })
     );
   }
 
-  private addToken(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
-    return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+  // Construit la requête avec withCredentials + Bearer uniquement en mode démo
+  private buildRequest(req: HttpRequest<unknown>): HttpRequest<unknown> {
+    const demoToken = this.auth.getToken(); // non-null uniquement pour mock-demo-*
+    if (demoToken) {
+      return req.clone({
+        withCredentials: true,
+        setHeaders: { Authorization: `Bearer ${demoToken}` },
+      });
+    }
+    // Mode réel : le cookie httpOnly est envoyé automatiquement par le navigateur
+    return req.clone({ withCredentials: true });
   }
 
   private handle401(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (this.isRefreshing) {
       return this.refreshDone$.pipe(
-        filter(token => token !== null),
+        filter(t => t !== null),
         take(1),
-        switchMap(token => next.handle(this.addToken(req, token!)))
+        switchMap(() => next.handle(this.buildRequest(req)))
       );
     }
 
@@ -55,7 +62,8 @@ export class AuthInterceptor implements HttpInterceptor {
       switchMap(({ token }) => {
         this.isRefreshing = false;
         this.refreshDone$.next(token);
-        return next.handle(this.addToken(req, token));
+        // Relancer la requête originale — le nouveau cookie est posé par le backend
+        return next.handle(this.buildRequest(req));
       }),
       catchError(err => {
         this.isRefreshing = false;
