@@ -59,12 +59,13 @@ export class SupplierShellComponent implements OnInit {
   sidebarOpen = false;
 
   navItems: NavItem[] = [
-    { route: '/supplier',          icon: 'fa-solid fa-gauge-high',    label: 'Tableau de bord', exact: true },
-    { route: '/supplier/products', icon: 'fa-solid fa-box-open',      label: 'Mes Produits',    badge: 0 },
-    { route: '/supplier/groups',   icon: 'fa-solid fa-layer-group',   label: 'Mes Groupes',     badge: 0 },
-    { route: '/supplier/orders',   icon: 'fa-solid fa-cart-shopping', label: 'Commandes',       badge: 0, badgeColor: '#FF4D6A' },
-    { route: '/supplier/revenue',  icon: 'fa-solid fa-sack-dollar',   label: 'Revenus' },
-    { route: '/supplier/profile',  icon: 'fa-solid fa-user',          label: 'Mon Profil' },
+    { route: '/supplier',            icon: 'fa-solid fa-gauge-high',          label: 'Tableau de bord', exact: true },
+    { route: '/supplier/products',   icon: 'fa-solid fa-box-open',            label: 'Mes Produits',    badge: 0 },
+    { route: '/supplier/groups',     icon: 'fa-solid fa-layer-group',         label: 'Mes Groupes',     badge: 0 },
+    { route: '/supplier/orders',     icon: 'fa-solid fa-cart-shopping',       label: 'Commandes',       badge: 0, badgeColor: '#FF4D6A' },
+    { route: '/supplier/revenue',    icon: 'fa-solid fa-sack-dollar',         label: 'Revenus' },
+    { route: '/supplier/withdrawal', icon: 'fa-solid fa-money-bill-transfer', label: 'Retrait' },
+    { route: '/supplier/profile',    icon: 'fa-solid fa-user',                label: 'Mon Profil' },
   ];
 
   constructor(private http: HttpClient) {}

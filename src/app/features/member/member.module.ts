@@ -11,6 +11,7 @@ import { PaymentComponent }          from './payment/member-payment.component';
 import { OrdersComponent }           from './orders/member-orders.component';
 import { NotificationsComponent }    from './notifications/member-notifications.component';
 import { ProfileComponent }          from './profile/member-profile.component';
+import { MemberDisputesComponent }   from './disputes/member-disputes.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { ProfileComponent }          from './profile/member-profile.component';
     OrdersComponent,
     NotificationsComponent,
     ProfileComponent,
+    MemberDisputesComponent,
   ],
   imports: [
     SharedModule,
@@ -38,6 +40,7 @@ import { ProfileComponent }          from './profile/member-profile.component';
           { path: 'orders',        component: OrdersComponent },
           { path: 'notifications', component: NotificationsComponent },
           { path: 'profile',       component: ProfileComponent },
+          { path: 'disputes',      component: MemberDisputesComponent },
         ]
       }
     ]),
