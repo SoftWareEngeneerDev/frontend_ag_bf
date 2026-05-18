@@ -82,7 +82,9 @@ export class ProductService {
       } : null as any,
       status:          p.status === 'APPROVED' ? 'ACTIVE' : 'PENDING',
       stock:           p.stock ?? 0,
-      rating:          p._count?.reviews > 0 ? 4.5 : 0,  // valeur par défaut
+      rating:          Array.isArray(p.reviews) && p.reviews.length > 0
+                         ? p.reviews.reduce((s: number, r: any) => s + r.rating, 0) / p.reviews.length
+                         : 0,
       reviewCount:     p._count?.reviews ?? 0,
       activeGroupCount: p._count?.groups ?? 0,
       createdAt:       new Date(p.createdAt ?? Date.now()),

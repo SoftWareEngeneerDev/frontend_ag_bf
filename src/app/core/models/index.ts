@@ -10,9 +10,9 @@ export type GroupStatus = 'OPEN' | 'THRESHOLD_REACHED' | 'COMPLETED' | 'CANCELLE
 
 export type MemberStatus = 'ACTIVE' | 'CANCELLED' | 'PAID';
 
-export type SupplierStatus = 'PENDING' | 'APPROVED' | 'SUSPENDED';
+export type SupplierStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
 
-export type PaymentType   = 'DEPOSIT' | 'FINAL_PAYMENT' | 'REFUND' | 'COMMISSION';
+export type PaymentType   = 'DEPOSIT' | 'FINAL_PAYMENT' | 'REFUND' | 'COMMISSION' | 'SUPPLIER_PAYOUT';
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'ESCROWED';
 export type PaymentMethod = 'ORANGE_MONEY' | 'MOOV_MONEY' | 'LIGDICASH' | 'CARD';
 
