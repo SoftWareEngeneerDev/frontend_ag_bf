@@ -94,12 +94,11 @@ export class AdminPaymentsComponent implements OnInit, OnDestroy {
   // ── Charger les paiements ─────────────────────────────────────
   private loadPayments(): void {
     this.loading = true;
-    this.adminService.getPaymentsAnalytics()
+    this.adminService.getAllPayments({ limit: 200 })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => {
-          const recent  = data?.recentPayments ?? data?.payments ?? [];
-          this.payments = recent.map((p: any) => this.mapPayment(p));
+        next: ({ data }) => {
+          this.payments = (data ?? []).map((p: any) => this.mapPayment(p));
           this.loading  = false;
         },
         error: () => { this.loading = false; }

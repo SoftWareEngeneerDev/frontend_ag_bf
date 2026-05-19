@@ -43,15 +43,7 @@ export class AdminDisputesComponent implements OnInit, OnDestroy {
   // ── Charger les litiges ───────────────────────────────────────
   private loadDisputes(): void {
     this.loading = true;
-    this.adminService.getDisputes('OPEN', 100)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          // Charger toutes catégories en parallèle via plusieurs appels
-          this.loadAllDisputes();
-        },
-        error: () => { this.loading = false; }
-      });
+    this.loadAllDisputes();
   }
 
   private loadAllDisputes(): void {

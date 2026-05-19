@@ -1,5 +1,13 @@
 <div class="orders-page">
 
+  <!-- ══ MESSAGES ════════════════════════════════════════════════ -->
+  <div class="alert alert-primary mb-20" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert alert-red mb-20" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
   <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
   <div class="orders-header mb-24">
     <div>
@@ -124,6 +132,19 @@
         </button>
         <button class="btn-primary btn-sm btn-round" (click)="leaveReview(o)">
           <i class="fa-solid fa-star"></i> Laisser un avis
+        </button>
+      </div>
+
+      <!-- ── Actions commande expédiée ───────────────────────── -->
+      <div class="order-actions" *ngIf="o.status === 'SHIPPED'">
+        <button
+          class="btn-ok btn-sm btn-round"
+          [disabled]="confirming === o.id"
+          (click)="confirmDelivery(o)">
+          <i [class]="confirming === o.id
+            ? 'fa-solid fa-spinner fa-spin'
+            : 'fa-solid fa-house-circle-check'"></i>
+          {{ confirming === o.id ? 'Confirmation...' : 'Confirmer la livraison' }}
         </button>
       </div>
 

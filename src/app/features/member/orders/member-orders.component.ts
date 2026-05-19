@@ -11,10 +11,13 @@ import { Order } from '../../../core/models';
   styleUrls:  ['./member-orders.component.scss']
 })
 export class OrdersComponent implements OnInit, OnDestroy {
-  orders   : Order[] = [];
-  filtered : Order[] = [];
-  loading    = true;
-  activeTab  = 'all';
+  orders       : Order[] = [];
+  filtered     : Order[] = [];
+  loading       = true;
+  activeTab     = 'all';
+  confirming    = '';
+  successMsg    = '';
+  errorMsg      = '';
 
   private destroy$ = new Subject<void>();
 
@@ -119,7 +122,39 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   trackById(_: number, o: Order): string { return o.id; }
 
+  // ── Confirmer la livraison ────────────────────────────────────
+  confirmDelivery(o: Order): void {
+    if (this.confirming) return;
+    this.confirming = o.id;
+
+    this.orderService.confirmDelivery(o.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          o.status      = 'DELIVERED' as any;
+          this.confirming = '';
+          this.updateCounts();
+          this.applyFilter(this.activeTab);
+          this.showSuccess('Livraison confirmée ! Vous pouvez maintenant laisser un avis.');
+        },
+        error: (err) => {
+          this.confirming = '';
+          this.showError(err?.error?.error?.message ?? 'Erreur lors de la confirmation.');
+        },
+      });
+  }
+
   // ── Navigation ────────────────────────────────────────────────
   reorder(o: Order): void { this.router.navigate(['/groups', o.group?.id ?? o.id]); }
   leaveReview(o: Order): void { this.router.navigate(['/groups', o.group?.id ?? o.id], { queryParams: { review: true } }); }
+
+  private showSuccess(msg: string): void {
+    this.successMsg = msg; this.errorMsg = '';
+    setTimeout(() => { this.successMsg = ''; }, 4000);
+  }
+
+  private showError(msg: string): void {
+    this.errorMsg = msg; this.successMsg = '';
+    setTimeout(() => { this.errorMsg = ''; }, 5000);
+  }
 }

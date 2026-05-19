@@ -199,6 +199,15 @@ export class AdminService {
 
   // ── Paiements & Remboursements ────────────────────────────────
 
+  getAllPayments(params?: { status?: string; type?: string; page?: number; limit?: number }): Observable<any> {
+    return this.http.get<any>(`${API}/admin/payments`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => ({
+      data : Array.isArray(res.data) ? res.data : [],
+      meta : res.meta ?? {}
+    })));
+  }
+
   getPayments(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
     return this.http.get<any>(`${API}/admin/refunds`, {
       params: this.buildParams(params)

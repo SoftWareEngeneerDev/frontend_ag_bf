@@ -19,6 +19,13 @@ export class OrderService {
     );
   }
 
+  // ── PATCH /orders/:id/confirm-delivery ───────────────────────
+  confirmDelivery(id: string): Observable<any> {
+    return this.http.patch<any>(`${API}/orders/${id}/confirm-delivery`, {}).pipe(
+      map(res => res.data)
+    );
+  }
+
   // ── GET /orders/:id ───────────────────────────────────────────
   getById(id: string): Observable<Order | undefined> {
     return this.http.get<any>(`${API}/orders/${id}`).pipe(
