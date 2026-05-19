@@ -34,6 +34,11 @@ export class OrdersComponent implements OnInit, OnDestroy {
   successMsg    = '';
   errorMsg      = '';
 
+  // ── Livreurs ──────────────────────────────────────────────────
+  deliverers        : any[]    = [];
+  showDeliverersModal = false;
+  loadingDeliverers   = false;
+
   private destroy$ = new Subject<void>();
 
   readonly tabList = [
@@ -159,6 +164,34 @@ export class OrdersComponent implements OnInit, OnDestroy {
           this.showError(err?.error?.error?.message ?? 'Erreur lors de la confirmation.');
         },
       });
+  }
+
+  // ── Livreurs ─────────────────────────────────────────────────
+  openDeliverersModal(): void {
+    this.showDeliverersModal = true;
+    if (this.deliverers.length > 0) return;
+    this.loadingDeliverers = true;
+    this.orderService.getPublicDeliverers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next : (data) => { this.deliverers = data; this.loadingDeliverers = false; },
+        error: ()     => { this.loadingDeliverers = false; },
+      });
+  }
+
+  closeDeliverersModal(): void { this.showDeliverersModal = false; }
+
+  callDeliverer(phone: string): void {
+    window.open(`tel:${phone}`, '_self');
+  }
+
+  whatsappDeliverer(phone: string): void {
+    const clean = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/${clean}`, '_blank');
+  }
+
+  delivererInitials(name: string): string {
+    return name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
   // ── Navigation ────────────────────────────────────────────────

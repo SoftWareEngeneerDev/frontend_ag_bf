@@ -20,6 +20,7 @@ import { AdminLogsComponent }              from './logs/admin-logs.component';
 import { AdminProfileComponent }           from './profile/admin-profile.component';
 import { AdminNotificationsComponent }     from './notifications/admin-notifications.component';
 import { AdminWithdrawalsComponent }       from './withdrawals/admin-withdrawals.component';
+import { AdminDeliverersComponent }        from './deliverers/admin-deliverers.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { AdminWithdrawalsComponent }       from './withdrawals/admin-withdrawals
     AdminProfileComponent,
     AdminNotificationsComponent,
     AdminWithdrawalsComponent,
+    AdminDeliverersComponent,
   ],
   imports: [
     SharedModule,
@@ -67,6 +69,7 @@ import { AdminWithdrawalsComponent }       from './withdrawals/admin-withdrawals
           { path: 'profile',         component: AdminProfileComponent },
           { path: 'notifications',   component: AdminNotificationsComponent },
           { path: 'withdrawals',     component: AdminWithdrawalsComponent },
+          { path: 'deliverers',      component: AdminDeliverersComponent },
         ]
       }
     ]),

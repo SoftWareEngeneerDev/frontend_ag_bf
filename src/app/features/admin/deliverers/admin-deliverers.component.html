@@ -1,0 +1,205 @@
+<div class="dl-page">
+
+  <!-- ══ MESSAGES ════════════════════════════════════════════════ -->
+  <div class="alert alert-primary" *ngIf="successMsg" style="margin-bottom:16px">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert alert-red" *ngIf="errorMsg" style="margin-bottom:16px">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════ -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-motorcycle"></i> Livreurs
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ deliverers.length }} livreur{{ deliverers.length !== 1 ? 's' : '' }} au total
+      </p>
+    </div>
+    <button class="btn-primary btn-round" (click)="openAddModal()">
+      <i class="fa-solid fa-plus"></i> Ajouter un livreur
+    </button>
+  </div>
+
+  <!-- ══ ONGLETS ══════════════════════════════════════════════════ -->
+  <div class="tab-nav mb-24">
+    <button class="tab-btn"
+            *ngFor="let t of tabs"
+            [class.active]="activeTab === t"
+            (click)="activeTab = t">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
+  </div>
+
+  <!-- ══ LOADING ══════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ════════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-motorcycle"
+    title="Aucun livreur"
+    description="Ajoutez des livreurs partenaires pour les membres.">
+    <button class="btn-primary btn-round" (click)="openAddModal()">
+      <i class="fa-solid fa-plus"></i> Ajouter un livreur
+    </button>
+  </app-empty-state>
+
+  <!-- ══ GRILLE LIVREURS ══════════════════════════════════════════ -->
+  <div class="dl-grid" *ngIf="!loading && filtered.length > 0">
+    <div class="glass dl-card"
+         *ngFor="let d of filtered; trackBy: trackById">
+
+      <!-- En-tête carte -->
+      <div class="dl-card-head">
+        <!-- Avatar -->
+        <div class="dl-avatar">
+          <img *ngIf="d.photoUrl" [src]="d.photoUrl" [alt]="d.name" class="dl-av-img">
+          <span *ngIf="!d.photoUrl" class="dl-av-initials">{{ initials(d.name) }}</span>
+        </div>
+
+        <!-- Infos principales -->
+        <div class="dl-info">
+          <div class="dl-name">{{ d.name }}</div>
+          <div class="dl-phone text-muted">
+            <i class="fa-solid fa-phone" style="font-size:11px"></i>
+            {{ d.phone }}
+          </div>
+          <div class="dl-zone">
+            <i class="fa-solid fa-map-pin" style="color:var(--primary);font-size:11px"></i>
+            {{ d.zone }}
+          </div>
+        </div>
+
+        <!-- Statut badge -->
+        <span [class]="d.status === 'ACTIVE' ? 'badge-ok' : 'badge-red'" class="dl-status-badge">
+          {{ d.status === 'ACTIVE' ? '✅ Actif' : '🔴 Suspendu' }}
+        </span>
+      </div>
+
+      <!-- Tarif -->
+      <div class="dl-tarif" *ngIf="d.tarif">
+        <i class="fa-solid fa-coins" style="color:var(--gold)"></i>
+        <span class="font-mono">{{ d.tarif | number:'1.0-0' }} XOF</span>
+      </div>
+
+      <!-- Description -->
+      <p class="dl-desc text-muted" *ngIf="d.description">{{ d.description }}</p>
+
+      <!-- Actions -->
+      <div class="dl-actions">
+        <button class="btn-err btn-sm btn-round"
+                *ngIf="d.status === 'ACTIVE'"
+                [disabled]="processing"
+                (click)="toggle(d)">
+          <i class="fa-solid fa-ban"></i> Suspendre
+        </button>
+        <button class="btn-ok btn-sm btn-round"
+                *ngIf="d.status === 'SUSPENDED'"
+                [disabled]="processing"
+                (click)="toggle(d)">
+          <i class="fa-solid fa-circle-check"></i> Réactiver
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ MODAL AJOUTER LIVREUR ════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-box glass" (click)="$event.stopPropagation()">
+
+    <div class="modal-head flex-between">
+      <h3 class="font-display" style="font-size:17px;font-weight:700">
+        <i class="fa-solid fa-motorcycle" style="color:var(--primary)"></i>
+        {{ editMode ? 'Modifier le livreur' : 'Ajouter un livreur' }}
+      </h3>
+      <button class="btn-ghost btn-sm btn-icon" (click)="closeModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Nom -->
+      <div class="inp-group">
+        <label>Nom complet <span style="color:var(--red)">*</span></label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-user inp-icon"></i>
+          <input class="inp" [class.error]="formErrors['name']"
+                 placeholder="Ex : Ouédraogo Moussa"
+                 [(ngModel)]="form.name">
+        </div>
+        <span class="error-msg" *ngIf="formErrors['name']">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ formErrors['name'] }}
+        </span>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="inp-group">
+        <label>Téléphone <span style="color:var(--red)">*</span></label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-phone inp-icon"></i>
+          <input class="inp" [class.error]="formErrors['phone']"
+                 placeholder="+226 70 00 00 00"
+                 [(ngModel)]="form.phone">
+        </div>
+        <span class="error-msg" *ngIf="formErrors['phone']">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ formErrors['phone'] }}
+        </span>
+      </div>
+
+      <!-- Zone -->
+      <div class="inp-group">
+        <label>Zone de livraison <span style="color:var(--red)">*</span></label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-map-pin inp-icon"></i>
+          <input class="inp" [class.error]="formErrors['zone']"
+                 placeholder="Ex : Ouagadougou Centre, Bobo-Dioulasso..."
+                 [(ngModel)]="form.zone">
+        </div>
+        <span class="error-msg" *ngIf="formErrors['zone']">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ formErrors['zone'] }}
+        </span>
+      </div>
+
+      <!-- Tarif -->
+      <div class="inp-group">
+        <label>Tarif (XOF) <span class="text-muted" style="font-weight:400">— optionnel</span></label>
+        <div class="inp-icon-wrap">
+          <i class="fa-solid fa-coins inp-icon"></i>
+          <input class="inp" type="number" min="0"
+                 placeholder="Ex : 500"
+                 [(ngModel)]="form.tarif">
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="inp-group">
+        <label>Description <span class="text-muted" style="font-weight:400">— optionnel</span></label>
+        <textarea class="inp"
+                  rows="3"
+                  placeholder="Ex : Livraison rapide, disponible le week-end..."
+                  [(ngModel)]="form.description">
+        </textarea>
+      </div>
+
+      <!-- Boutons -->
+      <div class="flex gap-10" style="justify-content:flex-end;padding-top:8px">
+        <button class="btn-ghost btn-round" (click)="closeModal()" [disabled]="processing">
+          Annuler
+        </button>
+        <button class="btn-primary btn-round" (click)="submitForm()" [disabled]="processing">
+          <i [class]="processing ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'"></i>
+          {{ processing ? 'Enregistrement...' : (editMode ? 'Mettre à jour' : 'Ajouter') }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

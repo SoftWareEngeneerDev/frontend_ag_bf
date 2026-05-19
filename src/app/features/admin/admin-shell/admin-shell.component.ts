@@ -81,6 +81,8 @@ export class AdminShellComponent implements OnInit, OnDestroy {
     { route: '/admin/withdrawals',  icon: 'fa-solid fa-money-bill-transfer', label: 'Retraits',       badge: 0, badgeColor: '#F4A902' },
     { route: '/admin/disputes',     icon: 'fa-solid fa-gavel',              label: 'Litiges',        badge: 0, badgeColor: '#E63946' },
     { separator: true, route: '', icon: '', label: '' },
+    { route: '/admin/deliverers',   icon: 'fa-solid fa-motorcycle',   label: 'Livreurs' },
+    { separator: true, route: '', icon: '', label: '' },
     { route: '/admin/analytics',    icon: 'fa-solid fa-chart-line',   label: 'Analytics' },
     { route: '/admin/logs',         icon: 'fa-solid fa-scroll',       label: 'Logs système' },
   ];

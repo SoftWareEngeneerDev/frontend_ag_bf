@@ -240,6 +240,33 @@ export class AdminService {
     );
   }
 
+  // ── Livreurs ──────────────────────────────────────────────────
+  getDeliverers(status?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (status && status !== 'all') params = params.set('status', status);
+    return this.http.get<any>(`${API}/admin/deliverers`, { params }).pipe(
+      map(res => res.data ?? [])
+    );
+  }
+
+  createDeliverer(data: any): Observable<any> {
+    return this.http.post<any>(`${API}/admin/deliverers`, data).pipe(
+      map(res => res.data)
+    );
+  }
+
+  updateDeliverer(id: string, data: any): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/deliverers/${id}`, data).pipe(
+      map(res => res.data)
+    );
+  }
+
+  toggleDelivererStatus(id: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/deliverers/${id}/toggle-status`, {}).pipe(
+      map(res => res.data)
+    );
+  }
+
   // ── Helper ────────────────────────────────────────────────────
   private buildParams(obj?: Record<string, any>): HttpParams {
     let params = new HttpParams();

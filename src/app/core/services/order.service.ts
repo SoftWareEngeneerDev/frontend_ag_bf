@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Order } from '../models';
 import { environment } from '../../../environments/environment';
@@ -46,5 +46,14 @@ export class OrderService {
       product:     o.group?.product,
       member:      null as any,
     };
+  }
+
+  // ── Livreurs publics ─────────────────────────────────────────
+  getPublicDeliverers(zone?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (zone) params = params.set('zone', zone);
+    return this.http.get<any>(`${API}/deliverers/public`, { params }).pipe(
+      map(res => res.data ?? [])
+    );
   }
 }
