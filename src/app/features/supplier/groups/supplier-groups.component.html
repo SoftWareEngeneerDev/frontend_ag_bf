@@ -126,6 +126,12 @@
           <button class="btn-ghost btn-sm btn-round" (click)="goDetail(g)">
             Voir détail <i class="fa-solid fa-arrow-right"></i>
           </button>
+          <button class="btn-sm btn-round"
+                  *ngIf="['OPEN','THRESHOLD_REACHED'].includes(g.status)"
+                  style="background:#FFF0F0;color:#c0392b;border:1px solid #FF4D6A"
+                  (click)="openCloseModal(g)">
+            <i class="fa-solid fa-ban"></i> Clôturer
+          </button>
         </div>
       </div>
 
@@ -225,6 +231,48 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL — CLÔTURER UN GROUPE ════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showCloseModal && selectedGroup" (click)="showCloseModal = false">
+    <div class="modal-box glass" style="max-width:420px" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <div>
+          <h3 style="margin:0;font-size:16px;color:#c0392b">
+            <i class="fa-solid fa-ban"></i> Annuler le groupe
+          </h3>
+          <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedGroup.title }}</p>
+        </div>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showCloseModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div style="margin-top:16px">
+        <div style="padding:12px 14px;background:#FFF0F0;border-radius:10px;border-left:3px solid #FF4D6A;margin-bottom:16px">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#FF4D6A;margin-right:6px"></i>
+          <span style="font-size:13px;color:#c0392b">
+            Cette action est irréversible. Les {{ selectedGroup.currentCount }} membre(s) seront notifiés et leurs dépôts remboursés sous 72h.
+          </span>
+        </div>
+
+        <label class="form-label">Raison (optionnelle)</label>
+        <textarea class="form-input" [(ngModel)]="closeReason" rows="3"
+                  placeholder="Ex : Rupture de stock imprévue, délai de livraison impossible..."
+                  style="resize:vertical"></textarea>
+
+        <div class="flex gap-10" style="margin-top:20px">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showCloseModal = false">Garder le groupe</button>
+          <button style="flex:1;justify-content:center;background:#FF4D6A;color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px"
+                  (click)="closeGroup()" [disabled]="closing">
+            <i *ngIf="closing" class="fa-solid fa-spinner fa-spin"></i>
+            <i *ngIf="!closing" class="fa-solid fa-ban"></i>
+            {{ closing ? 'Annulation...' : 'Confirmer l\'annulation' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -124,10 +124,14 @@
                   [disabled]="p.status === 'INACTIVE'">
             <i class="fa-solid fa-pen"></i> Modifier
           </button>
+          <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
+                  (click)="openStockModal(p)">
+            <i class="fa-solid fa-cubes"></i> Stock
+          </button>
           <button class="btn-cyan btn-sm" style="flex:1;justify-content:center"
                   (click)="openCreateGroup(p)"
                   [disabled]="!['ACTIVE','APPROVED'].includes(p.status) || p.stock === 0">
-            <i class="fa-solid fa-users-plus"></i> Créer un groupe
+            <i class="fa-solid fa-users-plus"></i> Groupe
           </button>
         </div>
       </div>
@@ -402,6 +406,46 @@
                   (click)="createGroupFromProduct()" [disabled]="creatingGroup">
             <i *ngIf="creatingGroup" class="fa-solid fa-spinner fa-spin"></i>
             {{ creatingGroup ? 'Création...' : 'Créer le groupe →' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL — MODIFIER STOCK ════════════════════════════════════ -->
+  <div class="modal-backdrop" *ngIf="showStockModal && selectedProduct" (click)="showStockModal = false">
+    <div class="modal-box glass" style="max-width:400px" (click)="$event.stopPropagation()">
+      <div class="flex-between modal-head">
+        <div>
+          <h3 style="margin:0;font-size:16px">Modifier le stock</h3>
+          <p class="text-muted" style="font-size:12px;margin-top:2px">{{ selectedProduct!.name }}</p>
+        </div>
+        <button class="btn-ghost btn-sm btn-icon" (click)="showStockModal = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div style="margin-top:16px">
+        <label class="form-label">Stock actuel : <strong>{{ selectedProduct!.stock }}</strong></label>
+        <label class="form-label" style="margin-top:12px">Nouveau stock</label>
+        <input type="number" class="form-input" [(ngModel)]="stockForm.newStock" min="0" step="1"
+               placeholder="Ex : 50" style="font-size:20px;text-align:center;font-weight:700">
+
+        <div *ngIf="stockForm.newStock === 0"
+             style="margin-top:12px;padding:10px 14px;background:#FFF0F0;border-radius:10px;border-left:3px solid #FF4D6A">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#FF4D6A;margin-right:6px"></i>
+          <span style="font-size:13px;color:#c0392b">
+            Stock à 0 : tous les groupes actifs liés à ce produit seront automatiquement annulés et les membres remboursés.
+          </span>
+        </div>
+
+        <div class="flex gap-10" style="margin-top:20px">
+          <button class="btn-ghost" style="flex:1;justify-content:center"
+                  (click)="showStockModal = false">Annuler</button>
+          <button class="btn-gold btn-round" style="flex:1;justify-content:center"
+                  (click)="saveStock()" [disabled]="savingStock || stockForm.newStock < 0">
+            <i *ngIf="savingStock" class="fa-solid fa-spinner fa-spin"></i>
+            {{ savingStock ? 'Enregistrement...' : 'Enregistrer' }}
           </button>
         </div>
       </div>
