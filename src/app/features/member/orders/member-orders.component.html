@@ -57,10 +57,10 @@
       <div class="order-head">
         <div class="order-head-left">
           <div class="order-img">
-            <img [src]="productImage(o)" [alt]="o.product.name" loading="lazy">
+            <img [src]="productImage(o)" [alt]="o.product?.name" loading="lazy">
           </div>
           <div class="order-info">
-            <div class="order-name">{{ o.product.name }}</div>
+            <div class="order-name">{{ o.product?.name }}</div>
             <div class="order-ref">
               <i class="fa-solid fa-hashtag"></i>
               <span class="font-mono">{{ o.id | slice:0:8 }}...</span>
@@ -70,7 +70,7 @@
             </div>
             <div class="order-supplier text-muted">
               <i class="fa-solid fa-store"></i>
-              {{ o.product.supplier.companyName || '—' }}
+              {{ o.product?.supplier?.companyName || '—' }}
             </div>
           </div>
         </div>

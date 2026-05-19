@@ -22,10 +22,11 @@ export class OrdersComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   readonly tabList = [
-    { key: 'all',       icon: 'fa-solid fa-list',         label: 'Toutes',    count: 0 },
-    { key: 'ongoing',   icon: 'fa-solid fa-clock',        label: 'En cours',  count: 0 },
-    { key: 'delivered', icon: 'fa-solid fa-circle-check', label: 'Livrées',   count: 0 },
-    { key: 'cancelled', icon: 'fa-solid fa-circle-xmark', label: 'Annulées',  count: 0 },
+    { key: 'all',       icon: 'fa-solid fa-list',          label: 'Toutes',    count: 0 },
+    { key: 'ongoing',   icon: 'fa-solid fa-clock',         label: 'En cours',  count: 0 },
+    { key: 'shipped',   icon: 'fa-solid fa-truck-fast',    label: 'En route',  count: 0 },
+    { key: 'delivered', icon: 'fa-solid fa-circle-check',  label: 'Livrées',   count: 0 },
+    { key: 'cancelled', icon: 'fa-solid fa-circle-xmark',  label: 'Annulées',  count: 0 },
   ];
 
   readonly timelineSteps = [
@@ -78,8 +79,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
   private updateCounts(): void {
     this.tabList[0].count = this.orders.length;
     this.tabList[1].count = this.orders.filter(o => ['CREATED','PROCESSING'].includes(o.status)).length;
-    this.tabList[2].count = this.orders.filter(o => o.status === 'DELIVERED').length;
-    this.tabList[3].count = this.orders.filter(o => o.status === 'CANCELLED').length;
+    this.tabList[2].count = this.orders.filter(o => o.status === 'SHIPPED').length;
+    this.tabList[3].count = this.orders.filter(o => o.status === 'DELIVERED').length;
+    this.tabList[4].count = this.orders.filter(o => o.status === 'CANCELLED').length;
   }
 
   // ── Filtre ────────────────────────────────────────────────────
