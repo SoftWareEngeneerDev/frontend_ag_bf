@@ -139,8 +139,7 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
     }
     this.savingPw = true;
 
-    // Utilise PUT /users/me avec les champs password
-    this.http.put<any>(`${API}/users/me`, {
+    this.http.post<any>(`${API}/users/me/password`, {
       currentPassword: this.pwForm.currentPassword,
       newPassword    : this.pwForm.newPassword,
     })

@@ -1,0 +1,174 @@
+<div class="wd-page">
+
+  <!-- ══ MESSAGES ══════════════════════════════════════════════ -->
+  <div class="alert alert-primary mb-20" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert alert-red mb-20" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <div class="flex-between mb-20">
+    <div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:4px">
+        <i class="fa-solid fa-money-bill-transfer"></i> Retraits fournisseurs
+      </h2>
+      <p class="text-muted" style="font-size:13px">
+        {{ withdrawals.length }} demande{{ withdrawals.length !== 1 ? 's' : '' }} au total
+        · <strong style="color:#F4A902">{{ tabCount('En attente') }}</strong> en attente
+      </p>
+    </div>
+    <button class="btn-ghost btn-round btn-sm" (click)="loadWithdrawals()">
+      <i class="fa-solid fa-rotate-right"></i> Actualiser
+    </button>
+  </div>
+
+  <!-- ══ ONGLETS ════════════════════════════════════════════════ -->
+  <div class="tab-nav mb-24">
+    <button
+      class="tab-btn"
+      *ngFor="let t of tabs"
+      [class.active]="activeTab === t"
+      (click)="setTab(t)">
+      {{ t }}
+      <span class="tab-count" *ngIf="tabCount(t) > 0">{{ tabCount(t) }}</span>
+    </button>
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-money-bill-transfer"
+    [title]="activeTab === 'Tous' ? 'Aucune demande de retrait' : 'Aucune demande dans cette catégorie'"
+    description="Les demandes de retrait des fournisseurs apparaîtront ici.">
+  </app-empty-state>
+
+  <!-- ══ TABLE ══════════════════════════════════════════════════ -->
+  <div class="glass wd-table-wrap" *ngIf="!loading && filtered.length > 0">
+    <table class="wd-table">
+      <thead>
+        <tr>
+          <th>Fournisseur</th>
+          <th>Montant</th>
+          <th>Méthode</th>
+          <th>Compte</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th style="text-align:right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let w of filtered; trackBy: trackById">
+          <td>
+            <div class="wd-supplier">
+              <span class="wd-company">{{ w.supplier?.companyName ?? '—' }}</span>
+              <span class="text-muted wd-contact">{{ w.supplier?.user?.name ?? '' }}</span>
+            </div>
+          </td>
+          <td>
+            <strong style="color:#10D98B">{{ w.amount | number:'1.0-0' }} XOF</strong>
+          </td>
+          <td>
+            <span class="wd-method">{{ methodLabel(w.method) }}</span>
+          </td>
+          <td>
+            <span class="font-mono" style="font-size:12px">{{ w.accountInfo }}</span>
+          </td>
+          <td class="text-muted" style="font-size:12px">
+            {{ w.createdAt | date:'dd MMM yyyy' }}
+          </td>
+          <td>
+            <span [class]="statusClass(w.status)">{{ statusLabel(w.status) }}</span>
+          </td>
+          <td style="text-align:right">
+            <div class="wd-actions" *ngIf="w.status === 'PENDING'; else processed">
+              <button
+                class="btn-ok btn-sm btn-round"
+                [disabled]="processing === w.id"
+                (click)="openModal(w, true)">
+                <i [class]="processing === w.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-check'"></i>
+                Approuver
+              </button>
+              <button
+                class="btn-err btn-sm btn-round"
+                [disabled]="processing === w.id"
+                (click)="openModal(w, false)">
+                <i class="fa-solid fa-xmark"></i>
+                Refuser
+              </button>
+            </div>
+            <ng-template #processed>
+              <span class="text-muted" style="font-size:12px">—</span>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ══ MODAL CONFIRMATION ════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <div class="modal-head">
+      <h3>
+        <i [class]="modalApprove ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
+           [style.color]="modalApprove ? '#10D98B' : '#FF4D6A'"></i>
+        {{ modalApprove ? 'Approuver le retrait' : 'Refuser le retrait' }}
+      </h3>
+      <button class="btn-ghost btn-icon" (click)="closeModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="modalItem">
+      <div class="wd-summary glass mb-16">
+        <div class="wd-summary-row">
+          <span class="text-muted">Fournisseur</span>
+          <strong>{{ modalItem.supplier?.companyName ?? '—' }}</strong>
+        </div>
+        <div class="wd-summary-row">
+          <span class="text-muted">Montant</span>
+          <strong style="color:#10D98B">{{ modalItem.amount | number:'1.0-0' }} XOF</strong>
+        </div>
+        <div class="wd-summary-row">
+          <span class="text-muted">Méthode</span>
+          <span>{{ methodLabel(modalItem.method) }} — {{ modalItem.accountInfo }}</span>
+        </div>
+      </div>
+
+      <div class="inp-group">
+        <label>
+          Raison
+          <span class="text-err" *ngIf="!modalApprove">*</span>
+          <span class="text-muted" *ngIf="modalApprove"> (optionnel)</span>
+        </label>
+        <textarea
+          class="inp inp-area"
+          rows="3"
+          [placeholder]="modalApprove ? 'Note interne (optionnel)' : 'Motif du refus (obligatoire)'"
+          [(ngModel)]="modalReason"
+          maxlength="300">
+        </textarea>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-ghost btn-round" (click)="closeModal()">Annuler</button>
+        <button
+          [class]="modalApprove ? 'btn-ok btn-round' : 'btn-err btn-round'"
+          [disabled]="!modalApprove && !modalReason.trim()"
+          (click)="confirm()">
+          <i [class]="modalApprove ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+          {{ modalApprove ? 'Confirmer l\'approbation' : 'Confirmer le refus' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

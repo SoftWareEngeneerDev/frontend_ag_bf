@@ -67,6 +67,27 @@ export class AdminService {
 
   // ── Fournisseurs ──────────────────────────────────────────────
 
+  getSupplierById(id: string): Observable<any> {
+    return this.http.get<any>(`${API}/admin/suppliers/${id}`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getWithdrawals(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
+    return this.http.get<any>(`${API}/admin/withdrawals`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => ({
+      data : Array.isArray(res.data) ? res.data : [],
+      meta : res.meta ?? {}
+    })));
+  }
+
+  processWithdrawal(id: string, approved: boolean, reason?: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/withdrawals/${id}/process`, { approved, reason }).pipe(
+      map(res => res.data)
+    );
+  }
+
   getSuppliers(status = 'ALL', limit = 20, page = 1): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/suppliers`, {
       params: this.buildParams({ status, limit, page })

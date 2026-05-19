@@ -11,9 +11,11 @@ const API = environment.apiUrl;
   styleUrls: ['./member-disputes.component.scss']
 })
 export class MemberDisputesComponent implements OnInit, OnDestroy {
-  disputes: any[] = [];
-  loading    = true;
-  submitting = false;
+  disputes       : any[] = [];
+  loading         = true;
+  submitting      = false;
+  loadingDetail   = false;
+  selectedDispute : any = null;
 
   // Tabs
   activeTab = 'all';
@@ -78,6 +80,21 @@ export class MemberDisputesComponent implements OnInit, OnDestroy {
   }
 
   cancelForm(): void { this.showForm = false; }
+
+  viewDetail(d: any): void {
+    if (this.loadingDetail) return;
+    this.loadingDetail   = true;
+    this.selectedDispute = null;
+
+    this.http.get<any>(`${API}/disputes/${d.id}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next : (res) => { this.selectedDispute = res.data ?? d; this.loadingDetail = false; },
+        error: ()     => { this.selectedDispute = d;            this.loadingDetail = false; },
+      });
+  }
+
+  closeDetail(): void { this.selectedDispute = null; }
 
   submitDispute(): void {
     if (!this.subject.trim() || !this.description.trim() || this.submitting) return;

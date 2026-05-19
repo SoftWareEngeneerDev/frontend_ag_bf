@@ -159,7 +159,79 @@
         </div>
       </div>
 
+      <!-- ── Bouton détail ──────────────────────────────────── -->
+      <div class="d-footer">
+        <button class="btn-ghost btn-sm btn-round" (click)="viewDetail(d)">
+          <i class="fa-solid fa-magnifying-glass"></i> Voir le détail
+        </button>
+      </div>
+
     </div>
   </div>
 
+</div>
+
+<!-- ══ PANEL DÉTAIL LITIGE ══════════════════════════════════ -->
+<div class="detail-overlay" *ngIf="selectedDispute || loadingDetail" (click)="closeDetail()">
+  <div class="detail-panel" (click)="$event.stopPropagation()">
+
+    <div class="detail-head">
+      <h3><i class="fa-solid fa-gavel"></i> Détail du litige</h3>
+      <button class="btn-ghost btn-icon" (click)="closeDetail()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="detail-body" *ngIf="loadingDetail">
+      <app-loading-spinner [full]="false"></app-loading-spinner>
+    </div>
+
+    <div class="detail-body" *ngIf="!loadingDetail && selectedDispute">
+
+      <div class="detail-meta mb-16">
+        <span [class]="statusClass(selectedDispute.status)">
+          <i [class]="statusIcon(selectedDispute.status)"></i>
+          {{ statusLabel(selectedDispute.status) }}
+        </span>
+        <span class="text-muted detail-date">
+          <i class="fa-regular fa-calendar"></i>
+          {{ selectedDispute.createdAt | date:'dd MMMM yyyy' }}
+        </span>
+      </div>
+
+      <div class="detail-row mb-12">
+        <span class="detail-label">Référence</span>
+        <span class="font-mono">{{ selectedDispute.id | slice:0:16 }}...</span>
+      </div>
+
+      <div class="detail-row mb-12" *ngIf="selectedDispute.orderId">
+        <span class="detail-label">Commande</span>
+        <span class="font-mono">{{ selectedDispute.orderId | slice:0:16 }}...</span>
+      </div>
+
+      <div class="detail-section mb-16">
+        <div class="detail-section-title">Raison du litige</div>
+        <p class="detail-text">{{ selectedDispute.subject }}</p>
+      </div>
+
+      <div class="detail-section mb-16">
+        <div class="detail-section-title">Description</div>
+        <p class="detail-text">{{ selectedDispute.description }}</p>
+      </div>
+
+      <div class="alert alert-primary" *ngIf="selectedDispute.resolution">
+        <i class="fa-solid fa-gavel"></i>
+        <div>
+          <div class="d-res-title">Décision de l'équipe</div>
+          <div class="d-res-body">{{ selectedDispute.resolution }}</div>
+        </div>
+      </div>
+
+      <div class="detail-pending" *ngIf="!selectedDispute.resolution && selectedDispute.status !== 'RESOLVED'">
+        <i class="fa-solid fa-clock"></i>
+        Notre équipe analyse votre litige. Vous serez notifié par SMS dès qu'une décision est prise.
+      </div>
+
+    </div>
+  </div>
 </div>

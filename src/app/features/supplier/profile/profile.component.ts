@@ -244,9 +244,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
     this.savingPw = true;
 
-    this.http.put<any>(`${API}/users/me`, {
+    this.http.post<any>(`${API}/users/me/password`, {
       currentPassword: this.pwForm.currentPassword,
-      newPassword: this.pwForm.newPassword
+      newPassword    : this.pwForm.newPassword,
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({

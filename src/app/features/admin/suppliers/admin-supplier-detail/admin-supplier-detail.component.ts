@@ -39,13 +39,11 @@ export class AdminSupplierDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadSupplier(id: string): void {
-    this.adminService.getSuppliers('ALL', 200)
+    this.adminService.getSupplierById(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: any) => {
-          const list  = Array.isArray(data) ? data : [];
-          const found = list.find((s: any) => s.id === id);
-          this.supplier = found ? this.mapSupplier(found) : null;
+          this.supplier = data ? this.mapSupplier(data) : null;
           this.loading  = false;
         },
         error: () => { this.loading = false; }
