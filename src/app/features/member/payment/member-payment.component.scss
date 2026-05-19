@@ -62,3 +62,7 @@
   .pay-card  { padding: 14px; }
   .methods-list .btn { font-size: 13px; padding: 11px 14px; }
 }
+
+@media (max-width: 360px) {
+  .pay-total { font-size: 28px; }
+}

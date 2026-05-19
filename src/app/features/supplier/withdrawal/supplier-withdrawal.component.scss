@@ -54,7 +54,7 @@
 }
 
 // ── Responsive ─────────────────────────────────────────────────
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .wd-grid { grid-template-columns: 1fr; }
   .wd-full { grid-column: 1; }
   .wd-actions { flex-direction: column; }

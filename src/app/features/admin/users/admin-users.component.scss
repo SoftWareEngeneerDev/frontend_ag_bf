@@ -41,6 +41,13 @@
   gap: 14px;
 }
 
+// ── Barre de recherche ────────────────────────────────────────
+.au-search-inp {
+  width: 260px;
+  @media (max-width: 900px) { width: 200px; }
+  @media (max-width: 768px) { width: 100%; }
+}
+
 // ── Responsive ────────────────────────────────────────────────
 @media (max-width: 600px) {
   .flex.gap-6 { flex-wrap: wrap; }

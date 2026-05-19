@@ -506,3 +506,7 @@
   .md-referral   { padding: 16px !important; }
   .mdr-btn       { width: 100%; justify-content: center; }
 }
+
+@media (max-width: 360px) {
+  .md-kpi-grid { grid-template-columns: 1fr; }
+}

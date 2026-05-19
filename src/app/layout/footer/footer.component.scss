@@ -169,3 +169,7 @@
   font-weight: 500;
   &:hover { color: #6EE7B7; }
 }
+
+@media (max-width: 480px) {
+  .ft-legal { flex-wrap: wrap; gap: 12px; justify-content: center; }
+}
