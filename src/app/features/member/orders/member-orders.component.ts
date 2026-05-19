@@ -3,7 +3,22 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { OrderService }  from '../../../core/services/order.service';
 import { FormatService } from '../../../core/services/format.service';
-import { Order } from '../../../core/models';
+import { Order, OrderStatus } from '../../../core/models';
+
+interface OrderItem {
+  id          : string;
+  status      : OrderStatus;
+  trackingCode: string | null;
+  createdAt   : Date | string;
+  amount      : number;
+  group       : { id: string; title: string };
+  product     : {
+    id        : string;
+    name      : string;
+    imagesUrls: string[];
+    supplier  : { companyName: string };
+  };
+}
 
 @Component({
   selector: 'app-orders',
@@ -11,8 +26,8 @@ import { Order } from '../../../core/models';
   styleUrls:  ['./member-orders.component.scss']
 })
 export class OrdersComponent implements OnInit, OnDestroy {
-  orders       : Order[] = [];
-  filtered     : Order[] = [];
+  orders       : OrderItem[] = [];
+  filtered     : OrderItem[] = [];
   loading       = true;
   activeTab     = 'all';
   confirming    = '';
@@ -61,7 +76,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (orders: Order[]) => {
-          this.orders  = orders;
+          this.orders  = orders as unknown as OrderItem[];
           this.loading = false;
           this.updateCounts();
           this.applyFilter(this.activeTab);
@@ -102,9 +117,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
     return this.statusMap[status] ?? 0;
   }
 
-  productImage(o: Order): string {
-    return o.product?.images?.[0]
-      ?? `https://picsum.photos/seed/${o.product?.id ?? o.id}/80/80`;
+  productImage(o: OrderItem): string {
+    return o.product.imagesUrls?.[0]
+      ?? `https://picsum.photos/seed/${o.product.id ?? o.id}/80/80`;
   }
 
   statusIcon(status: string): string {
@@ -118,14 +133,14 @@ export class OrdersComponent implements OnInit, OnDestroy {
     return icons[status] ?? 'fa-solid fa-circle';
   }
 
-  isOngoing(o: Order): boolean {
+  isOngoing(o: OrderItem): boolean {
     return ['CREATED', 'PROCESSING'].includes(o.status);
   }
 
-  trackById(_: number, o: Order): string { return o.id; }
+  trackById(_: number, o: OrderItem): string { return o.id; }
 
   // ── Confirmer la livraison ────────────────────────────────────
-  confirmDelivery(o: Order): void {
+  confirmDelivery(o: OrderItem): void {
     if (this.confirming) return;
     this.confirming = o.id;
 
@@ -147,8 +162,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   // ── Navigation ────────────────────────────────────────────────
-  reorder(o: Order): void { this.router.navigate(['/groups', o.group?.id ?? o.id]); }
-  leaveReview(o: Order): void { this.router.navigate(['/groups', o.group?.id ?? o.id], { queryParams: { review: true } }); }
+  reorder(o: OrderItem): void { this.router.navigate(['/groups', o.group?.id ?? o.id]); }
+  leaveReview(o: OrderItem): void { this.router.navigate(['/groups', o.group?.id ?? o.id], { queryParams: { review: true } }); }
 
   private showSuccess(msg: string): void {
     this.successMsg = msg; this.errorMsg = '';
