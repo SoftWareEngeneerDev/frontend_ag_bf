@@ -2,7 +2,7 @@
 
 /* ── Announce bar ────────────────────────────────────────────── */
 .announce-bar {
-  background: linear-gradient(135deg, #0B8F75, #0DA487);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -75,8 +75,8 @@
 
   // Quand scrollé : liens foncés
   .navbar.scrolled & a {
-    color: #4B5563;
-    &:hover  { background: #F0FDF9; color: var(--primary); }
+    color: var(--txt2);
+    &:hover  { background: var(--light-bg); color: var(--primary); }
     &.active {
       background: var(--primary-l);
       color: var(--primary);
@@ -105,9 +105,9 @@
   border-radius: 10px;
   font-size: 14px;
   font-weight: 700;
-  border: 1.5px solid #E2E8F0;
+  border: 1.5px solid var(--border);
   background: transparent;
-  color: #4B5563;
+  color: var(--txt2);
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -115,9 +115,9 @@
   transition: all .18s ease;
 
   &:hover {
-    border-color: var(--primary, #0DA487);
-    color: var(--primary, #0DA487);
-    background: var(--primary-l, #E6F7F4);
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-l);
   }
 }
 
@@ -134,9 +134,9 @@
   font-size: 13px;
   border-radius: 9px;
   font-weight: 700;
-  box-shadow: 0 3px 12px rgba(13,164,135,.25);
+  box-shadow: 0 3px 12px rgba(13,92,74,.25);
 
-  &:hover { box-shadow: 0 5px 20px rgba(13,164,135,.35); }
+  &:hover { box-shadow: 0 5px 20px rgba(13,92,74,.35); }
 }
 
 /* ── Notification bell ───────────────────────────────────────── */
@@ -153,8 +153,8 @@
   &:hover { background: rgba(255,255,255,.15); }
 
   .navbar.scrolled & {
-    color: #4B5563;
-    &:hover { background: #f5f5f5; color: var(--primary); }
+    color: var(--txt2);
+    &:hover { background: var(--bg2); color: var(--primary); }
   }
 }
 
@@ -162,7 +162,7 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  background: #E63946;
+  background: var(--err);
   color: #fff;
   font-size: 9px;
   font-weight: 800;
@@ -202,16 +202,16 @@
   }
 
   .navbar.scrolled & {
-    background: #f4f4f4;
+    background: var(--bg2);
     border-color: transparent;
-    span { background: #2B3445; }
+    span { background: var(--dark); }
   }
 
   &.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   &.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
   &.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  &:hover { background: #e8e8e8; }
+  &:hover { background: var(--border); }
   @media (max-width: 900px) { display: flex; }
 }
 
@@ -235,7 +235,7 @@
   right: 0;
   width: min(320px, 88vw);
   height: 100%;
-  background: #fff;
+  background: var(--bg-white);
   box-shadow: -8px 0 48px rgba(0,0,0,.18);
   padding: 88px 20px 32px;
   display: flex;
@@ -260,28 +260,28 @@
     border-radius: 14px;
     font-size: 15px;
     font-weight: 600;
-    color: #2B3445;
+    color: var(--dark);
     text-decoration: none;
     transition: all .18s ease;
 
     i {
       font-size: 16px;
-      color: #9CA3AF;
+      color: var(--grey);
       width: 20px;
       text-align: center;
       transition: color .18s;
     }
 
     &:hover {
-      background: #f5f5f5;
-      i { color: var(--primary, #0DA487); }
+      background: var(--bg2);
+      i { color: var(--primary); }
     }
 
     &.active {
-      background: var(--primary-l, #E6F7F4);
-      color: var(--primary, #0DA487);
+      background: var(--primary-l);
+      color: var(--primary);
       font-weight: 700;
-      i { color: var(--primary, #0DA487); }
+      i { color: var(--primary); }
     }
   }
 }
@@ -291,7 +291,7 @@
   flex-direction: column;
   gap: 10px;
   padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border);
 
   a {
     display: flex;
@@ -308,14 +308,14 @@
 
   // Bouton connexion dans drawer
   .btn-outline {
-    border: 1.5px solid #E2E8F0;
-    color: #4B5563;
+    border: 1.5px solid var(--border);
+    color: var(--txt2);
     background: transparent;
 
     &:hover {
-      border-color: var(--primary, #0DA487);
-      color: var(--primary, #0DA487);
-      background: var(--primary-l, #E6F7F4);
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-l);
     }
   }
 }
@@ -370,8 +370,8 @@
 
   border: none;
   border-radius: 50%;
-  background: #f3f4f6;
-  color: #333;
+  background: var(--bg2);
+  color: var(--dark);
 
   font-size: 18px;
   font-weight: bold;
@@ -385,7 +385,7 @@
 }
 
 .modal-close:hover {
-  background: #e5e7eb;
+  background: var(--bg3);
   transform: rotate(90deg);
 }
 

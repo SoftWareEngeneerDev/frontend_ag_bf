@@ -2,7 +2,7 @@
 
 // ── HERO ──────────────────────────────────────────────────────────
 .lit-hero {
-  background: linear-gradient(140deg, #1a0525 0%, #7B2FBE 55%, #E63946 100%);
+  background: linear-gradient(140deg, #1a0525 0%, var(--purple) 55%, var(--err) 100%);
   padding: 80px 0 64px;
   position: relative;
   overflow: hidden;
@@ -53,7 +53,7 @@
   background: #fff;
   border: 1.5px solid #d4f0e8;
   border-left: 5px solid var(--primary);
-  box-shadow: 0 4px 20px rgba(13,164,135,.08);
+  box-shadow: 0 4px 20px rgba(13,92,74,.08);
 
   @media (max-width: 600px) { flex-direction: column; gap: 14px; padding: 20px; }
 }
@@ -67,7 +67,7 @@
   flex-shrink: 0;
 }
 
-.lit-guarantee-title { font-size: 18px; font-weight: 900; color: #1a1a2e; margin-bottom: 8px; }
+.lit-guarantee-title { font-size: 18px; font-weight: 900; color: var(--dark); margin-bottom: 8px; }
 
 // ── SECTIONS ──────────────────────────────────────────────────────
 .lit-section {
@@ -90,7 +90,7 @@
   font-size: 20px; flex-shrink: 0;
 }
 
-.lit-section-title { font-size: 18px; font-weight: 900; color: #1a1a2e; }
+.lit-section-title { font-size: 18px; font-weight: 900; color: var(--dark); }
 
 // ── TYPES ─────────────────────────────────────────────────────────
 .lit-types { display: flex; flex-direction: column; gap: 12px; }
@@ -108,12 +108,12 @@
   &:hover {
     background: #fff;
     border-color: #d4f0e8;
-    box-shadow: 0 4px 16px rgba(13,164,135,.08);
+    box-shadow: 0 4px 16px rgba(13,92,74,.08);
   }
 }
 
 .lit-type-icon  { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-.lit-type-title { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 3px; }
+.lit-type-title { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 3px; }
 .lit-type-desc  { font-size: 12px; color: #6B7280; line-height: 1.6; }
 
 // ── ÉTAPES ────────────────────────────────────────────────────────
@@ -135,7 +135,7 @@
   color: var(--primary);
   font-size: 13px; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
-  border: 2px solid rgba(13,164,135,.2);
+  border: 2px solid rgba(13,92,74,.2);
 }
 
 .lit-step-line {
@@ -153,7 +153,7 @@
 }
 
 .lit-step-icon  { font-size: 18px; color: var(--primary); flex-shrink: 0; margin-top: 2px; }
-.lit-step-title { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+.lit-step-title { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
 .lit-step-desc  { font-size: 12px; color: #6B7280; line-height: 1.6; }
 
 // ── DÉLAIS ────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@
 }
 
 .lit-delay-label { color: #4B5563; font-weight: 600; }
-.lit-delay-time  { font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 6px; i { font-size: 11px; } }
+.lit-delay-time  { font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 6px; i { font-size: 11px; } }
 
 // ── FAQ ───────────────────────────────────────────────────────────
 .lit-faq { display: flex; flex-direction: column; }
@@ -187,7 +187,7 @@
   gap: 12px;
   padding: 18px 0;
   cursor: pointer;
-  font-size: 14px; font-weight: 700; color: #1a1a2e;
+  font-size: 14px; font-weight: 700; color: var(--dark);
   transition: color .18s;
 
   &:hover { color: var(--primary); }
@@ -223,6 +223,6 @@
   margin: 0 auto 16px;
 }
 
-.lit-cta-title { font-size: 22px; font-weight: 900; color: #1a1a2e; margin-bottom: 8px; }
+.lit-cta-title { font-size: 22px; font-weight: 900; color: var(--dark); margin-bottom: 8px; }
 .lit-cta-sub   { font-size: 14px; margin-bottom: 24px; color: #6B7280; }
 .lit-cta-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }

@@ -64,7 +64,7 @@
   position: absolute;
   bottom: 1px; right: 1px;
   width: 9px; height: 9px;
-  background: #10D98B;
+  background: var(--success);
   border-radius: 50%;
   border: 2px solid var(--bg2);
 }
@@ -124,7 +124,7 @@
   }
 
   &.active {
-    background: rgba(13,164,135,.1);
+    background: rgba(13,92,74,.1);
     color: var(--primary);
     font-weight: 700;
 
@@ -171,13 +171,13 @@
 }
 
 .sb-logout {
-  color: #FF4D6A !important;
+  color: var(--err) !important;
 
-  .nav-icon { color: #FF4D6A !important; }
+  .nav-icon { color: var(--err) !important; }
 
   &:hover {
-    background: rgba(255,77,106,.08) !important;
-    color: #FF4D6A !important;
+    background: var(--red-l) !important;
+    color: var(--err) !important;
   }
 }
 

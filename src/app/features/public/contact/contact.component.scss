@@ -2,7 +2,7 @@
 
 // ── HERO ──────────────────────────────────────────────────────────
 .ct-hero {
-  background: linear-gradient(140deg, #0DA487 0%, #07836C 45%, #065F46 100%);
+  background: linear-gradient(140deg, var(--primary-light) 0%, var(--primary) 45%, var(--border-dark) 100%);
   padding: 80px 0 64px;
   position: relative;
   overflow: hidden;
@@ -73,7 +73,7 @@
 .ct-form-title {
   font-size: 20px;
   font-weight: 900;
-  color: #1a1a2e;
+  color: var(--dark);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -119,14 +119,14 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: linear-gradient(135deg, #0DA487, #07836C);
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
   color: #fff;
-  box-shadow: 0 5px 20px rgba(13,164,135,.3);
+  box-shadow: 0 5px 20px rgba(13,92,74,.3);
   transition: all .2s ease;
   letter-spacing: .2px;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 8px 28px rgba(13,164,135,.4);
+    box-shadow: 0 8px 28px rgba(13,92,74,.4);
     transform: translateY(-1px);
   }
 
@@ -148,7 +148,7 @@
 
 .ct-sent-icon {
   width: 80px; height: 80px;
-  background: #E6F7F4;
+  background: var(--light-bg);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 36px;
@@ -156,7 +156,7 @@
   margin-bottom: 20px;
 }
 
-.ct-sent-title { font-size: 24px; font-weight: 900; color: #1a1a2e; margin-bottom: 10px; }
+.ct-sent-title { font-size: 24px; font-weight: 900; color: var(--dark); margin-bottom: 10px; }
 .ct-sent-desc  { font-size: 14px; line-height: 1.75; margin-bottom: 28px; color: #6B7280; }
 
 // ── INFOS CONTACT ─────────────────────────────────────────────────
@@ -175,7 +175,7 @@
 
   &:hover {
     border-color: #d4f0e8;
-    box-shadow: 0 6px 20px rgba(13,164,135,.1);
+    box-shadow: 0 6px 20px rgba(13,92,74,.1);
     transform: translateY(-2px);
   }
 }
@@ -197,7 +197,7 @@
   margin-bottom: 3px;
 }
 
-.ct-info-val { font-size: 14px; font-weight: 800; color: #1a1a2e; margin-bottom: 3px; }
+.ct-info-val { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 3px; }
 .ct-info-sub { font-size: 12px; color: #9CA3AF; font-weight: 500; }
 
 // ── HORAIRES ──────────────────────────────────────────────────────
@@ -212,7 +212,7 @@
 .ct-hours-title {
   font-size: 14px;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--dark);
   display: flex;
   align-items: center;
   gap: 8px;

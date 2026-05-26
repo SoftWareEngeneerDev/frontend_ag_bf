@@ -87,7 +87,14 @@ export class MyGroupsComponent implements OnInit, OnDestroy {
 
   onJoin(g: Group): void {
     if (g.status === 'THRESHOLD_REACHED') {
-      this.router.navigate(['/member/payment']);
+      this.router.navigate(['/member/payment'], {
+        queryParams: {
+          groupId     : g.id,
+          currentPrice: g.currentPrice,
+          type        : 'FINAL_PAYMENT',
+          groupTitle  : g.product?.name ?? '',
+        }
+      });
     } else {
       this.goDetail(g);
     }

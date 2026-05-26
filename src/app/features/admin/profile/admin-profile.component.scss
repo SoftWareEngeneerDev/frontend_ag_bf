@@ -138,7 +138,7 @@
   background: var(--border, #ccc);
   flex-shrink: 0;
 
-  &.ok { background: #10D98B; }
+  &.ok { background: var(--success); }
 }
 
 // ── Mot de passe ──────────────────────────────────────────────
@@ -170,4 +170,4 @@
   transition: width .3s, background .3s;
 }
 
-.inp-err { border-color: #FF4D6A !important; }
+.inp-err { border-color: var(--err) !important; }

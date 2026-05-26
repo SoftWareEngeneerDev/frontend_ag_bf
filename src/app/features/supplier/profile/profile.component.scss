@@ -46,7 +46,7 @@
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--primary, #00B883);
+  border: 3px solid var(--primary, var(--primary));
   background: #f5f5f5;
 }
 
@@ -54,7 +54,7 @@
   width: 100px; 
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary, #00B883), #009966);
+  background: linear-gradient(135deg, var(--primary, var(--primary)), var(--primary2));
   color: #fff;
   font-size: 32px;
   font-weight: 800;
@@ -71,7 +71,7 @@
   width: 30px; 
   height: 30px;
   border-radius: 50%;
-  background: var(--primary, #00B883);
+  background: var(--primary, var(--primary));
   color: #fff;
   display: flex;
   align-items: center;
@@ -82,7 +82,7 @@
   transition: background .15s, transform .15s;
 
   &:hover { 
-    background: #009966; 
+    background: var(--primary2); 
     transform: scale(1.1); 
   }
   &.loading { 
@@ -147,7 +147,7 @@
   gap: 10px;
 
   i { 
-    color: var(--primary, #00B883); 
+    color: var(--primary, var(--primary)); 
     font-size: 18px;
   }
 }
@@ -196,7 +196,7 @@
 
   i {
     font-size: 20px;
-    color: #FF4D6A;
+    color: var(--err);
   }
 
   .btn-icon, .btn-ghost {
@@ -261,7 +261,7 @@
   background: var(--border, #ccc);
   flex-shrink: 0;
 
-  &.ok { background: #10D98B; }
+  &.ok { background: var(--success); }
 }
 
 // ── Mot de passe ──────────────────────────────────────────────
@@ -309,7 +309,7 @@
   height: 48px;
   border: 3px solid rgba(0,0,0,0.1);
   border-radius: 50%;
-  border-top-color: var(--primary, #00B883);
+  border-top-color: var(--primary, var(--primary));
   animation: spin 0.8s ease-in-out infinite;
 }
 
@@ -319,8 +319,8 @@
 
 // ── Badges ────────────────────────────────────────────────────
 .badge-ok {
-  background: #10D98B20;
-  color: #10D98B;
+  background: var(--success)20;
+  color: var(--success);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -328,8 +328,8 @@
 }
 
 .badge-warn {
-  background: #F4A90220;
-  color: #F4A902;
+  background: var(--warning)20;
+  color: var(--warning);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -337,8 +337,8 @@
 }
 
 .badge-err {
-  background: #FF4D6A20;
-  color: #FF4D6A;
+  background: var(--err)20;
+  color: var(--err);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -407,26 +407,26 @@
 }
 
 .alert-ok {
-  background: #10D98B10;
-  border-left: 3px solid #10D98B;
-  color: #10D98B;
+  background: var(--success)10;
+  border-left: 3px solid var(--success);
+  color: var(--success);
 }
 
 .alert-red {
-  background: #FF4D6A10;
-  border-left: 3px solid #FF4D6A;
-  color: #FF4D6A;
+  background: var(--err)10;
+  border-left: 3px solid var(--err);
+  color: var(--err);
 }
 
 .alert-cyan {
-  background: #00B88310;
-  border-left: 3px solid #00B883;
-  color: #00B883;
+  background: var(--primary)10;
+  border-left: 3px solid var(--primary);
+  color: var(--primary);
 }
 
 // ── Buttons ───────────────────────────────────────────────────
 .btn-primary {
-  background: var(--primary, #00B883);
+  background: var(--primary, var(--primary));
   color: white;
   border: none;
   padding: 10px 20px;
@@ -440,7 +440,7 @@
   gap: 8px;
 
   &:hover:not(:disabled) {
-    background: #009966;
+    background: var(--primary2);
     transform: translateY(-1px);
   }
 
@@ -482,7 +482,7 @@
 }
 
 .btn-err {
-  background: #FF4D6A;
+  background: var(--err);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -505,7 +505,7 @@
 }
 
 .btn-ok {
-  background: #10D98B;
+  background: var(--success);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -546,7 +546,7 @@
 
   &:focus {
     outline: none;
-    border-color: var(--primary, #00B883);
+    border-color: var(--primary, var(--primary));
     box-shadow: 0 0 0 3px rgba(0,184,131,0.1);
   }
 

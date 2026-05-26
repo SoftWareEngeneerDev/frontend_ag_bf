@@ -6,7 +6,6 @@ import { FormatService } from '../../../core/services/format.service';
 const TYPE_MAP: Record<string, string> = {
   'Acomptes'        : 'DEPOSIT',
   'Paiements finaux': 'FINAL_PAYMENT',
-  'Remboursements'  : 'REFUND',
   'Commissions'     : 'COMMISSION',
 };
 
@@ -115,13 +114,16 @@ export class AdminPaymentsComponent implements OnInit, OnDestroy {
         || p.product.toLowerCase().includes(q)
         || p.transactionId.toLowerCase().includes(q);
       const matchTab = this.activeTab === 'Tous'
-        || p.type === TYPE_MAP[this.activeTab];
+        || (this.activeTab === 'Remboursements'
+          ? p.status === 'REFUNDED'
+          : p.type === TYPE_MAP[this.activeTab]);
       return matchSearch && matchTab;
     });
   }
 
   tabCount(t: string): number {
     if (t === 'Tous') return this.payments.length;
+    if (t === 'Remboursements') return this.payments.filter(p => p.status === 'REFUNDED').length;
     return this.payments.filter(p => p.type === TYPE_MAP[t]).length;
   }
 

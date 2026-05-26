@@ -59,7 +59,7 @@
 
 .suph-stars {
   display: flex; align-items: center; gap: 3px;
-  font-size: 13px; color: #F4A902;
+  font-size: 13px; color: var(--warning);
 }
 .suph-rating-val { font-size: 14px; font-weight: 800; color: #fff; margin-left: 4px; }
 .suph-rating-sub { font-size: 12px; color: rgba(255,255,255,.5); }
@@ -141,8 +141,8 @@
   display: flex; align-items: center; gap: 3px;
   padding: 4px 8px; border-radius: 99px;
   flex-shrink: 0;
-  &.up   { color: #10D98B; background: #E8FDF2; }
-  &.down { color: #FF4D6A; background: #FFE8EC; }
+  &.up   { color: var(--success); background: var(--light-bg); }
+  &.down { color: var(--err); background: var(--red-l); }
 }
 
 // ══ PANEL GÉNÉRIQUE ═════════════════════════════════════════════════
@@ -174,11 +174,11 @@
   background: none; border: none; cursor: pointer;
   display: flex; align-items: center; gap: 4px;
   padding: 4px 8px; border-radius: 6px; transition: background .15s;
-  &:hover { background: var(--primary-l, #e6faf5); }
+  &:hover { background: var(--primary-l); }
 }
 
 .sup-badge-err {
-  background: #FFE8EC; color: #FF4D6A;
+  background: var(--red-l); color: var(--err);
   font-size: 11px; font-weight: 700;
   padding: 3px 10px; border-radius: 99px; margin-left: 8px;
 }
@@ -217,13 +217,13 @@
 .sbc-bar {
   width: 100%;
   border-radius: 6px 6px 0 0;
-  background: linear-gradient(180deg, rgba(244,169,2,.5), rgba(244,169,2,.12));
+  background: linear-gradient(180deg, rgba(245,158,11,.5), rgba(245,158,11,.12));
   transition: height 1s ease;
   min-height: 4px;
 
   &.active {
-    background: linear-gradient(180deg, #F4A902, rgba(244,169,2,.4));
-    box-shadow: 0 0 16px rgba(244,169,2,.35);
+    background: linear-gradient(180deg, var(--warning), rgba(245,158,11,.4));
+    box-shadow: 0 0 16px rgba(245,158,11,.35);
   }
 }
 
@@ -241,10 +241,10 @@
 .sup-donut {
   width: 120px; height: 120px; border-radius: 50%;
   background: conic-gradient(
-    #F4A902 0deg 108deg,
-    #00D4FF 108deg 156deg,
-    #10D98B 156deg 228deg,
-    #7B2FBE 228deg 360deg
+    var(--warning) 0deg 108deg,
+    var(--cyan) 108deg 156deg,
+    var(--success) 156deg 228deg,
+    var(--purple) 228deg 360deg
   );
   box-shadow: 0 4px 24px rgba(0,0,0,.1);
   mask: radial-gradient(circle 40px, transparent 98%, black 100%);
@@ -269,7 +269,7 @@
 .sl-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .sl-label { flex: 1; color: var(--txt2); }
 .sl-val   { font-weight: 700; font-family: var(--font-mono); min-width: 20px; text-align: right; }
-.sl-bar-wrap { width: 60px; height: 5px; background: #eee; border-radius: 3px; overflow: hidden; }
+.sl-bar-wrap { width: 60px; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
 .sl-bar { height: 100%; border-radius: 3px; }
 
 // ══ RESPONSIVE GLOBAL ═══════════════════════════════════════════════
@@ -325,7 +325,7 @@
   font-size: 16px; font-weight: 900;
   width: 36px; text-align: center; flex-shrink: 0;
   color: var(--muted);
-  &.gold   { color: #F4A902; }
+  &.gold   { color: var(--warning); }
   &.silver { color: #9CA3AF; }
   &.bronze { color: #CD7C2F; }
 }
@@ -337,12 +337,12 @@
   font-size: 12px; color: var(--muted);
   i { font-size: 10px; }
 }
-.stp-stars { font-size: 12px; color: #F4A902; display: flex; gap: 1px; }
+.stp-stars { font-size: 12px; color: var(--warning); display: flex; gap: 1px; }
 
 .stp-revenue { text-align: right; }
 .stp-rev-val   { font-size: 14px; font-weight: 700; color: var(--txt); font-family: var(--font-mono); }
 .stp-rev-trend {
   font-size: 11px; font-weight: 700;
   display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin-top: 2px;
-  &.up { color: #10D98B; }
+  &.up { color: var(--success); }
 }

@@ -11,55 +11,64 @@
   --bg2:       #F1F3F5;
   --bg3:       #E9ECEF;
 
-  // Brand colors
-  --primary:   #0DA487;    // Vert émeraude (principal)
-  --primary2:  #0B8F75;    // Vert foncé (hover)
-  --primary-l: #E6F7F4;    // Vert très clair (fond)
-  --deep-blue: #0D2B5B;    // Bleu profond premium
-  --night-blue:#0A0E1A;    // Bleu nuit (hero)
-  --orange:    #FF8C00;    // Orange vif (CTA)
-  --orange2:   #E67E00;    // Orange foncé
-  --orange-l:  #FFF3E0;    // Orange très clair
-  --purple:    #7B2FBE;    // Violet
-  --purple-l:  #F3EAFF;    // Violet clair
-  --red:       #E63946;    // Rouge urgence
-  --red-l:     #FFEAEA;    // Rouge clair
-  --yellow:    #F4A902;    // Jaune/or
-  --yellow-l:  #FFF8E6;    // Jaune clair
+  // Couleurs principales — Djula Market
+  --primary:       #0D5C4A;    // Vert foncé principal
+  --primary-light: #10B981;    // Vert clair
+  --secondary:     #10D98B;    // Vert menthe (accents)
+  --primary2:      #0A4A3A;    // Vert foncé hover
+  --primary-l:     #ECFDF5;    // Fond vert très clair
+  --light-bg:      #ECFDF5;    // Fond vert très clair (alias)
+  --deep-blue: #0D2B5B;
+  --night-blue:#0A0E1A;
+  --orange:    #FF8C00;
+  --orange2:   #E67E00;
+  --orange-l:  #FFF3E0;
+  --purple:    #7B2FBE;
+  --purple-l:  #F3EAFF;
+  --red:       #DC2626;    // Rouge erreur
+  --red-l:     #FFEAEA;
+  --yellow:    #F59E0B;    // Jaune/avertissement
+  --yellow-l:  #FFF8E6;
 
-  // Text
-  --txt:       #2B3445;    // Texte principal (foncé)
+  // Couleurs neutres
+  --dark:      #1A1A2E;    // Texte principal
+  --txt:       #1A1A2E;    // Texte principal (alias)
   --txt2:      #4B5563;    // Texte secondaire
-  --muted:     #7E8BA0;    // Texte gris
-  --light:     #ADB5BD;    // Très clair
+  --grey:      #6B7280;    // Texte secondaire
+  --muted:     #6B7280;    // Texte gris (alias)
+  --light:     #ADB5BD;
   --white:     #FFFFFF;
 
-  // Status
-  --ok:        #0DA487;
-  --err:       #E63946;
-  --warn:      #F4A902;
-  --info:      #3B82F6;
+  // Couleurs fonctionnelles
+  --success:   #10D98B;    // Succès (vert)
+  --ok:        #10D98B;    // Alias
+  --warning:   #F59E0B;    // Avertissement (or)
+  --warn:      #F59E0B;    // Alias
+  --error:     #DC2626;    // Erreur (rouge)
+  --err:       #DC2626;    // Alias
+  --info:      #3B82F6;    // Information (bleu)
 
-  // Alias couleurs utilitaires (utilisées dans les composants)
-  --gold:      #F4A902;    // Alias de --yellow
-  --gold-l:    #FFF8E6;    // Alias de --yellow-l
+  // Alias couleurs utilitaires
+  --gold:      #F59E0B;
+  --gold-l:    #FFF8E6;
   --cyan:      #00D4FF;
   --cyan-l:    #E0FAFE;
-  --shadow-gold: 0 4px 20px rgba(244,169,2,.3);
+  --shadow-gold: 0 4px 20px rgba(245,158,11,.3);
   --shadow-cyan: 0 4px 20px rgba(0,212,255,.3);
 
-  // Borders & shadows
-  --border:      #E2E8F0;
-  --border2:     #CBD5E1;
+  // Bordures & ombres
+  --border:      #D1FAE5;    // Bordure verte claire
+  --border-dark: #065F46;    // Bordure verte foncée
+  --border2:     #A7F3D0;    // Bordure verte variante
   --shadow-xs:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
   --shadow-sm:   0 2px 8px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
   --shadow:      0 4px 16px rgba(0,0,0,.1),  0 2px 6px rgba(0,0,0,.06);
   --shadow-lg:   0 8px 32px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
   --shadow-xl:   0 20px 60px rgba(0,0,0,.15);
-  --shadow-green:0 4px 20px rgba(13,164,135,.3);
+  --shadow-green:0 4px 20px rgba(13,92,74,.3);
   --shadow-orange:0 4px 20px rgba(255,140,0,.3);
 
-  // Radii
+  // Rayons
   --r-xs:  4px;
   --r-sm:  8px;
   --r:     12px;
@@ -68,15 +77,15 @@
   --r-2xl: 32px;
   --r-full:9999px;
 
-  // Fonts
-  --font-display:  'Nunito', sans-serif;      // Titres — ExtraBold arrondi
-  --font-body:     'Inter', sans-serif;       // Corps de texte — lisible et technique
-  --font-secondary:'Roboto', sans-serif;      // Éléments secondaires
-  --font-cursive:  'Charm', cursive;          // Décoratif cursif 1
-  --font-cursive2: 'Oregano', cursive;        // Décoratif cursif 2
-  --font-mono:     'Roboto', monospace;       // Montants, codes, IDs
-  --font-icon:     'Font Awesome 6 Free';     // Icônes FA
-  --font-flaticon: 'flaticon_shofy';          // Icônes projet
+  // Polices
+  --font-display:  'Nunito', sans-serif;
+  --font-body:     'Inter', sans-serif;
+  --font-secondary:'Roboto', sans-serif;
+  --font-cursive:  'Charm', cursive;
+  --font-cursive2: 'Oregano', cursive;
+  --font-mono:     'Roboto', monospace;
+  --font-icon:     'Font Awesome 6 Free';
+  --font-flaticon: 'flaticon_shofy';
 
   // Transitions
   --t:      0.2s ease;
@@ -140,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
 .text-dark     { color: var(--txt); }
 
 .gradient-primary {
-  background: linear-gradient(135deg, var(--primary), #0BC5A5);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .gradient-orange {
@@ -151,14 +160,14 @@ h1, h2, h3, h4, h5, h6 {
 // ── CARDS ────────────────────────────────────────────────────────
 .card {
   background: var(--bg-white);
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid var(--border);
   border-radius: 18px;
   box-shadow: 0 2px 12px rgba(0,0,0,.06);
   transition: all var(--t);
   &:hover {
     box-shadow: 0 12px 40px rgba(0,0,0,.1);
     transform: translateY(-4px);
-    border-color: #e8e8e8;
+    border-color: var(--border2);
   }
 }
 
@@ -270,7 +279,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 4px 12px; border-radius: var(--r-full);
   font-size: 12px; font-weight: 600; letter-spacing: .2px;
 }
-.badge-ok      { @extend %badge-base; background: #E6F7F4;       color: var(--ok); }
+.badge-ok      { @extend %badge-base; background: var(--light-bg); color: var(--ok); }
 .badge-primary { @extend %badge-base; background: var(--primary-l); color: var(--primary); }
 .badge-orange  { @extend %badge-base; background: var(--orange-l);  color: var(--orange); }
 .badge-red     { @extend %badge-base; background: var(--red-l);     color: var(--red); }
@@ -306,8 +315,8 @@ h1, h2, h3, h4, h5, h6 {
   outline: none;
   transition: all var(--t);
   &::placeholder { color: var(--light); }
-  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,164,135,.12); }
-  &.error { border-color: var(--red); &:focus { box-shadow: 0 0 0 3px rgba(230,57,70,.1); } }
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,92,74,.12); }
+  &.error { border-color: var(--red); &:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.1); } }
   &:disabled { background: var(--bg2); cursor: not-allowed; }
   option { background: #fff; color: var(--txt); }
 }
@@ -333,7 +342,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .error-msg {
-  font-size: 12px; color: #E63946;
+  font-size: 12px; color: var(--err);
   margin-top: 5px; display: flex; align-items: center; gap: 5px;
   i { flex-shrink: 0; }
 }
@@ -348,12 +357,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .prog-fill {
   height: 100%; border-radius: var(--r-full);
-  background: linear-gradient(90deg, var(--primary), #0BC5A5);
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
   transition: width 1.2s cubic-bezier(.4,0,.2,1);
   &.orange  { background: linear-gradient(90deg, var(--orange), #FFB347); }
   &.purple  { background: linear-gradient(90deg, var(--purple), #A855F7); }
   &.red     { background: linear-gradient(90deg, var(--red), #FF6B7A); }
-  &.full    { background: linear-gradient(90deg, var(--ok), #0BC5A5); }
+  &.full    { background: linear-gradient(90deg, var(--ok), var(--secondary)); }
 }
 
 // ── TABLES ───────────────────────────────────────────────────────
@@ -399,7 +408,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 13px; line-height: 1.55;
   display: flex; align-items: flex-start; gap: 10px;
 }
-.alert-primary { background: var(--primary-l); border: 1px solid rgba(13,164,135,.25); color: var(--primary2); }
+.alert-primary { background: var(--primary-l); border: 1px solid rgba(13,92,74,.25); color: var(--primary2); }
 .alert-orange  { background: var(--orange-l);  border: 1px solid rgba(255,140,0,.25);  color: #B36000; }
 .alert-red     { background: var(--red-l);     border: 1px solid rgba(230,57,70,.25);  color: var(--red); }
 .alert-info    { background: #EFF6FF;           border: 1px solid rgba(59,130,246,.25); color: #1D4ED8; }
@@ -415,7 +424,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--r); text-align: center;
   font-family: var(--font-mono); font-size: 24px; font-weight: 700;
   color: var(--txt); outline: none; transition: all var(--t);
-  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,164,135,.12); background: #fff; }
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,92,74,.12); background: #fff; }
 }
 
 // ── PAY OPTIONS ──────────────────────────────────────────────────
@@ -430,7 +439,7 @@ h1, h2, h3, h4, h5, h6 {
 
 // ── ANNOUNCEMENT BAR ─────────────────────────────────────────────
 .announce-bar {
-  background: linear-gradient(135deg, var(--primary), #0BC5A5);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: #fff; text-align: center; padding: 8px 20px;
   font-size: 13px; font-weight: 500; letter-spacing: .3px;
   @media (max-width: 480px) { font-size: 11px; padding: 7px 12px; }
@@ -449,7 +458,7 @@ h1, h2, h3, h4, h5, h6 {
   h2 {
     font-family: var(--font-display);
     font-size: clamp(24px, 3.2vw, 34px);
-    font-weight: 900; color: #1a1a2e; margin-bottom: 8px;
+    font-weight: 900; color: var(--dark); margin-bottom: 8px;
     letter-spacing: -.3px;
   }
   p  { color: var(--muted); font-size: 15px; }
@@ -459,7 +468,7 @@ h1, h2, h3, h4, h5, h6 {
 .cat-pill {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 20px 14px; border-radius: 16px; cursor: pointer;
-  background: var(--bg-white); border: 1.5px solid #f0f0f0;
+  background: var(--bg-white); border: 1.5px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.05); transition: all .22s ease; text-align: center;
   .cp-icon {
     width: 52px; height: 52px; border-radius: 14px;
@@ -476,7 +485,7 @@ h1, h2, h3, h4, h5, h6 {
   &:hover, &.active {
     border-color: var(--primary);
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(13,164,135,.12);
+    box-shadow: 0 8px 24px rgba(13,92,74,.12);
     .cp-icon { background: var(--primary); color: #fff; }
     .cp-name { color: var(--primary); }
   }
@@ -495,13 +504,13 @@ h1, h2, h3, h4, h5, h6 {
 .bg-light   { background: var(--bg); }
 .bg-primary { background: var(--primary); }
 .bg-gradient-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, #0BC5A5 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
 }
 .bg-gradient-orange {
   background: linear-gradient(135deg, var(--orange) 0%, #FFB347 100%);
 }
 .bg-gradient-hero {
-  background: linear-gradient(140deg, #0A0E1A 0%, #0D2B5B 55%, #16407A 100%);
+  background: linear-gradient(140deg, var(--night-blue) 0%, var(--deep-blue) 55%, #16407A 100%);
 }
 .bg-section { background: var(--bg2); }
 
@@ -625,7 +634,7 @@ h1, h2, h3, h4, h5, h6 {
 
 // ── MODALS ───────────────────────────────────────────────────────
 .modal-backdrop {
-  position:fixed; inset:0; background:rgba(43,52,69,.4);
+  position:fixed; inset:0; background:rgba(26,26,46,.4);
   backdrop-filter:blur(4px); z-index:1000;
   display:flex; align-items:center; justify-content:center; padding:20px;
 }

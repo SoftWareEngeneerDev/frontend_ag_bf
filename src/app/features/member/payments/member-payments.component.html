@@ -1,0 +1,76 @@
+<div class="pmts-page">
+
+  <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
+  <div class="pmts-header mb-24">
+    <div>
+      <h2 class="pmts-title">
+        <i class="fa-solid fa-credit-card"></i> Mes Paiements
+      </h2>
+      <p class="text-muted pmts-sub">
+        {{ filtered.length }} transaction{{ filtered.length !== 1 ? 's' : '' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ ONGLETS ════════════════════════════════════════════════ -->
+  <div class="tab-nav mb-24">
+    <button
+      class="tab-btn"
+      *ngFor="let t of tabList"
+      [class.active]="activeTab === t.key"
+      (click)="activeTab = t.key">
+      <i [class]="t.icon"></i>
+      {{ t.label }}
+      <span class="tab-count" *ngIf="tabCount(t.key) > 0">{{ tabCount(t.key) }}</span>
+    </button>
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════ -->
+  <ng-container *ngIf="!loading && filtered.length === 0">
+    <div class="glass pmts-empty text-center">
+      <i class="fa-solid fa-credit-card pmts-empty-icon"></i>
+      <p class="text-muted">Aucune transaction trouvée.</p>
+    </div>
+  </ng-container>
+
+  <!-- ══ LISTE ══════════════════════════════════════════════════ -->
+  <div class="pmts-list" *ngIf="!loading && filtered.length > 0">
+    <div class="glass pmts-card anim-fade"
+         *ngFor="let p of filtered; trackBy: trackById">
+
+      <!-- Icône méthode + type -->
+      <div class="pmts-icon">
+        <span class="pmts-icon-emoji">{{ methodIcon(p.method) }}</span>
+      </div>
+
+      <!-- Infos principales -->
+      <div class="pmts-info">
+        <div class="pmts-product font-display">{{ p.product }}</div>
+        <div class="pmts-meta text-muted">
+          <span [class]="typeClass(p.type)">{{ typeLabel(p.type) }}</span>
+          &nbsp;·&nbsp;
+          <span class="font-mono pmts-ref">{{ p.reference | slice:0:16 }}</span>
+        </div>
+        <div class="text-muted pmts-date" style="font-size:12px;margin-top:2px">
+          <i class="fa-regular fa-calendar" style="margin-right:4px"></i>{{ p.date }}
+        </div>
+      </div>
+
+      <!-- Montant + statut -->
+      <div class="pmts-right">
+        <div class="pmts-amount font-mono font-display"
+             [style.color]="p.status === 'REFUNDED' ? '#888' : '#10D98B'">
+          {{ p.status === 'REFUNDED' ? '-' : '+' }}{{ p.amount | currencyXof }}
+        </div>
+        <div class="pmts-status">
+          <span [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

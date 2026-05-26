@@ -21,6 +21,7 @@ export interface PaymentResult {
   transactionId:  string;
   message:        string;
   paymentUrl?:    string; // URL CinetPay si redirection nécessaire
+  paymentId?:     string; // UUID du Payment en base (pour polling statut)
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +48,7 @@ export class PaymentService {
         transactionId: res.data?.transactionId     ?? '',
         message:       res.data?.message           ?? 'Paiement initié',
         paymentUrl:    res.data?.paymentUrl        ?? res.data?.checkoutUrl ?? '',
+        paymentId:     res.data?.payment?.id       ?? '',
       }))
     );
   }

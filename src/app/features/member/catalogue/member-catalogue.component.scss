@@ -13,7 +13,7 @@
   transition: transform .2s, box-shadow .2s;
 
   &:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.12); }
-  &.mc-card-hot { border: 2px solid #F4A902; }
+  &.mc-card-hot { border: 2px solid var(--warning); }
 }
 
 // ── Image ─────────────────────────────────────────────────────
@@ -28,7 +28,7 @@
 .mc-badge-hot {
   position: absolute;
   top: 12px; left: 12px;
-  background: #F4A902;
+  background: var(--warning);
   color: #fff;
   font-size: 11px;
   font-weight: 700;

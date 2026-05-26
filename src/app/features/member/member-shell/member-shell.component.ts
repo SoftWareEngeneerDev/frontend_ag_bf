@@ -56,6 +56,7 @@ export class MemberShellComponent implements OnInit, OnDestroy {
     { route: '/member/catalogue',     icon: 'fa-solid fa-store',       label: 'Catalogue',       badge: 0, badgeColor: '#10D98B' },
     { route: '/member/groups',        icon: 'fa-solid fa-layer-group', label: 'Mes Groupes',     badge: 0 },
     { route: '/member/payment',       icon: 'fa-solid fa-credit-card', label: 'Paiement' },
+    { route: '/member/payments',      icon: 'fa-solid fa-clock-rotate-left', label: 'Historique paiements' },
     { route: '/member/orders',        icon: 'fa-solid fa-box',         label: 'Mes Commandes',   badge: 0 },
     { route: '/member/disputes',      icon: 'fa-solid fa-gavel',       label: 'Mes Litiges',     badge: 0, badgeColor: '#E63946' },
     { route: '/member/notifications', icon: 'fa-solid fa-bell',        label: 'Notifications',   badge: 0, badgeColor: '#FF4D6A' },
@@ -69,7 +70,7 @@ export class MemberShellComponent implements OnInit, OnDestroy {
     private socket : SocketService,
   ) {
     effect(() => {
-      this.navItems[6].badge = this.notifs.unreadCount();
+      this.navItems[7].badge = this.notifs.unreadCount();
     });
   }
 
@@ -80,8 +81,8 @@ export class MemberShellComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         // Incrémenter le badge notifications en temps réel
-        const current = (this.navItems[6].badge as number) || 0;
-        this.navItems[6].badge = current + 1;
+        const current = (this.navItems[7].badge as number) || 0;
+        this.navItems[7].badge = current + 1;
       });
   }
 
@@ -119,19 +120,19 @@ export class MemberShellComponent implements OnInit, OnDestroy {
         const pending = orders.filter((o: any) =>
           ['CREATED', 'PROCESSING', 'SHIPPED'].includes(o.status)
         ).length;
-        this.navItems[4].badge      = pending;
-        this.navItems[4].badgeColor = pending > 0 ? '#00D4FF' : undefined;
+        this.navItems[5].badge      = pending;
+        this.navItems[5].badgeColor = pending > 0 ? '#00D4FF' : undefined;
       },
-      error: () => { this.navItems[4].badge = 0; }
+      error: () => { this.navItems[5].badge = 0; }
     });
 
     // Badge litiges ouverts
     this.http.get<any>(`${API}/disputes/me`).subscribe({
       next: (res) => {
         const open = (res.data ?? []).filter((d: any) => d.status === 'OPEN').length;
-        this.navItems[5].badge = open || 0;
+        this.navItems[6].badge = open || 0;
       },
-      error: () => { this.navItems[5].badge = 0; }
+      error: () => { this.navItems[6].badge = 0; }
     });
   }
 }

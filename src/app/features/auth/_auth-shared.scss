@@ -3,7 +3,7 @@
 /* Left panel */
 .auth-left {
   flex: 0 0 440px;
-  background: linear-gradient(160deg, #0DA487 0%, #065F46 60%, #022c22 100%);
+  background: linear-gradient(160deg, var(--primary-light) 0%, var(--primary) 60%, var(--border-dark) 100%);
   padding: 48px 40px;
   display: flex; flex-direction: column;
   position: relative; overflow: hidden;
@@ -70,7 +70,7 @@
 /* Demo box */
 .demo-box {
   background: var(--primary-l);
-  border: 1.5px solid rgba(13,164,135,.25);
+  border: 1.5px solid rgba(13,92,74,.25);
   border-radius: var(--r-lg);
   padding: 16px; margin-top:20px;
   .demo-title { font-size:12px; font-weight:700; color:var(--primary); margin-bottom:10px; }
