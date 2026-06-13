@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'app-faq',
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss']
 })
-export class FaqComponent {
+export class FaqComponent implements OnInit {
   categories: { icon: string; label: string; items: { q: string; a: string }[] }[] = [
     {
       icon: 'fa-solid fa-users',
@@ -72,6 +73,14 @@ export class FaqComponent {
     return this.openItem === key;
   }
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private seo: SeoService) {}
+
+  ngOnInit(): void {
+    this.seo.setPage({
+      title      : 'FAQ — Questions fréquentes',
+      description: 'Toutes les réponses à vos questions sur Djula Market — inscription, paiement, livraison, remboursement.',
+    });
+  }
+
   goContact(): void { this.router.navigate(['/contact']); }
 }

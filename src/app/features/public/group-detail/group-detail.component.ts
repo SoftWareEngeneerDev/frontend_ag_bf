@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService, JoinGroupResult } from '../../../core/services/group.service';
 import { AuthService }   from '../../../core/services/auth.service';
 import { FormatService } from '../../../core/services/format.service';
+import { SeoService }    from '../../../core/services/seo.service';
 import { Group, PricingTier } from '../../../core/models';
 
 @Component({
@@ -48,6 +49,7 @@ export class GroupDetailComponent implements OnInit {
     public  auth:         AuthService,
     public  fmt:          FormatService,
     private router:       Router,
+    private seo:          SeoService,
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +60,13 @@ export class GroupDetailComponent implements OnInit {
       next: (g) => {
         this.group   = g;
         this.loading = false;
+        this.seo.setPage({
+          title      : `${g.product?.name ?? 'Groupe'} — Groupe d'achat`,
+          description: `Rejoignez ce groupe et achetez ${g.product?.name} à ${g.currentPrice} XOF. ${g.currentCount} membres déjà inscrits.`,
+          image      : g.product?.images?.[0],
+          type       : 'product',
+        });
+        this.addStructuredData(g);
       },
       error: () => {
         this.loading = false;
@@ -118,4 +127,23 @@ export class GroupDetailComponent implements OnInit {
   }
 
   goBack(): void { this.router.navigate(['/groups']); }
+
+  private addStructuredData(group: any): void {
+    const script   = document.createElement('script');
+    script.type    = 'application/ld+json';
+    script.text    = JSON.stringify({
+      '@context'   : 'https://schema.org',
+      '@type'      : 'Product',
+      'name'       : group.product?.name,
+      'description': group.product?.description,
+      'image'      : group.product?.images?.[0],
+      'offers'     : {
+        '@type'        : 'Offer',
+        'price'        : group.currentPrice,
+        'priceCurrency': 'XOF',
+        'availability' : group.status === 'OPEN' ? 'InStock' : 'OutOfStock',
+      }
+    });
+    document.head.appendChild(script);
+  }
 }

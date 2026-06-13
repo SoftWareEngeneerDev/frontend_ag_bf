@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { Product, Category } from '../../../core/models';
 
 @Component({
@@ -27,9 +28,15 @@ export class CatalogComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private router: Router,
+    private seo: SeoService,
   ) {}
 
   ngOnInit(): void {
+    this.seo.setPage({
+      title      : 'Catalogue des groupes d\'achat',
+      description: 'Parcourez tous les groupes d\'achat disponibles au Burkina Faso. Rejoignez un groupe et économisez sur vos achats.',
+    });
+
     // ── Charger les catégories depuis le backend ───────────────
     this.productService.getCategories().subscribe({
       next: (cats) => { this.categories = cats; },

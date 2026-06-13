@@ -1,11 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss']
 })
-export class ContactComponent {
+export class ContactComponent implements OnInit {
+  constructor(private seo: SeoService) {}
+
+  ngOnInit(): void {
+    this.seo.setPage({
+      title      : 'Contact — Djula Market',
+      description: 'Contactez l\'équipe Djula Market pour toute question ou assistance.',
+    });
+  }
+
   subjects = [
     'Question générale',
     'Problème de paiement',

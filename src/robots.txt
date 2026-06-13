@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /member/
+Disallow: /supplier/
+
+Sitemap: https://frontend-ag-bf.vercel.app/sitemap.xml
