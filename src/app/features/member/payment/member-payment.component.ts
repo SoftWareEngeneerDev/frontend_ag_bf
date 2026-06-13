@@ -50,24 +50,29 @@ export class PaymentComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const params = this.route.snapshot.queryParams;
+    this.route.queryParams.subscribe(params => {
+      if (!params['groupId']) {
+        this.router.navigate(['/member/catalogue']);
+        return;
+      }
 
-    this.groupId      = params['groupId']        ?? '';
-    this.depositAmount = +(params['depositAmount'] ?? 0);
-    this.currentPrice  = +(params['currentPrice']  ?? 0);
-    this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL_PAYMENT';
+      this.groupId       = params['groupId']        ?? '';
+      this.depositAmount = +(params['depositAmount'] ?? 0);
+      this.currentPrice  = +(params['currentPrice']  ?? 0);
+      this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL_PAYMENT';
 
-    if (this.groupId) {
-      this.groupService.getById(this.groupId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next  : (g) => { this.group = g; },
-          error : () => {}
-        });
-    }
+      if (this.groupId) {
+        this.groupService.getById(this.groupId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next  : (g) => { this.group = g; },
+            error : () => {}
+          });
+      }
 
-    // Détecter retour depuis CinetPay (paiement en attente sauvegardé)
-    this.resumePollingIfPending();
+      // Détecter retour depuis CinetPay (paiement en attente sauvegardé)
+      this.resumePollingIfPending();
+    });
   }
 
   ngOnDestroy(): void {

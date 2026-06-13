@@ -83,7 +83,13 @@ export class MemberPaymentsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.payments = (res.data ?? []).map((p: any) => this.mapPayment(p));
+          const raw = res.data ?? res;
+          const list = Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw.payments)
+              ? raw.payments
+              : [];
+          this.payments = list.map((p: any) => this.mapPayment(p));
           this.loading  = false;
         },
         error: () => { this.loading = false; }
