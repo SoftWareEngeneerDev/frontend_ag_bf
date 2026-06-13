@@ -1,7 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AdminService }  from '../../../core/services/admin.service';
 import { FormatService } from '../../../core/services/format.service';
+import { environment } from '../../../../environments/environment';
+
+const API = environment.apiUrl;
 
 const TYPE_MAP: Record<string, string> = {
   'Acomptes'        : 'DEPOSIT',
@@ -62,10 +66,11 @@ interface PaymentRow {
 export class AdminPaymentsComponent implements OnInit, OnDestroy {
   search     = '';
   activeTab  = 'Tous';
-  loading    = true;
-  refunding  = '';
+  loading       = true;
+  refunding     = '';
+  payingOut     = '';
 
-  readonly tabs = ['Tous', 'Acomptes', 'Paiements finaux', 'Remboursements', 'Commissions'];
+  readonly tabs = ['Tous', 'Acomptes', 'Paiements finaux', 'Remboursements', 'Commissions', 'Virements fournisseur'];
 
   payments   : PaymentRow[] = [];
   successMsg  = '';
@@ -80,6 +85,7 @@ export class AdminPaymentsComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminService: AdminService,
+    private http        : HttpClient,
     public  fmt         : FormatService,
   ) {}
 
@@ -113,17 +119,19 @@ export class AdminPaymentsComponent implements OnInit, OnDestroy {
         || p.user.toLowerCase().includes(q)
         || p.product.toLowerCase().includes(q)
         || p.transactionId.toLowerCase().includes(q);
-      const matchTab = this.activeTab === 'Tous'
-        || (this.activeTab === 'Remboursements'
-          ? p.status === 'REFUNDED'
-          : p.type === TYPE_MAP[this.activeTab]);
+      let matchTab: boolean;
+      if (this.activeTab === 'Tous')                   matchTab = true;
+      else if (this.activeTab === 'Remboursements')    matchTab = p.status === 'REFUNDED';
+      else if (this.activeTab === 'Virements fournisseur') matchTab = p.type === 'SUPPLIER_PAYOUT';
+      else                                             matchTab = p.type === TYPE_MAP[this.activeTab];
       return matchSearch && matchTab;
     });
   }
 
   tabCount(t: string): number {
-    if (t === 'Tous') return this.payments.length;
-    if (t === 'Remboursements') return this.payments.filter(p => p.status === 'REFUNDED').length;
+    if (t === 'Tous')                   return this.payments.length;
+    if (t === 'Remboursements')         return this.payments.filter(p => p.status === 'REFUNDED').length;
+    if (t === 'Virements fournisseur')  return this.payments.filter(p => p.type === 'SUPPLIER_PAYOUT').length;
     return this.payments.filter(p => p.type === TYPE_MAP[t]).length;
   }
 
@@ -190,6 +198,24 @@ export class AdminPaymentsComponent implements OnInit, OnDestroy {
     if (p.type === 'REFUND')      return '#888';
     if (p.type === 'COMMISSION')  return '#F4A902';
     return '#10D98B';
+  }
+
+  completePayout(p: PaymentRow): void {
+    if (this.payingOut) return;
+    this.payingOut = p.id;
+    this.http.patch(`${API}/admin/payments/${p.id}/complete-payout`, {})
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          p.status     = 'COMPLETED';
+          this.payingOut = '';
+          this.showSuccess('Virement fournisseur validé avec succès');
+        },
+        error: (err) => {
+          this.payingOut = '';
+          this.showError(err?.error?.error?.message ?? 'Erreur lors de la validation du virement');
+        }
+      });
   }
 
   trackById(_: number, p: PaymentRow): string { return p.id; }

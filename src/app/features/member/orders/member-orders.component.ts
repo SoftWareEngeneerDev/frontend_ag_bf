@@ -1,9 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { OrderService }  from '../../../core/services/order.service';
 import { FormatService } from '../../../core/services/format.service';
 import { Order, OrderStatus } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
+
+const API = environment.apiUrl;
 
 interface OrderItem {
   id          : string;
@@ -39,6 +43,13 @@ export class OrdersComponent implements OnInit, OnDestroy {
   showDeliverersModal = false;
   loadingDeliverers   = false;
 
+  // ── Avis ──────────────────────────────────────────────────────
+  showReviewModal = false;
+  reviewProductId = '';
+  reviewRating    = 0;
+  reviewComment   = '';
+  savingReview    = false;
+
   private destroy$ = new Subject<void>();
 
   readonly tabList = [
@@ -72,6 +83,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   constructor(
     private orderService : OrderService,
+    private http         : HttpClient,
     public  fmt          : FormatService,
     private router       : Router,
   ) {}
@@ -195,8 +207,37 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   // ── Navigation ────────────────────────────────────────────────
-  reorder(o: OrderItem): void { this.router.navigate(['/groups', o.group?.id ?? o.id]); }
-  leaveReview(o: OrderItem): void { this.router.navigate(['/groups', o.group?.id ?? o.id], { queryParams: { review: true } }); }
+  reorder(o: OrderItem): void { this.router.navigate(['/member/catalogue']); }
+
+  // ── Modal avis ────────────────────────────────────────────────
+  openReviewModal(o: OrderItem): void {
+    this.reviewProductId = o.product?.id ?? '';
+    this.reviewRating    = 0;
+    this.reviewComment   = '';
+    this.showReviewModal = true;
+  }
+
+  setRating(n: number): void { this.reviewRating = n; }
+
+  submitReview(): void {
+    if (!this.reviewRating) { this.showError('Sélectionnez une note (1 à 5 étoiles)'); return; }
+    this.savingReview = true;
+    this.http.post(`${API}/products/${this.reviewProductId}/reviews`, {
+      rating : this.reviewRating,
+      comment: this.reviewComment.trim() || undefined,
+    }).pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showReviewModal = false;
+          this.savingReview    = false;
+          this.showSuccess('Avis publié avec succès !');
+        },
+        error: (err) => {
+          this.savingReview = false;
+          this.showError(err?.error?.error?.message ?? 'Erreur lors de la publication de l\'avis');
+        }
+      });
+  }
 
   private showSuccess(msg: string): void {
     this.successMsg = msg; this.errorMsg = '';

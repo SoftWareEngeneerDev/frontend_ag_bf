@@ -9,10 +9,10 @@ import { environment } from '../../../../environments/environment';
 const API = environment.apiUrl;
 
 const STATUS_MAP: Record<string, string> = {
-  'Approuvés'  : 'ACTIVE',
-  'En attente' : 'PENDING',
+  'Approuvés'  : 'APPROVED',
+  'En attente' : 'PENDING_APPROVAL',
   'Rejetés'    : 'REJECTED',
-  'Archivés'   : 'INACTIVE',
+  'Archivés'   : 'ARCHIVED',
 };
 
 @Component({
@@ -288,6 +288,21 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
         this.showError(err?.error?.error?.message ?? 'Erreur lors de la modification');
       }
     });
+  }
+
+  // ── Supprimer un produit ──────────────────────────────────
+  deleteProduct(p: Product): void {
+    if (!confirm('Supprimer ce produit ? Cette action est irréversible.')) return;
+    this.http.delete(`${API}/supplier/products/${p.id}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.products = this.products.filter(x => x.id !== p.id);
+          this.applyFilter();
+          this.showSuccess('Produit supprimé avec succès');
+        },
+        error: (err) => this.showError(err?.error?.error?.message ?? 'Erreur lors de la suppression'),
+      });
   }
 
   // ── Créer un groupe depuis un produit ─────────────────────

@@ -1,14 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AdminService }  from '../../../core/services/admin.service';
 import { GroupService }  from '../../../core/services/group.service';
 import { FormatService } from '../../../core/services/format.service';
 import { Group } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
+
+const API = environment.apiUrl;
 
 const STATUS_MAP: Record<string, string[]> = {
-  'Ouverts'      : ['OPEN'],
-  'Seuil atteint': ['THRESHOLD_REACHED'],
-  'Terminés'     : ['COMPLETED', 'CANCELLED', 'EXPIRED'],
+  'En cours'   : ['OPEN', 'THRESHOLD_REACHED'],
+  'Clôturés'   : ['CLOSED'],
+  'Échoués'    : ['FAILED'],
+  'Annulés'    : ['CANCELLED'],
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -38,17 +43,23 @@ export class AdminGroupsComponent implements OnInit, OnDestroy {
   loading   = true;
   closing   = '';
 
-  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'En cours', 'Terminés'];
+  readonly tabs = ['Tous', 'En cours', 'Clôturés', 'Échoués', 'Annulés'];
 
   groups    : Group[] = [];
   successMsg = '';
   errorMsg   = '';
+
+  // Modal groupe échoué
+  showFailModal  = false;
+  failTarget     : Group | null = null;
+  failing        = '';
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private adminService : AdminService,
     private groupService : GroupService,
+    private http         : HttpClient,
     public  fmt          : FormatService,
   ) {}
 
@@ -114,6 +125,34 @@ export class AdminGroupsComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.closing = '';
           this.showError(err?.error?.error?.message ?? 'Erreur lors de la fermeture');
+        }
+      });
+  }
+
+  // ── Marquer groupe échoué ─────────────────────────────────────
+  openFailModal(g: Group): void {
+    this.failTarget    = g;
+    this.showFailModal = true;
+  }
+
+  confirmFail(): void {
+    if (!this.failTarget || this.failing) return;
+    this.failing = this.failTarget.id;
+    this.showFailModal = false;
+
+    this.http.patch(`${API}/admin/groups/${this.failTarget.id}/fail`, {})
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.failTarget) this.failTarget.status = 'FAILED' as any;
+          this.failing    = '';
+          this.failTarget = null;
+          this.showSuccess('Groupe marqué échoué — membres notifiés et acomptes remboursés');
+        },
+        error: (err) => {
+          this.failing    = '';
+          this.failTarget = null;
+          this.showError(err?.error?.error?.message ?? 'Erreur lors du marquage');
         }
       });
   }

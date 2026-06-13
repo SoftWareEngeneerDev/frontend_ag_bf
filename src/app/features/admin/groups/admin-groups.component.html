@@ -160,6 +160,15 @@
                 <i *ngIf="closing !== g.id" class="fa-solid fa-ban"></i>
                 Fermer
               </button>
+              <button class="btn-err btn-sm btn-round"
+                      *ngIf="g.status === 'OPEN'"
+                      [disabled]="failing === g.id"
+                      (click)="openFailModal(g)"
+                      title="Marquer échoué + rembourser les acomptes">
+                <i *ngIf="failing === g.id" class="fa-solid fa-spinner fa-spin"></i>
+                <i *ngIf="failing !== g.id" class="fa-solid fa-circle-xmark"></i>
+                Échoué
+              </button>
             </div>
           </td>
         </tr>
@@ -167,4 +176,43 @@
     </table>
   </div>
 
+</div>
+
+<!-- ══ MODAL — GROUPE ÉCHOUÉ ══════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showFailModal" (click)="showFailModal = false">
+  <div class="modal-box glass" (click)="$event.stopPropagation()">
+    <div class="flex-between modal-head">
+      <h3 class="font-display" style="font-size:17px;font-weight:700">
+        <i class="fa-solid fa-circle-xmark" style="color:#E63946"></i> Marquer le groupe comme échoué
+      </h3>
+      <button class="btn-ghost btn-sm btn-icon" (click)="showFailModal = false">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body" *ngIf="failTarget">
+      <div class="alert-red alert" style="font-size:13px;margin-bottom:16px">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <strong>Cette action est irréversible.</strong><br>
+        Le groupe sera marqué FAILED. Tous les membres actifs seront annulés
+        et leurs acomptes ESCROWED seront automatiquement remboursés.
+      </div>
+      <div class="glass" style="padding:12px;margin-bottom:16px;border-left:4px solid #E63946">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px">
+          {{ failTarget.product.name }}
+        </div>
+        <div class="text-muted" style="font-size:12px">
+          Fournisseur : {{ failTarget.supplier.companyName }}
+          &nbsp;·&nbsp; {{ failTarget.currentCount }} membre(s)
+        </div>
+      </div>
+      <div class="flex gap-10">
+        <button class="btn-ghost" style="flex:1;justify-content:center" (click)="showFailModal = false">
+          Annuler
+        </button>
+        <button class="btn-err btn-round" style="flex:1;justify-content:center" (click)="confirmFail()">
+          <i class="fa-solid fa-circle-xmark"></i> Confirmer — Marquer échoué
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

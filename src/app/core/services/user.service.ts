@@ -71,18 +71,19 @@ export class UserService {
   // ── Helper : mapper backend → modèle User front ───────────────
   private mapUser(data: any): User {
     return {
-      id:           data.id,
-      fullName:     data.name,
-      phone:        data.phone,
-      email:        data.email,
-      role:         data.role,
-      status:       data.status,
-      trustScore:   data.trustScore ?? 100,
-      city:         data.city ?? 'Ouagadougou',
-      referralCode: data.referralCode ?? '',
-      totalSaved:   0,
-      createdAt:    new Date(data.createdAt ?? Date.now()),
-      avatarUrl:    data.avatarUrl,
+      id:            data.id,
+      fullName:      data.name,
+      phone:         data.phone,
+      email:         data.email,
+      role:          data.role,
+      status:        data.status,
+      trustScore:    data.trustScore   ?? 100,
+      city:          data.city         ?? 'Ouagadougou',
+      referralCode:  data.referralCode ?? '',
+      referralCount: data._count?.referrals ?? 0,
+      totalSaved:    0,
+      createdAt:     new Date(data.createdAt ?? Date.now()),
+      avatarUrl:     data.avatarUrl,
     };
   }
 }

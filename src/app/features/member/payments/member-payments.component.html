@@ -39,7 +39,9 @@
   <!-- ══ LISTE ══════════════════════════════════════════════════ -->
   <div class="pmts-list" *ngIf="!loading && filtered.length > 0">
     <div class="glass pmts-card anim-fade"
-         *ngFor="let p of filtered; trackBy: trackById">
+         *ngFor="let p of filtered; trackBy: trackById"
+         (click)="openDetail(p)"
+         style="cursor:pointer">
 
       <!-- Icône méthode + type -->
       <div class="pmts-icon">
@@ -73,4 +75,68 @@
     </div>
   </div>
 
+</div>
+
+<!-- ══ MODAL DÉTAIL PAIEMENT ══════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showPaymentDetail && selectedPayment" (click)="showPaymentDetail = false">
+  <div class="modal-box glass" (click)="$event.stopPropagation()">
+    <div class="flex-between modal-head">
+      <h3 class="font-display" style="font-size:17px;font-weight:700">
+        <i class="fa-solid fa-receipt" style="color:var(--primary)"></i> Détail du paiement
+      </h3>
+      <button class="btn-ghost btn-sm btn-icon" (click)="showPaymentDetail = false">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedPayment">
+
+      <!-- Montant + statut -->
+      <div style="text-align:center;padding:16px 0 20px">
+        <div class="font-mono font-display"
+             style="font-size:32px;font-weight:700;margin-bottom:8px"
+             [style.color]="selectedPayment.status === 'REFUNDED' ? '#888' : '#10D98B'">
+          {{ selectedPayment.status === 'REFUNDED' ? '-' : '+' }}{{ selectedPayment.amount | currencyXof }}
+        </div>
+        <span [class]="statusClass(selectedPayment.status)">{{ statusLabel(selectedPayment.status) }}</span>
+      </div>
+
+      <!-- Détails -->
+      <div class="glass" style="padding:14px;border-radius:12px">
+        <table style="width:100%;border-collapse:collapse">
+          <tr style="border-bottom:1px solid var(--border)">
+            <td class="text-muted" style="padding:8px 0;font-size:13px;width:45%">Groupe / Produit</td>
+            <td style="padding:8px 0;font-size:13px;font-weight:600;text-align:right">{{ selectedPayment.product }}</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td class="text-muted" style="padding:8px 0;font-size:13px">Type</td>
+            <td style="padding:8px 0;text-align:right">
+              <span [class]="typeClass(selectedPayment.type)">{{ typeLabel(selectedPayment.type) }}</span>
+            </td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td class="text-muted" style="padding:8px 0;font-size:13px">Méthode</td>
+            <td style="padding:8px 0;font-size:13px;text-align:right">
+              {{ methodIcon(selectedPayment.method) }} {{ methodLabel(selectedPayment.method) }}
+            </td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td class="text-muted" style="padding:8px 0;font-size:13px">Date</td>
+            <td style="padding:8px 0;font-size:13px;text-align:right">{{ selectedPayment.date }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted" style="padding:8px 0;font-size:13px">Référence</td>
+            <td style="padding:8px 0;text-align:right">
+              <span class="font-mono" style="font-size:11px;opacity:.7">{{ selectedPayment.reference }}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn-ghost" style="width:100%;justify-content:center;margin-top:16px"
+              (click)="showPaymentDetail = false">
+        Fermer
+      </button>
+    </div>
+  </div>
 </div>

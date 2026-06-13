@@ -121,7 +121,7 @@
         <div class="sp-actions">
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
                   (click)="openEdit(p)"
-                  [disabled]="p.status === 'INACTIVE'">
+                  [disabled]="p.status === 'INACTIVE' || p.status === 'ARCHIVED'">
             <i class="fa-solid fa-pen"></i> Modifier
           </button>
           <button class="btn-ghost btn-sm" style="flex:1;justify-content:center"
@@ -132,6 +132,12 @@
                   (click)="openCreateGroup(p)"
                   [disabled]="!['ACTIVE','APPROVED'].includes(p.status) || p.stock === 0">
             <i class="fa-solid fa-users-plus"></i> Groupe
+          </button>
+          <button class="btn-err btn-sm" style="justify-content:center"
+                  *ngIf="p.status === 'REJECTED' || p.status === 'ARCHIVED' || p.status === 'INACTIVE'"
+                  (click)="deleteProduct(p)"
+                  title="Supprimer définitivement ce produit">
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       </div>

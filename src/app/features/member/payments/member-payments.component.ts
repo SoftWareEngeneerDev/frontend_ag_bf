@@ -50,9 +50,11 @@ interface PaymentItem {
   styleUrls  : ['./member-payments.component.scss'],
 })
 export class MemberPaymentsComponent implements OnInit, OnDestroy {
-  payments : PaymentItem[] = [];
-  loading   = true;
-  activeTab = 'Tous';
+  payments         : PaymentItem[] = [];
+  loading           = true;
+  activeTab         = 'Tous';
+  selectedPayment  : PaymentItem | null = null;
+  showPaymentDetail = false;
 
   readonly tabList = [
     { key: 'Tous',             icon: 'fa-solid fa-list',           label: 'Tous' },
@@ -109,6 +111,17 @@ export class MemberPaymentsComponent implements OnInit, OnDestroy {
   statusLabel(s: string): string { return STATUS_LABELS[s] ?? s; }
   statusClass(s: string): string { return STATUS_CLASSES[s] ?? 'badge-grey'; }
 
+  methodLabel(m: string): string {
+    const labels: Record<string, string> = {
+      ORANGE_MONEY : 'Orange Money',
+      MOOV_MONEY   : 'Moov Money',
+      LIGDICASH    : 'LigdiCash',
+      CARD         : 'Carte bancaire',
+      BANK_TRANSFER: 'Virement bancaire',
+    };
+    return labels[m] ?? m;
+  }
+
   methodIcon(m: string): string {
     const icons: Record<string, string> = {
       ORANGE_MONEY : '🟠',
@@ -118,6 +131,11 @@ export class MemberPaymentsComponent implements OnInit, OnDestroy {
       BANK_TRANSFER: '🏦',
     };
     return icons[m] ?? '💰';
+  }
+
+  openDetail(p: PaymentItem): void {
+    this.selectedPayment   = p;
+    this.showPaymentDetail = true;
   }
 
   trackById(_: number, p: PaymentItem): string { return p.id; }
