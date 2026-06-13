@@ -144,6 +144,14 @@
                 <i *ngIf="refunding !== p.id" class="fa-solid fa-rotate-left"></i>
                 Rembourser
               </button>
+              <button class="btn-ok btn-sm btn-round"
+                      *ngIf="p.type === 'SUPPLIER_PAYOUT' && p.status === 'PENDING'"
+                      [disabled]="payingOut === p.id"
+                      (click)="completePayout(p)">
+                <i *ngIf="payingOut === p.id" class="fa-solid fa-spinner fa-spin"></i>
+                <i *ngIf="payingOut !== p.id" class="fa-solid fa-circle-check"></i>
+                Valider
+              </button>
             </div>
           </td>
         </tr>

@@ -65,8 +65,9 @@
   top          : calc(100% + 10px);
   right        : 0;
   min-width    : 230px;
-  background   : #fff;
-  border       : 1px solid #e5e7eb;
+  max-width    : calc(100vw - 32px);
+  background   : var(--bg-white);
+  border       : 1px solid var(--border);
   border-radius: 14px;
   box-shadow   : 0 10px 40px rgba(0,0,0,.15);
   z-index      : 9999;
@@ -94,18 +95,18 @@
 .tb-dd-name {
   font-size  : 14px;
   font-weight: 700;
-  color      : #111;
+  color      : var(--dark);
   margin-bottom: 2px;
 }
 
 .tb-dd-role {
   font-size: 11px;
-  color    : #888;
+  color    : var(--grey);
 }
 
 .tb-dd-sep {
   height    : 1px;
-  background: #f0f0f0;
+  background: var(--border);
   margin    : 2px 0;
 }
 
@@ -118,21 +119,21 @@
   padding    : 11px 16px;
   font-size  : 13px;
   font-weight: 500;
-  color      : #222;
+  color      : var(--txt);
   background : none;
   border     : none;
   cursor     : pointer;
   text-align : left;
   transition : background .12s;
 
-  i { width: 16px; color: var(--primary, #10D98B); font-size: 13px; }
+  i { width: 16px; color: var(--primary); font-size: 13px; }
 
-  &:hover { background: #f5f5f5; }
+  &:hover { background: var(--bg2); }
 }
 
 .tb-dd-logout {
-  color: #FF4D6A !important;
-  i    { color: #FF4D6A !important; }
+  color: var(--err) !important;
+  i    { color: var(--err) !important; }
 }
 
 // ── Hamburger ─────────────────────────────────────────────────
@@ -146,6 +147,10 @@
 }
 
 // ── Responsive ────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .tb-search { width: 160px; }
+}
+
 @media (max-width: 768px) {
   .topbar         { padding: 0 16px; }
   .topbar-title   { font-size: 15px; }

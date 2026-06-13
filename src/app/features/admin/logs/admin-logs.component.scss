@@ -59,6 +59,10 @@
 }
 
 // ── Responsive ────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .flex-between { flex-wrap: wrap; gap: 10px; }
+}
+
 @media (max-width: 768px) {
   .tbl { min-width: 600px; }
   .glass { overflow-x: auto; }

@@ -71,18 +71,18 @@
 
   &.done {
     background: var(--primary); border-color: var(--primary);
-    color: #fff; box-shadow: 0 0 0 3px rgba(13,164,135,.2);
+    color: #fff; box-shadow: 0 0 0 3px rgba(13,92,74,.2);
   }
   &.active {
     border-color: var(--primary); color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(13,164,135,.15);
+    box-shadow: 0 0 0 4px rgba(13,92,74,.15);
     animation: pulse-ring 2s ease infinite;
   }
 }
 
 @keyframes pulse-ring {
-  0%,100% { box-shadow: 0 0 0 4px rgba(13,164,135,.15); }
-  50%      { box-shadow: 0 0 0 8px rgba(13,164,135,.05); }
+  0%,100% { box-shadow: 0 0 0 4px rgba(13,92,74,.15); }
+  50%      { box-shadow: 0 0 0 8px rgba(13,92,74,.05); }
 }
 
 .ot-label {
@@ -102,6 +102,72 @@
   display: flex; gap: 10px; flex-wrap: wrap;
   padding-top: 12px; border-top: 1px solid var(--border);
   margin-top: 4px;
+}
+
+// ── Modal livreurs ───────────────────────────────────────────────
+.dlr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.dlr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.dlr-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.dlr-av {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--primary-l);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.dlr-av-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.dlr-av-init {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+
+.dlr-info    { flex: 1; min-width: 0; }
+.dlr-name    { font-size: 14px; font-weight: 700; color: var(--txt); margin-bottom: 2px; }
+.dlr-zone    { font-size: 11px; display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+.dlr-tarif   { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+
+.dlr-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  @media (max-width: 480px) {
+    width: 100%;
+    flex-direction: column;
+    button { width: 100%; justify-content: center; }
+  }
 }
 
 // ── Responsive ──────────────────────────────────────────────────

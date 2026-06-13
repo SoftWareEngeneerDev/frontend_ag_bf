@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Order } from '../models';
 import { environment } from '../../../environments/environment';
@@ -19,9 +19,16 @@ export class OrderService {
     );
   }
 
-  // ── GET /orders/:id/tracking ──────────────────────────────────
+  // ── PATCH /orders/:id/confirm-delivery ───────────────────────
+  confirmDelivery(id: string): Observable<any> {
+    return this.http.patch<any>(`${API}/orders/${id}/confirm-delivery`, {}).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // ── GET /orders/:id ───────────────────────────────────────────
   getById(id: string): Observable<Order | undefined> {
-    return this.http.get<any>(`${API}/orders/${id}/tracking`).pipe(
+    return this.http.get<any>(`${API}/orders/${id}`).pipe(
       map(res => res.data ? this.mapOrder(res.data) : undefined)
     );
   }
@@ -39,5 +46,14 @@ export class OrderService {
       product:     o.group?.product,
       member:      null as any,
     };
+  }
+
+  // ── Livreurs publics ─────────────────────────────────────────
+  getPublicDeliverers(zone?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (zone) params = params.set('zone', zone);
+    return this.http.get<any>(`${API}/deliverers/public`, { params }).pipe(
+      map(res => res.data ?? [])
+    );
   }
 }

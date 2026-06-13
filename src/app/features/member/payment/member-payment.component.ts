@@ -6,6 +6,8 @@ import { GroupService }   from '../../../core/services/group.service';
 import { FormatService }  from '../../../core/services/format.service';
 import { PaymentMethod, Group } from '../../../core/models';
 
+const PENDING_STORAGE_KEY = 'djula_pending_payment';
+
 @Component({
   selector: 'app-payment',
   templateUrl: './member-payment.component.html',
@@ -25,9 +27,10 @@ export class PaymentComponent implements OnInit, OnDestroy {
   groupId       = '';
   depositAmount = 0;
   currentPrice  = 0;
-  paymentType   : 'DEPOSIT' | 'FINAL' = 'FINAL';
+  paymentType   : 'DEPOSIT' | 'FINAL_PAYMENT' = 'FINAL_PAYMENT';
 
-  private destroy$ = new Subject<void>();
+  private destroy$        = new Subject<void>();
+  private pollingInterval : any;
 
   readonly steps = ['Résumé', 'Méthode', 'Traitement', 'Confirmé'];
 
@@ -47,26 +50,35 @@ export class PaymentComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const params = this.route.snapshot.queryParams;
+    this.route.queryParams.subscribe(params => {
+      if (!params['groupId']) {
+        this.router.navigate(['/member/catalogue']);
+        return;
+      }
 
-    this.groupId      = params['groupId']        ?? '';
-    this.depositAmount = +(params['depositAmount'] ?? 0);
-    this.currentPrice  = +(params['currentPrice']  ?? 0);
-    this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL';
+      this.groupId       = params['groupId']        ?? '';
+      this.depositAmount = +(params['depositAmount'] ?? 0);
+      this.currentPrice  = +(params['currentPrice']  ?? 0);
+      this.paymentType   = this.depositAmount > 0 ? 'DEPOSIT' : 'FINAL_PAYMENT';
 
-    if (this.groupId) {
-      this.groupService.getById(this.groupId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next  : (g) => { this.group = g; },
-          error : () => {}
-        });
-    }
+      if (this.groupId) {
+        this.groupService.getById(this.groupId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next  : (g) => { this.group = g; },
+            error : () => {}
+          });
+      }
+
+      // Détecter retour depuis CinetPay (paiement en attente sauvegardé)
+      this.resumePollingIfPending();
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    clearInterval(this.pollingInterval);
   }
 
   // ── Getters ───────────────────────────────────────────────────
@@ -108,7 +120,13 @@ export class PaymentComponent implements OnInit, OnDestroy {
         this.now     = new Date();
 
         if (r.paymentUrl) {
-          // Mode PROD → rediriger vers CinetPay
+          // Mode PROD → sauvegarder le paymentId puis rediriger vers CinetPay
+          if (r.paymentId) {
+            sessionStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify({
+              paymentId: r.paymentId,
+              ref      : r.reference,
+            }));
+          }
           window.location.href = r.paymentUrl;
         } else if (r.reference) {
           // Mode DEV → simuler
@@ -140,4 +158,56 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   goHome()   : void { this.router.navigate(['/member']); }
   goOrders() : void { this.router.navigate(['/member/orders']); }
+
+  // ── Polling statut après retour CinetPay ─────────────────────
+
+  private resumePollingIfPending(): void {
+    const stored = sessionStorage.getItem(PENDING_STORAGE_KEY);
+    if (!stored) return;
+
+    try {
+      const { paymentId, ref } = JSON.parse(stored);
+      if (!paymentId) { sessionStorage.removeItem(PENDING_STORAGE_KEY); return; }
+      this.ref  = ref ?? '';
+      this.step = 3;
+      this.startPolling(paymentId);
+    } catch {
+      sessionStorage.removeItem(PENDING_STORAGE_KEY);
+    }
+  }
+
+  private startPolling(paymentId: string): void {
+    let attempts = 0;
+    const maxAttempts = 40; // 2 minutes à 3 s d'intervalle
+
+    this.pollingInterval = setInterval(() => {
+      attempts++;
+
+      this.payService.getStatus(paymentId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (payment) => {
+            if (payment?.status === 'COMPLETED' || payment?.status === 'ESCROWED') {
+              clearInterval(this.pollingInterval);
+              sessionStorage.removeItem(PENDING_STORAGE_KEY);
+              this.now  = new Date();
+              this.step = 4;
+            } else if (payment?.status === 'FAILED') {
+              clearInterval(this.pollingInterval);
+              sessionStorage.removeItem(PENDING_STORAGE_KEY);
+              this.step     = 2;
+              this.errorMsg = 'Paiement échoué. Veuillez réessayer.';
+            }
+          },
+          error: () => { /* ignorer les erreurs transitoires */ }
+        });
+
+      if (attempts >= maxAttempts) {
+        clearInterval(this.pollingInterval);
+        sessionStorage.removeItem(PENDING_STORAGE_KEY);
+        this.step     = 2;
+        this.errorMsg = 'Délai dépassé. Vérifiez votre historique de paiements.';
+      }
+    }, 3000);
+  }
 }

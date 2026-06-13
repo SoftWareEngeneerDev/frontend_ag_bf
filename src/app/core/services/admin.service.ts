@@ -67,6 +67,27 @@ export class AdminService {
 
   // ── Fournisseurs ──────────────────────────────────────────────
 
+  getSupplierById(id: string): Observable<any> {
+    return this.http.get<any>(`${API}/admin/suppliers/${id}`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getWithdrawals(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
+    return this.http.get<any>(`${API}/admin/withdrawals`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => ({
+      data : Array.isArray(res.data) ? res.data : [],
+      meta : res.meta ?? {}
+    })));
+  }
+
+  processWithdrawal(id: string, approved: boolean, reason?: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/withdrawals/${id}/process`, { approved, reason }).pipe(
+      map(res => res.data)
+    );
+  }
+
   getSuppliers(status = 'ALL', limit = 20, page = 1): Observable<any[]> {
     return this.http.get<any>(`${API}/admin/suppliers`, {
       params: this.buildParams({ status, limit, page })
@@ -178,6 +199,15 @@ export class AdminService {
 
   // ── Paiements & Remboursements ────────────────────────────────
 
+  getAllPayments(params?: { status?: string; type?: string; page?: number; limit?: number }): Observable<any> {
+    return this.http.get<any>(`${API}/admin/payments`, {
+      params: this.buildParams(params)
+    }).pipe(map(res => ({
+      data : Array.isArray(res.data) ? res.data : [],
+      meta : res.meta ?? {}
+    })));
+  }
+
   getPayments(params?: { status?: string; page?: number; limit?: number }): Observable<any> {
     return this.http.get<any>(`${API}/admin/refunds`, {
       params: this.buildParams(params)
@@ -206,6 +236,33 @@ export class AdminService {
 
   updateOrderStatus(id: string, status: string): Observable<any> {
     return this.http.patch<any>(`${API}/admin/orders/${id}/status`, { status }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // ── Livreurs ──────────────────────────────────────────────────
+  getDeliverers(status?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (status && status !== 'all') params = params.set('status', status);
+    return this.http.get<any>(`${API}/admin/deliverers`, { params }).pipe(
+      map(res => res.data ?? [])
+    );
+  }
+
+  createDeliverer(data: any): Observable<any> {
+    return this.http.post<any>(`${API}/admin/deliverers`, data).pipe(
+      map(res => res.data)
+    );
+  }
+
+  updateDeliverer(id: string, data: any): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/deliverers/${id}`, data).pipe(
+      map(res => res.data)
+    );
+  }
+
+  toggleDelivererStatus(id: string): Observable<any> {
+    return this.http.patch<any>(`${API}/admin/deliverers/${id}/toggle-status`, {}).pipe(
       map(res => res.data)
     );
   }

@@ -39,8 +39,6 @@ export class FormatService {
     const m: Record<GroupStatus, string> = {
       OPEN             : '● Ouvert',
       THRESHOLD_REACHED: '● Seuil atteint',
-      PAYMENT_PENDING  : '● Paiement en attente',
-      PROCESSING       : '● En traitement',
       COMPLETED        : '● Terminé',
       CANCELLED        : '● Annulé',
       EXPIRED          : '● Expiré',
@@ -52,8 +50,6 @@ export class FormatService {
     const m: Record<GroupStatus, string> = {
       OPEN             : 'badge-ok',
       THRESHOLD_REACHED: 'badge-gold',
-      PAYMENT_PENDING  : 'badge-warn',
-      PROCESSING       : 'badge-cyan',
       COMPLETED        : 'badge-ok',
       CANCELLED        : 'badge-err',
       EXPIRED          : 'badge-grey',
@@ -64,11 +60,9 @@ export class FormatService {
   orderStatusLabel(s: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
       CREATED   : 'Créée',
-      CONFIRMED : 'Confirmée',
       PROCESSING: 'En préparation',
       SHIPPED   : 'Expédiée',
       DELIVERED : 'Livrée',
-      DISPUTED  : 'Litige',
       CANCELLED : 'Annulée',
     };
     return m[s] || s;
@@ -77,11 +71,9 @@ export class FormatService {
   orderStatusClass(s: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
       CREATED   : 'badge-grey',
-      CONFIRMED : 'badge-cyan',
       PROCESSING: 'badge-cyan',
       SHIPPED   : 'badge-gold',
       DELIVERED : 'badge-ok',
-      DISPUTED  : 'badge-err',
       CANCELLED : 'badge-err',
     };
     return m[s] || 'badge-grey';

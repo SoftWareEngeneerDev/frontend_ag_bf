@@ -1,0 +1,64 @@
+.wd-page { }
+
+// ══ HEADER ═══════════════════════════════════════════════════════
+.wd-title {
+  font-size: 20px; font-weight: 700; margin-bottom: 4px;
+  i { margin-right: 8px; color: var(--primary); }
+}
+.wd-sub { font-size: 13px; }
+
+// ══ FORMULAIRE ═══════════════════════════════════════════════════
+.wd-form-card { transition: none; &:hover { transform: none; } }
+
+.form-title {
+  font-size: 17px; font-weight: 700;
+  i { margin-right: 8px; color: var(--primary); }
+}
+
+.wd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.wd-full { grid-column: 1 / -1; }
+
+.inp-hint { font-size: 12px; margin-top: 4px; display: block; }
+
+// ── Méthodes de paiement ─────────────────────────────────────
+.method-grid {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+
+.pay-opt {
+  flex: 1; min-width: 100px;
+  cursor: pointer;
+  .pay-icon { font-size: 20px; }
+  .pay-label { font-size: 13px; font-weight: 600; }
+}
+
+// ── Bouton ─────────────────────────────────────────────────────
+.wd-actions {
+  display: flex; justify-content: flex-end;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+
+// ══ HISTORIQUE ═══════════════════════════════════════════════════
+.wd-table-wrap { overflow-x: auto; }
+
+.glass {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+// ── Responsive ─────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .wd-grid { grid-template-columns: 1fr; }
+  .wd-full { grid-column: 1; }
+  .wd-actions { flex-direction: column; }
+  .wd-actions button { width: 100%; justify-content: center; }
+  .method-grid { flex-direction: column; }
+  .pay-opt { min-width: unset; }
+}

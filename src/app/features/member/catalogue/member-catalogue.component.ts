@@ -111,8 +111,17 @@ export class MemberCatalogueComponent implements OnInit, OnDestroy {
           this.showJoinModal = false;
           // Recharger pour mettre à jour les compteurs
           this.loadGroups();
-          // Rediriger vers paiement
-          setTimeout(() => this.router.navigate(['/member/payment']), 1500);
+          // Rediriger vers paiement avec tous les paramètres requis
+          const g = this.selectedGroup!;
+          setTimeout(() => this.router.navigate(['/member/payment'], {
+            queryParams: {
+              groupId      : result.groupId,
+              depositAmount: result.depositAmount,
+              currentPrice : result.currentPrice,
+              groupTitle   : g.product?.name ?? '',
+              type         : 'DEPOSIT',
+            }
+          }), 1500);
         },
         error: (err) => {
           this.joining2 = false;

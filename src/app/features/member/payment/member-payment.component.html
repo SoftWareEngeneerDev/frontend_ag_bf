@@ -51,7 +51,7 @@
           <div class="font-display font-mono pay-total">{{ finalAmount | currencyXof }}</div>
           <div class="text-muted pay-amount-detail">
             Prix total : {{ group.currentPrice | currencyXof }}
-            <ng-container *ngIf="paymentType === 'FINAL'">
+            <ng-container *ngIf="paymentType === 'FINAL_PAYMENT'">
               &nbsp;−&nbsp;Dépôt déjà payé : {{ group.depositAmount | currencyXof }}
             </ng-container>
           </div>

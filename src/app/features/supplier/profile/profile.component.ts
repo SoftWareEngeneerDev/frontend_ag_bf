@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '..//../../core/services/auth.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { environment } from '../../../../environments/environment.prod';
+import { environment } from '../../../../environments/environment';
 
 // const API = 'http://localhost:3000/api/v1';
 const API          = environment.apiUrl;
@@ -69,7 +69,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // CHARGEMENT DU PROFIL FOURNISSEUR
   // ─────────────────────────────────────────────────────────────
   private loadSupplierProfile(): void {
-    this.http.get<any>(`${API}/suppliers/me`)
+    this.http.get<any>(`${API}/supplier/me`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -115,7 +115,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('logo', file);
 
-    this.http.post<any>(`${API}/suppliers/me/logo`, formData)
+    this.http.post<any>(`${API}/supplier/me/logo`, formData)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -164,7 +164,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       formData.append('documents', doc);
     });
 
-    this.http.post<any>(`${API}/suppliers/me/documents`, formData)
+    this.http.post<any>(`${API}/supplier/me/documents`, formData)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -182,7 +182,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   removeDocument(index: number): void {
     const docUrl = this.existingDocs[index];
-    this.http.delete<any>(`${API}/suppliers/me/documents`, { body: { url: docUrl } })
+    this.http.delete<any>(`${API}/supplier/me/documents`, { body: { url: docUrl } })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -202,7 +202,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.saving || !this.form.companyName.trim()) return;
     this.saving = true;
 
-    this.http.put<any>(`${API}/suppliers/me`, {
+    this.http.put<any>(`${API}/supplier/me`, {
       companyName: this.form.companyName.trim(),
       contactName: this.form.contactName.trim(),
       email: this.form.email.trim() || undefined,
@@ -244,9 +244,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
     this.savingPw = true;
 
-    this.http.put<any>(`${API}/users/me`, {
+    this.http.post<any>(`${API}/users/me/password`, {
       currentPassword: this.pwForm.currentPassword,
-      newPassword: this.pwForm.newPassword
+      newPassword    : this.pwForm.newPassword,
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({

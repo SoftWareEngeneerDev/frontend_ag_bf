@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../core/services/notification.service';
-import { environment } from '../../../../environments/environment';
 
+import { environment } from '../../../../environments/environment';
 const API = environment.apiUrl;
 
 const TYPE_CONFIG: Record<string, { icon: string; color: string; label: string }> = {
@@ -80,32 +80,19 @@ export class AdminNotificationsComponent implements OnInit, OnDestroy {
     if (this.markingAll || this.unread === 0) return;
     this.markingAll = true;
 
-    this.http.patch<any>(`${API}/notifications/read-all`, {})
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.notifications.forEach(n => n.isRead = true);
-          this.unread     = 0;
-          this.markingAll = false;
-          this.notifs.markAllRead();
-          this.showSuccess('Toutes les notifications marquées comme lues');
-        },
-        error: () => { this.markingAll = false; }
-      });
+    this.notifs.markAllRead();
+    this.notifications.forEach(n => n.isRead = true);
+    this.unread     = 0;
+    this.markingAll = false;
+    this.showSuccess('Toutes les notifications marquées comme lues');
   }
 
   // ── Marquer une comme lue ─────────────────────────────────────
   markRead(n: any): void {
     if (n.isRead) return;
-    this.http.patch<any>(`${API}/notifications/${n.id}/read`, {})
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          n.isRead = true;
-          if (this.unread > 0) this.unread--;
-        },
-        error: () => {}
-      });
+    n.isRead = true;
+    if (this.unread > 0) this.unread--;
+    this.notifs.markRead(n.id);
   }
 
   // ── Helpers ───────────────────────────────────────────────────

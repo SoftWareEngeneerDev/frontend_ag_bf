@@ -59,12 +59,15 @@ export class SupplierShellComponent implements OnInit {
   sidebarOpen = false;
 
   navItems: NavItem[] = [
-    { route: '/supplier',          icon: 'fa-solid fa-gauge-high',    label: 'Tableau de bord', exact: true },
-    { route: '/supplier/products', icon: 'fa-solid fa-box-open',      label: 'Mes Produits',    badge: 0 },
-    { route: '/supplier/groups',   icon: 'fa-solid fa-layer-group',   label: 'Mes Groupes',     badge: 0 },
-    { route: '/supplier/orders',   icon: 'fa-solid fa-cart-shopping', label: 'Commandes',       badge: 0, badgeColor: '#FF4D6A' },
-    { route: '/supplier/revenue',  icon: 'fa-solid fa-sack-dollar',   label: 'Revenus' },
-    { route: '/supplier/profile',  icon: 'fa-solid fa-user',          label: 'Mon Profil' },
+    { route: '/supplier',                icon: 'fa-solid fa-gauge-high',          label: 'Tableau de bord',  exact: true },
+    { route: '/supplier/products',       icon: 'fa-solid fa-box-open',            label: 'Mes Produits',     badge: 0 },
+    { route: '/supplier/groups',         icon: 'fa-solid fa-layer-group',         label: 'Mes Groupes',      badge: 0 },
+    { route: '/supplier/orders',         icon: 'fa-solid fa-cart-shopping',       label: 'Commandes',        badge: 0, badgeColor: '#FF4D6A' },
+    { route: '/supplier/revenue',        icon: 'fa-solid fa-sack-dollar',         label: 'Revenus' },
+    { route: '/supplier/reviews',        icon: 'fa-solid fa-star',               label: 'Avis reçus' },
+    { route: '/supplier/notifications',  icon: 'fa-solid fa-bell',               label: 'Notifications',    badge: 0, badgeColor: '#FF4D6A' },
+    { route: '/supplier/withdrawal',     icon: 'fa-solid fa-money-bill-transfer', label: 'Retrait' },
+    { route: '/supplier/profile',        icon: 'fa-solid fa-user',                label: 'Mon Profil' },
   ];
 
   constructor(private http: HttpClient) {}
@@ -73,28 +76,32 @@ export class SupplierShellComponent implements OnInit {
 
   private loadBadges(): void {
     forkJoin({
-      groups  : this.http.get<any>(`${API}/supplier/groups`,   { params: { limit: '100' } }).pipe(catchError(() => of(null))),
-      orders  : this.http.get<any>(`${API}/supplier/orders`,   { params: { limit: '100' } }).pipe(catchError(() => of(null))),
-      products: this.http.get<any>(`${API}/supplier/products`, { params: { status: 'PENDING_APPROVAL' } }).pipe(catchError(() => of(null))),
-    }).subscribe(({ groups, orders, products }) => {
+      groups       : this.http.get<any>(`${API}/supplier/groups`,   { params: { limit: '100' } }).pipe(catchError(() => of(null))),
+      orders       : this.http.get<any>(`${API}/supplier/orders`,   { params: { limit: '100' } }).pipe(catchError(() => of(null))),
+      products     : this.http.get<any>(`${API}/supplier/products`, { params: { status: 'PENDING_APPROVAL' } }).pipe(catchError(() => of(null))),
+      notifications: this.http.get<any>(`${API}/notifications`,     { params: { limit: '1' } }).pipe(catchError(() => of(null))),
+    }).subscribe(({ groups, orders, products, notifications }) => {
 
-      // Badge groupes actifs
+      // [1] Badge produits en attente de validation admin
+      const productList = products?.data ?? [];
+      this.navItems[1].badge = productList.length || 0;
+
+      // [2] Badge groupes actifs
       const groupList = groups?.data ?? [];
       this.navItems[2].badge = groupList.filter((g: any) =>
         ['OPEN', 'THRESHOLD_REACHED'].includes(g.status)
       ).length || 0;
 
-      // Badge commandes urgentes
+      // [3] Badge commandes urgentes
       const orderList = orders?.data ?? [];
-      const urgent = orderList.filter((o: any) =>
-        ['CREATED', 'CONFIRMED'].includes(o.status)
-      ).length;
+      const urgent = orderList.filter((o: any) => o.status === 'CREATED').length;
       this.navItems[3].badge      = urgent;
       this.navItems[3].badgeColor = urgent > 0 ? '#FF4D6A' : undefined;
 
-      // Badge produits en attente de validation admin
-      const productList = products?.data ?? [];
-      this.navItems[1].badge = productList.length || 0;
+      // [6] Badge notifications non lues
+      const unread = notifications?.data?.unreadCount ?? 0;
+      this.navItems[6].badge      = unread || 0;
+      this.navItems[6].badgeColor = unread > 0 ? '#FF4D6A' : undefined;
     });
   }
 }

@@ -33,7 +33,7 @@
 .hp-c2 {
   width: 320px; height: 320px;
   bottom: -140px; left: -80px;
-  background: rgba(13,164,135,.06);
+  background: rgba(13,92,74,.06);
 }
 
 /* Réseau décoratif style molécule (coin droit) */
@@ -198,7 +198,7 @@
 .ps-title-block { margin-bottom: 16px; }
 .ps-title {
   font-size: clamp(18px, 2.8vw, 26px);
-  font-weight: 900; color: #1a1a2e;
+  font-weight: 900; color: var(--dark);
   letter-spacing: -.3px; margin: 0;
 }
 
@@ -226,7 +226,7 @@
     background: var(--primary);
     border-color: var(--primary);
     color: #fff;
-    box-shadow: 0 3px 12px rgba(13,164,135,.3);
+    box-shadow: 0 3px 12px rgba(13,92,74,.3);
   }
 }
 
@@ -259,7 +259,7 @@
 
   &:hover {
     background: var(--primary); color: #fff;
-    box-shadow: 0 6px 22px rgba(13,164,135,.28);
+    box-shadow: 0 6px 22px rgba(13,92,74,.28);
     transform: translateY(-2px);
   }
 }
@@ -313,7 +313,7 @@
 .tb-orange   { &:hover { color: #FF6600; i { color: #FF6600; } } }
 .tb-moov     { &:hover { color: #0066CC; i { color: #0066CC; } } }
 .tb-cinetpay { &:hover { color: #1B4FA0; i { color: #1B4FA0; } } }
-.tb-secure   { &:hover { color: #0DA487; i { color: #0DA487; } } }
+.tb-secure   { &:hover { color: var(--primary-light); i { color: var(--primary-light); } } }
 
 /* ══ CATÉGORIES ═════════════════════════════════════════════════ */
 .cat-grid {

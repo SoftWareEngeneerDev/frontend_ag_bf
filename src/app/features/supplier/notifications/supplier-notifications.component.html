@@ -1,0 +1,75 @@
+<div class="page-wrap">
+
+  <!-- En-tête -->
+  <div class="flex-between" style="margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="font-display" style="font-size:22px;font-weight:800;margin:0">
+        Notifications
+        <span *ngIf="unreadCount > 0"
+              style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#FF4D6A;color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-left:8px;vertical-align:middle">
+          {{ unreadCount > 9 ? '9+' : unreadCount }}
+        </span>
+      </h1>
+      <p class="text-muted" style="margin:4px 0 0">Alertes et mises à jour de votre espace</p>
+    </div>
+    <button *ngIf="unreadCount > 0"
+            class="btn-ghost btn-round" (click)="markAllRead()" [disabled]="markingAll">
+      <i *ngIf="markingAll" class="fa-solid fa-spinner fa-spin"></i>
+      <i *ngIf="!markingAll" class="fa-solid fa-check-double"></i>
+      {{ markingAll ? 'En cours...' : 'Tout marquer lu' }}
+    </button>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="loading" style="text-align:center;padding:60px 0">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size:28px;color:var(--primary)"></i>
+    <p class="text-muted" style="margin-top:12px">Chargement...</p>
+  </div>
+
+  <!-- Aucune notification -->
+  <div *ngIf="!loading && notifications.length === 0"
+       class="glass" style="text-align:center;padding:60px 24px;border-radius:20px">
+    <div style="font-size:48px;margin-bottom:16px">🔔</div>
+    <h3 style="margin:0 0 8px;font-size:18px">Aucune notification</h3>
+    <p class="text-muted" style="margin:0">Vous serez alerté ici pour vos commandes, groupes et paiements.</p>
+  </div>
+
+  <!-- Liste -->
+  <div *ngIf="!loading && notifications.length > 0" style="display:flex;flex-direction:column;gap:8px">
+    <div *ngFor="let n of notifications; trackBy: trackById"
+         class="glass notif-row"
+         [class.unread]="!n.isRead"
+         (click)="markRead(n)">
+
+      <div class="notif-icon" [style.background]="notifColor(n.type) + '22'">
+        <i [class]="notifIcon(n.type)" [style.color]="notifColor(n.type)"></i>
+      </div>
+
+      <div class="notif-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <span style="font-weight:600;font-size:14px">{{ n.title }}</span>
+          <span class="text-muted" style="font-size:11px;white-space:nowrap">
+            {{ n.createdAt | date:'dd/MM HH:mm' }}
+          </span>
+        </div>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--text-2);line-height:1.4">{{ n.body }}</p>
+      </div>
+
+      <div *ngIf="!n.isRead"
+           style="width:8px;height:8px;border-radius:50%;background:#FF4D6A;flex-shrink:0;margin-top:4px"></div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1"
+       class="flex-between" style="margin-top:24px;flex-wrap:wrap;gap:8px">
+    <button class="btn-ghost btn-round" [disabled]="page <= 1" (click)="loadNotifications(page - 1)">
+      <i class="fa-solid fa-chevron-left"></i> Précédent
+    </button>
+    <span class="text-muted" style="font-size:13px">Page {{ page }} / {{ totalPages }}</span>
+    <button class="btn-ghost btn-round" [disabled]="page >= totalPages" (click)="loadNotifications(page + 1)">
+      Suivant <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+</div>

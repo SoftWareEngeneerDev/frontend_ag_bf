@@ -31,7 +31,9 @@
                 "glob": "**/*",
                 "input": "node_modules/@fortawesome/fontawesome-free/webfonts",
                 "output": "/webfonts"
-              }
+              },
+              "src/robots.txt",
+              "src/sitemap.xml"
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
@@ -42,17 +44,17 @@
           "configurations": {
             "production": {
               "budgets": [
-  {
-    "type": "initial",
-    "maximumWarning": "5mb",
-    "maximumError": "10mb"
-  },
-  {
-    "type": "anyComponentStyle",
-    "maximumWarning": "50kb",
-    "maximumError": "100kb"
-  }
-],
+                {
+                  "type": "initial",
+                  "maximumWarning": "5mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "50kb",
+                  "maximumError": "100kb"
+                }
+              ],
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false,

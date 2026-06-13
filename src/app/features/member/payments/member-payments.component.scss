@@ -1,0 +1,115 @@
+.pmts-page {
+  max-width: 760px;
+}
+
+.pmts-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pmts-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  i { margin-right: 8px; color: var(--primary); }
+}
+
+.pmts-sub {
+  font-size: 13px;
+}
+
+/* ── Liste ─────────────────────────────────────────── */
+.pmts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pmts-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  transition: transform 0.15s;
+
+  &:hover { transform: translateY(-1px); }
+}
+
+.pmts-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pmts-icon-emoji {
+  font-size: 22px;
+}
+
+.pmts-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pmts-product {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.pmts-meta {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pmts-ref {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.pmts-right {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.pmts-amount {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pmts-status {
+  font-size: 12px;
+}
+
+/* ── État vide ──────────────────────────────────────── */
+.pmts-empty {
+  padding: 56px 0;
+  border-radius: 16px;
+}
+
+.pmts-empty-icon {
+  font-size: 40px;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .pmts-card    { flex-wrap: wrap; }
+  .pmts-right   { flex: 0 0 100%; text-align: left; margin-top: 6px; }
+  .pmts-amount  { font-size: 15px; }
+}

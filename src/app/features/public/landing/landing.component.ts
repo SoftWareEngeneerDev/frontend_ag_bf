@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GroupService } from '../../../core/services/group.service';
 import { MockDataService } from '../../../core/services/mock-data.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { Group } from '../../../core/models';
 
 @Component({
@@ -35,9 +36,15 @@ export class LandingComponent implements OnInit, OnDestroy {
     private groupService: GroupService,
     public  mock: MockDataService,
     private router: Router,
+    private seo: SeoService,
   ) {}
 
   ngOnInit(): void {
+    this.seo.setPage({
+      title      : 'Accueil — Achats Groupés au Burkina Faso',
+      description: 'Djula Market — Rejoignez des groupes d\'achat et économisez jusqu\'à 40% sur vos achats. Paiement Orange Money, Moov Money, Ligdicash.',
+    });
+
     this.groupService.getAll({ status: 'OPEN' }).subscribe({
       next: (g: Group[]) => {
         this.allGroups = g;

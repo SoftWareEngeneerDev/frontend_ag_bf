@@ -9,10 +9,10 @@ import { environment } from '../../../../environments/environment';
 const API = environment.apiUrl;
 
 const STATUS_MAP: Record<string, string> = {
-  'Approuvés'  : 'ACTIVE',
-  'En attente' : 'PENDING',
+  'Approuvés'  : 'APPROVED',
+  'En attente' : 'PENDING_APPROVAL',
   'Rejetés'    : 'REJECTED',
-  'Archivés'   : 'INACTIVE',
+  'Archivés'   : 'ARCHIVED',
 };
 
 @Component({
@@ -36,7 +36,11 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
   showAddModal   = false;
   showEditModal  = false;
   showGroupModal = false;
+  showStockModal = false;
   selectedProduct: Product | null = null;
+
+  stockForm = { newStock: 0 };
+  savingStock = false;
 
   successMsg = '';
   errorMsg   = '';
@@ -286,6 +290,21 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Supprimer un produit ──────────────────────────────────
+  deleteProduct(p: Product): void {
+    if (!confirm('Supprimer ce produit ? Cette action est irréversible.')) return;
+    this.http.delete(`${API}/supplier/products/${p.id}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.products = this.products.filter(x => x.id !== p.id);
+          this.applyFilter();
+          this.showSuccess('Produit supprimé avec succès');
+        },
+        error: (err) => this.showError(err?.error?.error?.message ?? 'Erreur lors de la suppression'),
+      });
+  }
+
   // ── Créer un groupe depuis un produit ─────────────────────
   createGroupFromProduct(): void {
     if (!this.selectedProduct || this.creatingGroup) return;
@@ -330,6 +349,39 @@ export class SupplierProductsComponent implements OnInit, OnDestroy {
       stock        : p.stock,
     };
     this.showEditModal = true;
+  }
+
+  openStockModal(p: Product): void {
+    this.selectedProduct  = p;
+    this.stockForm.newStock = p.stock;
+    this.showStockModal   = true;
+  }
+
+  saveStock(): void {
+    if (!this.selectedProduct || this.savingStock) return;
+    this.savingStock = true;
+
+    this.http.patch<any>(`${API}/supplier/products/${this.selectedProduct.id}/stock`, {
+      stock: this.stockForm.newStock,
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        if (this.selectedProduct) {
+          this.selectedProduct.stock = this.stockForm.newStock;
+        }
+        this.showStockModal = false;
+        this.savingStock    = false;
+        const warn = this.stockForm.newStock === 0
+          ? 'Stock à 0 — groupes actifs annulés et membres notifiés'
+          : 'Stock mis à jour';
+        this.showSuccess(warn);
+      },
+      error: (err) => {
+        this.savingStock = false;
+        this.showError(err?.error?.error?.message ?? 'Erreur mise à jour stock');
+      }
+    });
   }
 
   openCreateGroup(p: Product): void {

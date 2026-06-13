@@ -5,8 +5,8 @@ import { OrderStatus } from '../../core/models';
 export class OrderStatusLabelPipe implements PipeTransform {
   transform(s: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
-      CREATED:'Créée', CONFIRMED:'Confirmée', PROCESSING:'En préparation',
-      SHIPPED:'Expédiée', DELIVERED:'Livrée', DISPUTED:'Litige', CANCELLED:'Annulée',
+      CREATED:'Créée', PROCESSING:'En préparation',
+      SHIPPED:'Expédiée', DELIVERED:'Livrée', CANCELLED:'Annulée',
     };
     return m[s] || s;
   }

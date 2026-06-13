@@ -1,0 +1,237 @@
+<div class="disputes-page">
+
+  <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
+  <div class="disputes-header mb-24 flex-between">
+    <div>
+      <h2 class="disputes-title">
+        <i class="fa-solid fa-gavel"></i> Mes Litiges
+      </h2>
+      <p class="text-muted disputes-sub">
+        {{ disputes.length }} litige{{ disputes.length !== 1 ? 's' : '' }} au total
+      </p>
+    </div>
+    <button class="btn-primary btn-round" (click)="openForm()" *ngIf="!showForm">
+      <i class="fa-solid fa-plus"></i> Ouvrir un litige
+    </button>
+  </div>
+
+  <!-- ══ ALERTE SUCCÈS ══════════════════════════════════════════ -->
+  <div class="alert alert-primary mb-24" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+
+  <!-- ══ FORMULAIRE NOUVEAU LITIGE ════════════════════════════ -->
+  <div class="card dispute-form-card mb-24 p-24" *ngIf="showForm">
+    <h3 class="form-title mb-20">
+      <i class="fa-solid fa-file-pen"></i> Déclarer un nouveau litige
+    </h3>
+
+    <div class="form-info alert alert-yellow mb-20">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Notre équipe analyse chaque litige sous 24h. Soyez précis dans votre description.</span>
+    </div>
+
+    <div class="form-grid">
+      <!-- ID commande (optionnel) -->
+      <div class="inp-group">
+        <label>ID de commande <span class="text-muted">(optionnel)</span></label>
+        <input class="inp"
+               type="text"
+               placeholder="Ex: a3f2b1c0-..."
+               [(ngModel)]="orderId" />
+      </div>
+
+      <!-- Objet / Raison -->
+      <div class="inp-group form-full">
+        <label>Raison du litige <span class="text-err">*</span></label>
+        <input class="inp"
+               type="text"
+               placeholder="Ex: Produit non conforme à la description"
+               maxlength="200"
+               [(ngModel)]="subject" />
+        <span class="char-count">{{ subject.length }}/200</span>
+      </div>
+
+      <!-- Description -->
+      <div class="inp-group form-full">
+        <label>Description détaillée <span class="text-err">*</span></label>
+        <textarea class="inp inp-area"
+                  placeholder="Décrivez le problème en détail : quand l'avez-vous constaté, quelles preuves avez-vous..."
+                  maxlength="1000"
+                  rows="4"
+                  [(ngModel)]="description"></textarea>
+        <span class="char-count">{{ description.length }}/1000</span>
+      </div>
+    </div>
+
+    <!-- Erreur -->
+    <div class="alert alert-red mt-16" *ngIf="errorMsg">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>{{ errorMsg }}</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions mt-20">
+      <button class="btn-ghost btn-round" (click)="cancelForm()" [disabled]="submitting">
+        <i class="fa-solid fa-xmark"></i> Annuler
+      </button>
+      <button class="btn-primary btn-round"
+              (click)="submitDispute()"
+              [disabled]="!subject.trim() || !description.trim() || submitting">
+        <i [class]="submitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-paper-plane'"></i>
+        {{ submitting ? 'Envoi...' : 'Soumettre le litige' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ ONGLETS ════════════════════════════════════════════════ -->
+  <div class="tab-nav mb-24">
+    <button
+      class="tab-btn"
+      *ngFor="let t of tabs"
+      [class.active]="activeTab === t.key"
+      (click)="setTab(t.key)">
+      <i [class]="t.icon"></i>
+      {{ t.label }}
+      <span class="tab-count" *ngIf="tabCount(t.key) > 0">{{ tabCount(t.key) }}</span>
+    </button>
+  </div>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <app-loading-spinner *ngIf="loading" [full]="true"></app-loading-spinner>
+
+  <!-- ══ ÉTAT VIDE ══════════════════════════════════════════════ -->
+  <app-empty-state
+    *ngIf="!loading && filtered.length === 0"
+    icon="fa-solid fa-gavel"
+    [title]="activeTab === 'all' ? 'Aucun litige' : 'Aucun litige dans cette catégorie'"
+    [description]="activeTab === 'all'
+      ? 'Vous n\'avez ouvert aucun litige pour le moment.'
+      : 'Changez de filtre pour voir vos autres litiges.'">
+    <button class="btn-primary btn-round" (click)="openForm()" *ngIf="!showForm">
+      <i class="fa-solid fa-plus"></i> Ouvrir un litige
+    </button>
+  </app-empty-state>
+
+  <!-- ══ LISTE DES LITIGES ══════════════════════════════════════ -->
+  <div class="disputes-list" *ngIf="!loading && filtered.length > 0">
+    <div class="card dispute-card" *ngFor="let d of filtered; trackBy: trackById">
+
+      <!-- ── En-tête ─────────────────────────────────────────── -->
+      <div class="d-head">
+        <div class="d-head-left">
+          <div class="d-icon">
+            <i [class]="statusIcon(d.status)"></i>
+          </div>
+          <div class="d-info">
+            <div class="d-subject">{{ d.subject }}</div>
+            <div class="d-ref text-muted">
+              <i class="fa-solid fa-hashtag"></i>
+              <span class="font-mono">{{ d.id | slice:0:8 }}...</span>
+              <span class="d-sep">·</span>
+              <i class="fa-regular fa-calendar"></i>
+              {{ d.createdAt | date:'dd MMM yyyy' }}
+            </div>
+            <div class="d-meta text-muted" *ngIf="d.orderId">
+              <i class="fa-solid fa-box"></i> Commande : <span class="font-mono">{{ d.orderId | slice:0:8 }}...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-head-right">
+          <span [class]="statusClass(d.status)" class="d-status">
+            <i [class]="statusIcon(d.status)"></i>
+            {{ statusLabel(d.status) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Description ────────────────────────────────────── -->
+      <div class="d-desc">{{ d.description }}</div>
+
+      <!-- ── Résolution ─────────────────────────────────────── -->
+      <div class="alert alert-primary d-resolution" *ngIf="d.resolution">
+        <i class="fa-solid fa-gavel"></i>
+        <div>
+          <div class="d-res-title">Décision de l'équipe</div>
+          <div class="d-res-body">{{ d.resolution }}</div>
+        </div>
+      </div>
+
+      <!-- ── Bouton détail ──────────────────────────────────── -->
+      <div class="d-footer">
+        <button class="btn-ghost btn-sm btn-round" (click)="viewDetail(d)">
+          <i class="fa-solid fa-magnifying-glass"></i> Voir le détail
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ PANEL DÉTAIL LITIGE ══════════════════════════════════ -->
+<div class="detail-overlay" *ngIf="selectedDispute || loadingDetail" (click)="closeDetail()">
+  <div class="detail-panel" (click)="$event.stopPropagation()">
+
+    <div class="detail-head">
+      <h3><i class="fa-solid fa-gavel"></i> Détail du litige</h3>
+      <button class="btn-ghost btn-icon" (click)="closeDetail()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="detail-body" *ngIf="loadingDetail">
+      <app-loading-spinner [full]="false"></app-loading-spinner>
+    </div>
+
+    <div class="detail-body" *ngIf="!loadingDetail && selectedDispute">
+
+      <div class="detail-meta mb-16">
+        <span [class]="statusClass(selectedDispute.status)">
+          <i [class]="statusIcon(selectedDispute.status)"></i>
+          {{ statusLabel(selectedDispute.status) }}
+        </span>
+        <span class="text-muted detail-date">
+          <i class="fa-regular fa-calendar"></i>
+          {{ selectedDispute.createdAt | date:'dd MMMM yyyy' }}
+        </span>
+      </div>
+
+      <div class="detail-row mb-12">
+        <span class="detail-label">Référence</span>
+        <span class="font-mono">{{ selectedDispute.id | slice:0:16 }}...</span>
+      </div>
+
+      <div class="detail-row mb-12" *ngIf="selectedDispute.orderId">
+        <span class="detail-label">Commande</span>
+        <span class="font-mono">{{ selectedDispute.orderId | slice:0:16 }}...</span>
+      </div>
+
+      <div class="detail-section mb-16">
+        <div class="detail-section-title">Raison du litige</div>
+        <p class="detail-text">{{ selectedDispute.subject }}</p>
+      </div>
+
+      <div class="detail-section mb-16">
+        <div class="detail-section-title">Description</div>
+        <p class="detail-text">{{ selectedDispute.description }}</p>
+      </div>
+
+      <div class="alert alert-primary" *ngIf="selectedDispute.resolution">
+        <i class="fa-solid fa-gavel"></i>
+        <div>
+          <div class="d-res-title">Décision de l'équipe</div>
+          <div class="d-res-body">{{ selectedDispute.resolution }}</div>
+        </div>
+      </div>
+
+      <div class="detail-pending" *ngIf="!selectedDispute.resolution && selectedDispute.status !== 'RESOLVED'">
+        <i class="fa-solid fa-clock"></i>
+        Notre équipe analyse votre litige. Vous serez notifié par SMS dès qu'une décision est prise.
+      </div>
+
+    </div>
+  </div>
+</div>

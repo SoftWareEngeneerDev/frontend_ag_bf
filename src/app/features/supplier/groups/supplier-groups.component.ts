@@ -12,7 +12,6 @@ const API = environment.apiUrl;
 const TAB_STATUS_MAP: Record<string, string> = {
   'Ouverts'       : 'OPEN',
   'Seuil atteint' : 'THRESHOLD_REACHED',
-  'En traitement' : 'PROCESSING',
   'Terminés'      : 'COMPLETED',
 };
 
@@ -27,12 +26,16 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
   myProducts : any[]     = [];
   loading         = true;
   creating        = false;
+  closing         = false;
   activeTab       = 'Tous';
   showCreateModal = false;
+  showCloseModal  = false;
+  selectedGroup   : any = null;
+  closeReason     = '';
   successMsg      = '';
   errorMsg        = '';
 
-  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'En traitement', 'Terminés'];
+  readonly tabs = ['Tous', 'Ouverts', 'Seuil atteint', 'Terminés'];
 
   private destroy$ = new Subject<void>();
 
@@ -128,6 +131,38 @@ export class SupplierGroupsComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.creating = false;
         this.showError(err?.error?.error?.message ?? 'Erreur lors de la création du groupe');
+      }
+    });
+  }
+
+  openCloseModal(g: Group): void {
+    this.selectedGroup = g;
+    this.closeReason   = '';
+    this.showCloseModal = true;
+  }
+
+  closeGroup(): void {
+    if (!this.selectedGroup || this.closing) return;
+    this.closing = true;
+
+    this.http.patch<any>(`${API}/supplier/groups/${this.selectedGroup.id}/close`, {
+      reason: this.closeReason.trim() || undefined,
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.groups = this.groups.map(g =>
+          g.id === this.selectedGroup.id ? { ...g, status: 'CANCELLED' as any } : g
+        );
+        this.applyFilter();
+        this.showCloseModal = false;
+        this.closing        = false;
+        this.selectedGroup  = null;
+        this.showSuccess('Groupe annulé — membres notifiés par SMS et email');
+      },
+      error: (err) => {
+        this.closing = false;
+        this.showError(err?.error?.error?.message ?? 'Erreur lors de la clôture');
       }
     });
   }

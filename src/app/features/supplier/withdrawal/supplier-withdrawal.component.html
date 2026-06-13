@@ -1,0 +1,137 @@
+<div class="wd-page">
+
+  <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
+  <div class="wd-header mb-24">
+    <h2 class="wd-title">
+      <i class="fa-solid fa-money-bill-transfer"></i> Demande de retrait
+    </h2>
+    <p class="text-muted wd-sub">
+      Retirez vos revenus vers votre compte mobile money
+    </p>
+  </div>
+
+  <!-- ══ ALERTE SUCCÈS ══════════════════════════════════════════ -->
+  <div class="alert alert-primary mb-24" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>{{ successMsg }}</span>
+  </div>
+
+  <!-- ══ FORMULAIRE ════════════════════════════════════════════ -->
+  <div class="card wd-form-card p-24 mb-24">
+    <h3 class="form-title mb-20">
+      <i class="fa-solid fa-file-invoice-dollar"></i> Nouvelle demande
+    </h3>
+
+    <div class="alert alert-yellow mb-20">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Les demandes sont traitées sous 48h ouvrées. Montant minimum : <strong>1 000 XOF</strong>.</span>
+    </div>
+
+    <div class="wd-grid">
+      <!-- Montant -->
+      <div class="inp-group">
+        <label>Montant à retirer (XOF) <span class="text-err">*</span></label>
+        <input class="inp"
+               type="number"
+               placeholder="Ex: 50000"
+               min="1000"
+               step="500"
+               [(ngModel)]="amount" />
+        <span class="inp-hint text-muted" *ngIf="+amount > 0 && +amount < 1000">
+          <i class="fa-solid fa-triangle-exclamation text-err"></i> Minimum 1 000 XOF
+        </span>
+      </div>
+
+      <!-- Méthode de paiement -->
+      <div class="inp-group">
+        <label>Méthode de retrait <span class="text-err">*</span></label>
+        <div class="method-grid">
+          <label class="pay-opt"
+                 *ngFor="let m of methods"
+                 [class.selected]="method === m.value">
+            <input type="radio"
+                   name="method"
+                   [value]="m.value"
+                   [(ngModel)]="method"
+                   style="display:none" />
+            <span class="pay-icon">{{ m.icon }}</span>
+            <span class="pay-label">{{ m.label }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Numéro de compte -->
+      <div class="inp-group wd-full">
+        <label>Numéro {{ methodLabel(method) }} <span class="text-err">*</span></label>
+        <input class="inp"
+               type="text"
+               [placeholder]="'Ex: +22670' + (method === 'ORANGE_MONEY' ? '123456' : (method === 'MOOV_MONEY' ? '654321' : '111222'))"
+               [(ngModel)]="accountInfo" />
+      </div>
+    </div>
+
+    <!-- Erreur -->
+    <div class="alert alert-red mt-16" *ngIf="errorMsg">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>{{ errorMsg }}</span>
+    </div>
+
+    <!-- Bouton -->
+    <div class="wd-actions mt-20">
+      <button class="btn-primary btn-round"
+              (click)="submitWithdrawal()"
+              [disabled]="!canSubmit">
+        <i [class]="submitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-paper-plane'"></i>
+        {{ submitting ? 'Envoi...' : 'Soumettre la demande' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ HISTORIQUE ═════════════════════════════════════════════ -->
+  <div class="glass p-24">
+    <h3 class="font-display" style="font-size:15px;font-weight:700;margin-bottom:20px">
+      <i class="fa-solid fa-clock-rotate-left"></i> Historique des retraits
+    </h3>
+
+    <app-loading-spinner *ngIf="loading" [full]="false"></app-loading-spinner>
+
+    <app-empty-state
+      *ngIf="!loading && requests.length === 0"
+      icon="fa-solid fa-money-bill-transfer"
+      title="Aucune demande"
+      description="Vous n'avez pas encore soumis de demande de retrait.">
+    </app-empty-state>
+
+    <div class="wd-table-wrap" *ngIf="!loading && requests.length > 0">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Méthode</th>
+            <th>Compte</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of requests; trackBy: trackById">
+            <td class="text-muted" style="font-size:12px">
+              {{ r.createdAt | date:'dd/MM/yyyy' }}
+            </td>
+            <td class="font-mono" style="font-weight:700;color:var(--primary)">
+              {{ r.amount | number:'1.0-0' }} XOF
+            </td>
+            <td>{{ methodLabel(r.method) }}</td>
+            <td class="font-mono text-muted" style="font-size:12px">{{ r.accountInfo }}</td>
+            <td>
+              <span [class]="statusClass(r.status)">
+                {{ statusLabel(r.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

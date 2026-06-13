@@ -179,14 +179,26 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // ── Changer le mot de passe ───────────────────────────────────
   changePassword(): void {
     if (this.passwordForm.invalid) { this.passwordForm.markAllAsTouched(); return; }
-    const { newPassword, confirmPassword } = this.passwordForm.value;
+    const { currentPassword, newPassword, confirmPassword } = this.passwordForm.value;
     if (newPassword !== confirmPassword) {
       this.showError('Les mots de passe ne correspondent pas.');
       return;
     }
-    // TODO: câbler l'endpoint changePassword quand disponible
-    this.showSuccess('Mot de passe mis à jour !');
-    this.passwordForm.reset();
+
+    this.saving = true;
+    this.http.post<any>(`${API}/users/me/password`, { currentPassword, newPassword })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.passwordForm.reset();
+          this.showSuccess('Mot de passe modifié. Reconnectez-vous si demandé.');
+        },
+        error: (err) => {
+          this.saving = false;
+          this.showError(err?.error?.error?.message ?? 'Mot de passe actuel incorrect.');
+        },
+      });
   }
 
   // ── Notifications ─────────────────────────────────────────────

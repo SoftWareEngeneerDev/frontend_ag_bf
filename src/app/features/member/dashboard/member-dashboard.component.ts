@@ -117,7 +117,7 @@ export class MemberDashboardComponent implements OnInit, OnDestroy {
       color  : this.notifColor(n.type),
       time   : new Date(n.createdAt).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }),
       text   : n.title + (n.body ? ' — ' + n.body : ''),
-      action : n.type === 'THRESHOLD_REACHED' ? 'Payer' : '',
+      action : n.type === 'GROUP_SUCCESS' ? 'Payer' : '',
     }));
   }
 
@@ -171,30 +171,26 @@ export class MemberDashboardComponent implements OnInit, OnDestroy {
   // ── Icônes et couleurs notifications ─────────────────────────
   private notifIcon(type: NotifType | string): string {
     const map: Record<string, string> = {
-      NEW_MEMBER       : 'fa-solid fa-user-plus',
-      THRESHOLD_REACHED: 'fa-solid fa-fire',
-      GROUP_EXPIRED    : 'fa-solid fa-times-circle',
-      PAYMENT_REMINDER : 'fa-solid fa-credit-card',
-      PAYMENT_SUCCESS  : 'fa-solid fa-circle-check',
-      ORDER_SHIPPED    : 'fa-solid fa-truck-fast',
-      ORDER_DELIVERED  : 'fa-solid fa-box-open',
-      PROMO            : 'fa-solid fa-tag',
-      SYSTEM           : 'fa-solid fa-bell',
+      NEW_MEMBER     : 'fa-solid fa-user-plus',
+      PRICE_DROP     : 'fa-solid fa-tag',
+      GROUP_SUCCESS  : 'fa-solid fa-fire',
+      GROUP_FAILED   : 'fa-solid fa-times-circle',
+      PAYMENT_DUE    : 'fa-solid fa-credit-card',
+      DELIVERY_UPDATE: 'fa-solid fa-truck-fast',
+      SYSTEM         : 'fa-solid fa-bell',
     };
     return map[type] ?? 'fa-solid fa-bell';
   }
 
   private notifColor(type: NotifType | string): string {
     const map: Record<string, string> = {
-      NEW_MEMBER       : '#0DA487',
-      THRESHOLD_REACHED: '#F4A902',
-      GROUP_EXPIRED    : '#FF4D6A',
-      PAYMENT_REMINDER : '#F4A902',
-      PAYMENT_SUCCESS  : '#10D98B',
-      ORDER_SHIPPED    : '#00D4FF',
-      ORDER_DELIVERED  : '#10D98B',
-      PROMO            : '#7B2FBE',
-      SYSTEM           : '#7B2FBE',
+      NEW_MEMBER     : '#0DA487',
+      PRICE_DROP     : '#F4A902',
+      GROUP_SUCCESS  : '#F4A902',
+      GROUP_FAILED   : '#FF4D6A',
+      PAYMENT_DUE    : '#F4A902',
+      DELIVERY_UPDATE: '#00D4FF',
+      SYSTEM         : '#7B2FBE',
     };
     return map[type] ?? '#7B2FBE';
   }

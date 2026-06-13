@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { environment } from '../../../../environments/environment';
 
+import { environment } from '../../../../environments/environment';
 const API = environment.apiUrl;
 
 @Component({
@@ -139,8 +139,7 @@ export class AdminProfileComponent implements OnInit, OnDestroy {
     }
     this.savingPw = true;
 
-    // Utilise PUT /users/me avec les champs password
-    this.http.put<any>(`${API}/users/me`, {
+    this.http.post<any>(`${API}/users/me/password`, {
       currentPassword: this.pwForm.currentPassword,
       newPassword    : this.pwForm.newPassword,
     })

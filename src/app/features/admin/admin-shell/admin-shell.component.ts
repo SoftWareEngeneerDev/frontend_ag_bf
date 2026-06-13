@@ -77,8 +77,11 @@ export class AdminShellComponent implements OnInit, OnDestroy {
     { route: '/admin/categories',   icon: 'fa-solid fa-tags',         label: 'Catégories' },
     { route: '/admin/groups',       icon: 'fa-solid fa-layer-group',  label: 'Groupes' },
     { separator: true, route: '', icon: '', label: '' },
-    { route: '/admin/payments',     icon: 'fa-solid fa-credit-card',  label: 'Paiements' },
-    { route: '/admin/disputes',     icon: 'fa-solid fa-gavel',        label: 'Litiges',        badge: 0, badgeColor: '#E63946' },
+    { route: '/admin/payments',     icon: 'fa-solid fa-credit-card',        label: 'Paiements' },
+    { route: '/admin/withdrawals',  icon: 'fa-solid fa-money-bill-transfer', label: 'Retraits',       badge: 0, badgeColor: '#F4A902' },
+    { route: '/admin/disputes',     icon: 'fa-solid fa-gavel',              label: 'Litiges',        badge: 0, badgeColor: '#E63946' },
+    { separator: true, route: '', icon: '', label: '' },
+    { route: '/admin/deliverers',   icon: 'fa-solid fa-motorcycle',   label: 'Livreurs' },
     { separator: true, route: '', icon: '', label: '' },
     { route: '/admin/analytics',    icon: 'fa-solid fa-chart-line',   label: 'Analytics' },
     { route: '/admin/logs',         icon: 'fa-solid fa-scroll',       label: 'Logs système' },
@@ -94,10 +97,10 @@ export class AdminShellComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           if (!data) return;
-          this.navItems[1].badge = data.totalUsers      ?? 0;
+          this.navItems[1].badge = data.totalUsers       ?? 0;
           this.navItems[2].badge = data.pendingSuppliers ?? 0;
           this.navItems[3].badge = data.pendingProducts  ?? 0;
-          this.navItems[8].badge = data.openDisputes     ?? 0;
+          this.navItems[9].badge = data.openDisputes     ?? 0;
           this.openDisputes      = data.openDisputes     ?? 0;
         },
         error: () => {}

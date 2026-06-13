@@ -1,5 +1,13 @@
 <div class="orders-page">
 
+  <!-- ══ MESSAGES ════════════════════════════════════════════════ -->
+  <div class="alert alert-primary mb-20" *ngIf="successMsg">
+    <i class="fa-solid fa-circle-check"></i> {{ successMsg }}
+  </div>
+  <div class="alert alert-red mb-20" *ngIf="errorMsg">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMsg }}
+  </div>
+
   <!-- ══ EN-TÊTE ════════════════════════════════════════════════ -->
   <div class="orders-header mb-24">
     <div>
@@ -117,13 +125,33 @@
         </button>
       </div>
 
+      <!-- ── Bouton livreurs (SHIPPED ou DELIVERED) ───────────── -->
+      <div class="order-actions" *ngIf="o.status === 'SHIPPED' || o.status === 'DELIVERED'">
+        <button class="btn-outline btn-sm btn-round" (click)="openDeliverersModal()">
+          <i class="fa-solid fa-motorcycle"></i> Trouver un livreur
+        </button>
+      </div>
+
       <!-- ── Actions commande livrée ──────────────────────────── -->
       <div class="order-actions" *ngIf="o.status === 'DELIVERED'">
         <button class="btn-outline-primary btn-sm btn-round" (click)="reorder(o)">
           <i class="fa-solid fa-cart-plus"></i> Commander à nouveau
         </button>
-        <button class="btn-primary btn-sm btn-round" (click)="leaveReview(o)">
+        <button class="btn-primary btn-sm btn-round" (click)="openReviewModal(o)">
           <i class="fa-solid fa-star"></i> Laisser un avis
+        </button>
+      </div>
+
+      <!-- ── Actions commande expédiée ───────────────────────── -->
+      <div class="order-actions" *ngIf="o.status === 'SHIPPED'">
+        <button
+          class="btn-ok btn-sm btn-round"
+          [disabled]="confirming === o.id"
+          (click)="confirmDelivery(o)">
+          <i [class]="confirming === o.id
+            ? 'fa-solid fa-spinner fa-spin'
+            : 'fa-solid fa-house-circle-check'"></i>
+          {{ confirming === o.id ? 'Confirmation...' : 'Confirmer la livraison' }}
         </button>
       </div>
 
@@ -138,4 +166,128 @@
     </div>
   </div>
 
+</div>
+
+<!-- ══ MODAL AVIS ══════════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showReviewModal" (click)="showReviewModal = false">
+  <div class="modal-box glass" (click)="$event.stopPropagation()">
+    <div class="modal-head flex-between">
+      <h3 class="font-display" style="font-size:17px;font-weight:700">
+        <i class="fa-solid fa-star" style="color:#F5A623"></i> Laisser un avis
+      </h3>
+      <button class="btn-ghost btn-sm btn-icon" (click)="showReviewModal = false">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Étoiles cliquables -->
+      <div class="inp-group">
+        <label>Note <span style="color:var(--err)">*</span></label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <span *ngFor="let i of [1,2,3,4,5]"
+                style="font-size:28px;cursor:pointer;transition:transform .1s"
+                [style.color]="i <= reviewRating ? '#F5A623' : 'var(--border2)'"
+                (click)="setRating(i)"
+                (mouseenter)="$event.target">
+            ★
+          </span>
+        </div>
+      </div>
+
+      <!-- Commentaire -->
+      <div class="inp-group">
+        <label>Commentaire <span class="text-muted" style="font-weight:400;font-size:12px">(optionnel)</span></label>
+        <textarea class="inp" rows="3" [(ngModel)]="reviewComment"
+                  placeholder="Partagez votre expérience avec ce produit..."
+                  style="resize:vertical">
+        </textarea>
+      </div>
+
+      <div class="flex gap-10">
+        <button class="btn-ghost" style="flex:1;justify-content:center"
+                (click)="showReviewModal = false"
+                [disabled]="savingReview">
+          Annuler
+        </button>
+        <button class="btn-primary btn-round" style="flex:1;justify-content:center"
+                (click)="submitReview()"
+                [disabled]="!reviewRating || savingReview">
+          <i *ngIf="savingReview" class="fa-solid fa-spinner fa-spin"></i>
+          <i *ngIf="!savingReview" class="fa-solid fa-paper-plane"></i>
+          {{ savingReview ? 'Publication...' : 'Publier l\'avis' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL LIVREURS ══════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showDeliverersModal" (click)="closeDeliverersModal()">
+  <div class="modal-box glass" (click)="$event.stopPropagation()">
+
+    <!-- En-tête -->
+    <div class="modal-head flex-between">
+      <h3 class="font-display" style="font-size:17px;font-weight:700">
+        <i class="fa-solid fa-motorcycle" style="color:var(--primary)"></i>
+        Livreurs disponibles
+      </h3>
+      <button class="btn-ghost btn-sm btn-icon" (click)="closeDeliverersModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Corps -->
+    <div class="modal-body">
+
+      <!-- Loading -->
+      <div *ngIf="loadingDeliverers" style="text-align:center;padding:24px">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:28px;color:var(--primary)"></i>
+      </div>
+
+      <!-- Vide -->
+      <div *ngIf="!loadingDeliverers && deliverers.length === 0"
+           style="text-align:center;padding:24px;color:var(--muted)">
+        <i class="fa-solid fa-motorcycle" style="font-size:36px;margin-bottom:12px;display:block;color:var(--border2)"></i>
+        <p style="font-size:14px">Aucun livreur disponible pour le moment.</p>
+      </div>
+
+      <!-- Liste livreurs -->
+      <div class="dlr-list" *ngIf="!loadingDeliverers && deliverers.length > 0">
+        <div class="dlr-item" *ngFor="let d of deliverers">
+
+          <!-- Avatar + infos -->
+          <div class="dlr-left">
+            <div class="dlr-av">
+              <img *ngIf="d.photoUrl" [src]="d.photoUrl" [alt]="d.name" class="dlr-av-img">
+              <span *ngIf="!d.photoUrl" class="dlr-av-init">{{ delivererInitials(d.name) }}</span>
+            </div>
+            <div class="dlr-info">
+              <div class="dlr-name">{{ d.name }}</div>
+              <div class="dlr-zone text-muted">
+                <i class="fa-solid fa-map-pin" style="font-size:10px"></i>
+                {{ d.zone }}
+              </div>
+              <div class="dlr-tarif" *ngIf="d.tarif">
+                <i class="fa-solid fa-coins" style="font-size:10px;color:var(--gold)"></i>
+                <span class="font-mono">{{ d.tarif | number:'1.0-0' }} XOF</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boutons contact -->
+          <div class="dlr-btns">
+            <button class="btn-primary btn-sm btn-round" (click)="callDeliverer(d.phone)" title="Appeler">
+              <i class="fa-solid fa-phone"></i> Appeler
+            </button>
+            <button class="btn-ok btn-sm btn-round" (click)="whatsappDeliverer(d.phone)" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>

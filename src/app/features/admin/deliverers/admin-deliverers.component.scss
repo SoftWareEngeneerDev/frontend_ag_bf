@@ -1,0 +1,91 @@
+.dl-page { display: flex; flex-direction: column; gap: 0; }
+
+// ── Grille ───────────────────────────────────────────────────
+.dl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; gap: 12px; }
+}
+
+// ── Carte ────────────────────────────────────────────────────
+.dl-card { padding: 18px; }
+
+.dl-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+// ── Avatar ───────────────────────────────────────────────────
+.dl-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--primary-l);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.dl-av-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.dl-av-initials {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+
+// ── Infos ────────────────────────────────────────────────────
+.dl-info    { flex: 1; min-width: 0; }
+.dl-name    { font-size: 15px; font-weight: 700; color: var(--txt); margin-bottom: 3px; }
+.dl-phone   { font-size: 12px; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
+.dl-zone    { font-size: 12px; display: flex; align-items: center; gap: 5px; }
+
+.dl-status-badge { flex-shrink: 0; white-space: nowrap; }
+
+// ── Tarif ────────────────────────────────────────────────────
+.dl-tarif {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt);
+  margin-bottom: 8px;
+}
+
+// ── Description ──────────────────────────────────────────────
+.dl-desc {
+  font-size: 12px;
+  line-height: 1.55;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Actions ──────────────────────────────────────────────────
+.dl-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+
+  @media (max-width: 480px) { flex-direction: column; }
+}
+
+// ── Responsive ───────────────────────────────────────────────
+@media (max-width: 600px) {
+  .dl-card { padding: 14px; }
+  .flex-between { flex-wrap: wrap; gap: 10px; }
+  .flex-between .btn-primary { width: 100%; justify-content: center; }
+}

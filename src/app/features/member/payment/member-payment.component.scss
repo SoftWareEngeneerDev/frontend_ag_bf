@@ -13,7 +13,7 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700; color: var(--muted); transition: all var(--t);
   &.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px var(--primary-l); }
-  &.done   { background: var(--ok, #10D98B); border-color: var(--ok, #10D98B); color: #fff; }
+  &.done   { background: var(--ok); border-color: var(--ok); color: #fff; }
 }
 .ps-label  { font-size: 11px; color: var(--muted); }
 .ps-line   { width: 60px; height: 2px; background: var(--border); margin: 0 4px; margin-bottom: 22px; transition: background var(--t); &.done { background: var(--primary); } }
@@ -42,9 +42,9 @@
 .pay-success { padding: 12px 0; }
 .suc-circle {
   width: 90px; height: 90px;
-  background: #E8FDF2; border: 3px solid #10D98B; border-radius: 50%;
+  background: var(--light-bg); border: 3px solid var(--success); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 38px; margin: 0 auto 24px; color: #10D98B;
+  font-size: 38px; margin: 0 auto 24px; color: var(--success);
 }
 .suc-details { padding: 18px; margin-bottom: 24px; text-align: left; }
 .suc-row {
@@ -61,4 +61,8 @@
   .pay-total { font-size: 38px; }
   .pay-card  { padding: 14px; }
   .methods-list .btn { font-size: 13px; padding: 11px 14px; }
+}
+
+@media (max-width: 360px) {
+  .pay-total { font-size: 28px; }
 }

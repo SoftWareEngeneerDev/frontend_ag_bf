@@ -1,0 +1,117 @@
+.disputes-page { }
+
+// ══ HEADER ═══════════════════════════════════════════════════════
+.disputes-title {
+  font-size: 20px; font-weight: 700; margin-bottom: 4px;
+  i { margin-right: 8px; color: var(--primary); }
+}
+.disputes-sub { font-size: 13px; }
+
+// ══ FORMULAIRE ═══════════════════════════════════════════════════
+.dispute-form-card { transition: none; &:hover { transform: none; } }
+
+.form-title {
+  font-size: 17px; font-weight: 700;
+  i { margin-right: 8px; color: var(--primary); }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-full { grid-column: 1 / -1; }
+
+.inp-area {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.char-count {
+  font-size: 11px; color: var(--muted);
+  text-align: right; display: block; margin-top: 3px;
+}
+
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+
+// ══ TAB COUNT BADGE ══════════════════════════════════════════════
+.tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-full); font-size: 10px; font-weight: 700;
+}
+
+// ══ DISPUTE CARD ═════════════════════════════════════════════════
+.disputes-list { display: flex; flex-direction: column; gap: 16px; }
+
+.dispute-card { padding: 22px; transition: transform .2s, box-shadow .2s; }
+
+// ── Header ─────────────────────────────────────────────────────
+.d-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 14px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.d-head-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
+.d-head-right { flex-shrink: 0; }
+
+.d-icon {
+  width: 44px; height: 44px; border-radius: var(--r);
+  background: var(--primary-l); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+
+.d-info { flex: 1; min-width: 0; }
+
+.d-subject {
+  font-size: 15px; font-weight: 700; color: var(--txt);
+  margin-bottom: 5px; word-break: break-word;
+}
+
+.d-ref {
+  font-size: 12px; margin-bottom: 3px;
+  display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+}
+
+.d-sep { color: var(--border2); }
+
+.d-meta {
+  font-size: 12px; display: flex; align-items: center; gap: 5px;
+}
+
+.d-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700; padding: 4px 12px;
+  border-radius: var(--r-full);
+}
+
+// ── Description ────────────────────────────────────────────────
+.d-desc {
+  font-size: 13.5px; color: var(--txt2); line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+// ── Résolution ─────────────────────────────────────────────────
+.d-resolution { margin-top: 6px; }
+
+.d-res-title {
+  font-size: 12px; font-weight: 700; color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.d-res-body { font-size: 13px; }
+
+// ── Responsive ─────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .dispute-card { padding: 14px; }
+  .d-head { flex-direction: column; }
+  .d-head-right { align-self: flex-start; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-actions { flex-direction: column; }
+  .form-actions button { width: 100%; justify-content: center; }
+}
